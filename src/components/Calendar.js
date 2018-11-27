@@ -22,6 +22,9 @@ class Calendar extends Component {
               startAccessor="start"
               endAccessor="end"
               selectable={true}
+              min={new Date(2017, 10, 0, 10, 0, 0)}
+              max={new Date(2017, 10, 0, 22, 0, 0)}
+
           />
       </div>
     );
