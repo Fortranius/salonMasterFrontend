@@ -1,26 +1,30 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import './App.css';
+import Clients from './components/Clients';
+import Masters from './components/Masters';
+import Calendar from "./components/Calendar";
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+        <Router>
+            <div>
+                <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                    <ul className="navbar-nav mr-auto">
+                        <li><Link to={'/'} className="nav-link"> Home </Link></li>
+                        <li><Link to={'/masters'} className="nav-link">Contact</Link></li>
+                        <li><Link to={'/clients'} className="nav-link">About</Link></li>
+                    </ul>
+                </nav>
+                <hr />
+                <Switch>
+                    <Route exact path='/' component={Calendar} />
+                    <Route path='/masters' component={Masters} />
+                    <Route path='/clients' component={Clients} />
+                </Switch>
+            </div>
+        </Router>
     );
   }
 }
