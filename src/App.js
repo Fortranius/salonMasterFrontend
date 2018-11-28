@@ -12,9 +12,9 @@ class App extends Component {
             <div>
                 <nav className="navbar navbar-expand-lg navbar-light bg-light">
                     <ul className="navbar-nav mr-auto">
-                        <li><Link to={'/'} className="nav-link"> Home </Link></li>
-                        <li><Link to={'/masters'} className="nav-link">Contact</Link></li>
-                        <li><Link to={'/clients'} className="nav-link">About</Link></li>
+                        <li><Link to={'/'} className="nav-link">График</Link></li>
+                        <li><Link to={'/masters'} className="nav-link">Мастера</Link></li>
+                        <li><Link to={'/clients'} className="nav-link">Клиенты</Link></li>
                     </ul>
                 </nav>
                 <hr />

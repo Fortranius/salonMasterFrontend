@@ -6,6 +6,7 @@
     "moment": "^2.22.2",
     "react": "^16.6.3",
     "react-big-calendar": "^0.20.2",
+    "react-bootstrap-table-next": "^1.4.1",
     "react-dom": "^16.6.3",
     "react-event-calendar": "^0.3.0",
     "react-router-dom": "^4.3.1",
