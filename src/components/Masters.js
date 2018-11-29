@@ -1,20 +1,40 @@
 import React, {Component} from 'react';
 import '../App.css';
-import BootstrapTable from 'react-bootstrap-table-next';
 import masters from "../data/masters";
-import columsMaster from "../data/columsMaster";
+import TableRemote from "./remote/TableRemote";
+import colMaster from "../data/colMaster";
 
 class Masters extends Component {
 
-    constructor(...args) {
-        super(...args);
-        this.state = {masters}
+    constructor(props) {
+        super(props);
+        this.state = {
+            page: 1,
+            data: masters.slice(0, 10),
+            totalSize: masters.length,
+            sizePerPage: 10
+        };
+        this.handleTableChange = this.handleTableChange.bind(this);
     }
+
+    handleTableChange = (type, { page, sizePerPage }) => {
+        const currentIndex = (page - 1) * sizePerPage;
+        this.setState(() => ({
+            page,
+            data: masters.slice(currentIndex, currentIndex + sizePerPage),
+            sizePerPage
+        }));
+    };
 
     render() {
         return (
             <div>
-                <BootstrapTable keyField='id' data={this.state.masters} columns={columsMaster}/>
+                <TableRemote data={ this.state.data }
+                             page={ this.state.page }
+                             columns={colMaster}
+                             sizePerPage={ this.state.sizePerPage }
+                             totalSize={ this.state.totalSize }
+                             onTableChange={ this.handleTableChange }/>
             </div>
         );
     }

@@ -1,20 +1,40 @@
 import React, {Component} from 'react';
 import '../App.css';
 import clients from "../data/clients";
-import columsClient from "../data/columsClient";
-import BootstrapTable from 'react-bootstrap-table-next';
+import TableRemote from "./remote/TableRemote";
+import colClient from "../data/colClient";
 
 class Clients extends Component {
 
-    constructor(...args) {
-        super(...args);
-        this.state = {clients}
+    constructor(props) {
+        super(props);
+        this.state = {
+            page: 1,
+            data: clients.slice(0, 10),
+            totalSize: clients.length,
+            sizePerPage: 10
+        };
+        this.handleTableChange = this.handleTableChange.bind(this);
     }
+
+    handleTableChange = (type, {page, sizePerPage}) => {
+        const currentIndex = (page - 1) * sizePerPage;
+        this.setState(() => ({
+            page,
+            data: clients.slice(currentIndex, currentIndex + sizePerPage),
+            sizePerPage
+        }));
+    };
 
     render() {
         return (
             <div>
-                <BootstrapTable keyField='id' data={this.state.clients} columns={columsClient}/>
+                <TableRemote data={this.state.data}
+                             page={this.state.page}
+                             columns={colClient}
+                             sizePerPage={this.state.sizePerPage}
+                             totalSize={this.state.totalSize}
+                             onTableChange={this.handleTableChange}/>
             </div>
         );
     }
