@@ -3,6 +3,8 @@ import '../App.css';
 import masters from "../data/masters";
 import TableRemote from "./remote/TableRemote";
 import colMaster from "../data/colMaster";
+import { connect } from 'react-redux';
+import { masterActions } from '../actions/masterActions'
 
 class Masters extends Component {
 
@@ -40,4 +42,8 @@ class Masters extends Component {
     }
 }
 
-export default Masters;
+const mapStateToProps = state => ({
+    data: state.masters
+});
+
+export default connect(mapStateToProps)(Masters);
