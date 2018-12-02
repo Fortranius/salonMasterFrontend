@@ -1,4 +1,4 @@
-import {GET_MASTERS, ADD_MASTER} from "../constants/masterConstants";
+import {GET_MASTERS} from "../constants/masterConstants";
 import {getMasters} from "../service/masterService";
 
 export const getMastersAction = (params) => dispatch => {

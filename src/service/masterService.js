@@ -7,6 +7,12 @@ export function getMasters(params) {
         });
 }
 
+export function removeMaster(master) {
+    return fetch("http://localhost:8080/api/master/" + master, {method: "DELETE"})
+        .then(handleErrors)
+        .then(function(res){ return res })
+}
+
 function handleErrors(response) {
     if (!response.ok) {
         throw Error(response.statusText);

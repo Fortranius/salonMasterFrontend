@@ -6,17 +6,25 @@ import {connect} from 'react-redux';
 import {getMastersAction} from "../actions/masterActions"
 import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
+import {removeMaster} from "../service/masterService";
 
 class Masters extends Component {
 
     constructor(props) {
         super(props);
         this.handleTableChange = this.handleTableChange.bind(this);
+        this.removeMaster = this.removeMaster.bind(this);
         this.props.masterActions(new PageParams(0, 10));
     }
 
     handleTableChange = (type, {page, sizePerPage}) => {
         this.props.masterActions(new PageParams(page - 1, sizePerPage));
+    };
+
+    removeMaster(id) {
+        removeMaster(id).then(() => {
+            this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
+        });
     };
 
     render() {
@@ -26,6 +34,7 @@ class Masters extends Component {
                                                    page={this.props.masters.number + 1}
                                                    columns={colMaster}
                                                    sizePerPage={this.props.masters.size}
+                                                   remove={this.removeMaster}
                                                    totalSize={this.props.masters.totalElements}
                                                    onTableChange={this.handleTableChange}/>
                     : null}
