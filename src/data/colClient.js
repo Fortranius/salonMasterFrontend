@@ -9,31 +9,31 @@ export default [
         sort: true
     },
     {
-        dataField: 'name',
+        dataField: 'person.firstname',
         text: 'Имя',
         filter: textFilter(),
         sort: true
     },
     {
-        dataField: 'surname',
+        dataField: 'person.lastname',
         text: 'Фамилия',
         filter: textFilter(),
         sort: true
     },
     {
-        dataField: 'midname',
+        dataField: 'person.midname',
         text: 'Отчество',
         filter: textFilter(),
         sort: true
     },
     {
-        dataField: 'phone',
+        dataField: 'person.phone',
         text: 'Телефон',
         filter: textFilter(),
         sort: true
     },
     {
-        dataField: 'mail',
+        dataField: 'person.mail',
         text: 'Почта',
         filter: textFilter(),
         sort: true
