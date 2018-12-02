@@ -1,43 +1,47 @@
 import React, {Component} from 'react';
 import '../App.css';
-import clients from "../data/clients";
 import TableRemote from "./remote/TableRemote";
 import colClient from "../data/colClient";
+import PageParams from "../model/PageParams";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {getClientsAction} from "../actions/clientActions";
 
 class Clients extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            page: 1,
-            data: clients.slice(0, 10),
-            totalSize: clients.length,
-            sizePerPage: 10
-        };
         this.handleTableChange = this.handleTableChange.bind(this);
+        this.props.clientActions(new PageParams(0, 10));
     }
 
     handleTableChange = (type, {page, sizePerPage}) => {
-        const currentIndex = (page - 1) * sizePerPage;
-        this.setState(() => ({
-            page,
-            data: clients.slice(currentIndex, currentIndex + sizePerPage),
-            sizePerPage
-        }));
+        this.props.clientActions(new PageParams(page - 1, sizePerPage));
     };
 
     render() {
         return (
             <div>
-                <TableRemote data={this.state.data}
-                             page={this.state.page}
-                             columns={colClient}
-                             sizePerPage={this.state.sizePerPage}
-                             totalSize={this.state.totalSize}
-                             onTableChange={this.handleTableChange}/>
+                {this.props.clients ? <TableRemote data={this.props.clients.content}
+                                                   page={this.props.clients.number + 1}
+                                                   columns={colClient}
+                                                   sizePerPage={this.props.clients.size}
+                                                   totalSize={this.props.clients.totalElements}
+                                                   onTableChange={this.handleTableChange}/>
+                    : null}
             </div>
         );
     }
 }
 
-export default Clients;
+const mapStateToProps = state => ({
+    clients: state.clientReducer.clients
+});
+
+function mapDispatchToProps(dispatch) {
+    return {
+        clientActions: bindActionCreators(getClientsAction, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Clients);

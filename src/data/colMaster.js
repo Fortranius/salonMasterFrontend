@@ -4,23 +4,23 @@ export default [
         text: 'ID'
     },
     {
-        dataField: 'name',
+        dataField: 'person.firstname',
         text: 'Имя'
     },
     {
-        dataField: 'surname',
+        dataField: 'person.lastname',
         text: 'Фамилия'
     },
     {
-        dataField: 'midname',
+        dataField: 'person.midname',
         text: 'Отчество'
     },
     {
-        dataField: 'phone',
+        dataField: 'person.phone',
         text: 'Телефон'
     },
     {
-        dataField: 'mail',
+        dataField: 'person.mail',
         text: 'Почта'
     }
 ]
