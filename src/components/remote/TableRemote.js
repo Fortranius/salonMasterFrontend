@@ -43,6 +43,7 @@ class TableRemote extends Component {
                         Удалить мастера
                     </button>: null }
                 </div>
+                <hr/>
                 <BootstrapTable
                     remote
                     keyField="id"
