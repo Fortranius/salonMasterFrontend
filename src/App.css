@@ -33,4 +33,5 @@
 
 .button-group>button {
   margin-right: 10px;
+  text-align: right;
 }
