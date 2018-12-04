@@ -6,13 +6,14 @@ import filterFactory from 'react-bootstrap-table2-filter';
 
 class TableRemote extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             select: undefined
         };
         this.handleOnSelect = this.handleOnSelect.bind(this);
-        this.removeMaster = this.removeMaster.bind(this);
+        this.removeEntity = this.removeEntity.bind(this);
+        this.updateEntity = this.updateEntity.bind(this);
     }
 
     handleOnSelect = (row) => {
@@ -21,8 +22,12 @@ class TableRemote extends Component {
         });
     };
 
-    removeMaster() {
+    removeEntity() {
         this.props.remove(this.state.select.id);
+    };
+
+    updateEntity() {
+        this.props.update(this.state.select);
     };
 
     render() {
@@ -39,8 +44,11 @@ class TableRemote extends Component {
                     <button className="btn btn-primary">
                         Добавить новго мастера
                     </button>
-                    { this.state.select ? <button onClick = { this.removeMaster } className="btn btn-primary">
-                        Удалить мастера
+                    { this.state.select ? <button onClick = { this.removeEntity } className="btn btn-primary">
+                        Удалить {this.props.entity}
+                    </button>: null }
+                    { this.state.select ? <button onClick = { this.updateEntity } className="btn btn-primary">
+                        Редактировать {this.props.entity}
                     </button>: null }
                 </div>
                 <hr/>

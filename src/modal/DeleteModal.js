@@ -4,37 +4,34 @@ import Modal from 'react-responsive-modal';
 
 class DeleteModal extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-        };
-        this.refusedCloseModal = this.refusedCloseModal.bind(this);
-        this.acceptCloseModal = this.acceptCloseModal.bind(this);
+    constructor() {
+        super();
+        this.refused = this.refused.bind(this);
+        this.accept = this.accept.bind(this);
     }
 
-    refusedCloseModal = () => {
-        this.props.closeDelete();
+    refused = () => {
+        this.props.close();
     };
 
-    acceptCloseModal = () => {
-        this.props.acceptDelete();
+    accept = () => {
+        this.props.accept();
     };
 
     render() {
         return (
             <div>
-                <Modal open={this.props.openDelete}
+                <Modal open={this.props.open}
                        closeOnOverlayClick={false}
                        showCloseIcon={false}
-                       onClose={this.refusedCloseModal}
+                       onClose={this.refused}
                        closeOnEsc={false} center={false}>
                     <h2>Вы действительно хотите удалить {this.props.entity}?</h2>
                     <div className="button-group">
-                        <button className="btn btn-primary" onClick={this.acceptCloseModal}>
+                        <button className="btn btn-primary" onClick={this.accept}>
                             Да
                         </button>
-                        <button className="btn btn-primary" onClick={this.refusedCloseModal}>
+                        <button className="btn btn-primary" onClick={this.refused}>
                             Нет
                         </button>
                     </div>

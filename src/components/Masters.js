@@ -6,8 +6,9 @@ import {connect} from 'react-redux';
 import {getMastersAction} from "../actions/masterActions"
 import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
-import {removeMaster} from "../service/masterService";
+import {removeMaster, updateMaster} from "../service/masterService";
 import DeleteModal from "../modal/DeleteModal";
+import UpdateModal from "../modal/UpdateModal";
 
 class Masters extends Component {
 
@@ -15,26 +16,46 @@ class Masters extends Component {
         super(props);
         this.state = {
             openDelete: false,
-            idDelete: undefined
+            openUpdate: false,
+            row: undefined
         };
         this.handleTableChange = this.handleTableChange.bind(this);
         this.removeMaster = this.removeMaster.bind(this);
         this.onOpenDeleteModal = this.onOpenDeleteModal.bind(this);
         this.onCloseDeleteModal = this.onCloseDeleteModal.bind(this);
+
+        this.updateMaster = this.updateMaster.bind(this);
+        this.onOpenUpdateModal = this.onOpenUpdateModal.bind(this);
+        this.onCloseUpdateModal = this.onCloseUpdateModal.bind(this);
+
         this.props.masterActions(new PageParams(0, 10));
     }
 
-    onOpenDeleteModal (id) {
+    onOpenDeleteModal (row) {
         this.setState({
             openDelete: true,
-            idDelete: id
+            row: row
+        });
+    };
+
+    onOpenUpdateModal (row) {
+        this.setState({
+            openUpdate: true,
+            row: row
         });
     };
 
     onCloseDeleteModal = () => {
         this.setState({
             openDelete: false,
-            idDelete: undefined
+            row: undefined
+        });
+    };
+
+    onCloseUpdateModal = () => {
+        this.setState({
+            openUpdate: false,
+            row: undefined
         });
     };
 
@@ -43,13 +64,27 @@ class Masters extends Component {
     };
 
     removeMaster() {
-        removeMaster(this.state.idDelete).then(() => {
+        removeMaster(this.state.row.id).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({
                 openDelete: false,
-                idDelete: undefined
+                row: undefined
             });
         });
+    };
+
+    updateMaster() {
+        updateMaster(this.state.row).then(() => {
+            this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
+            this.setState({
+                openUpdate: false,
+                row: undefined
+            });
+        });
+    };
+
+    handleUpdateChange = (name, value) => {
+        console.log(value);
     };
 
     render() {
@@ -58,14 +93,23 @@ class Masters extends Component {
                 {this.props.masters ? <TableRemote data={this.props.masters.content}
                                                    page={this.props.masters.number + 1}
                                                    columns={colMaster}
+                                                   entity="мастера"
                                                    sizePerPage={this.props.masters.size}
                                                    remove={this.onOpenDeleteModal}
+                                                   update={this.onOpenUpdateModal}
                                                    totalSize={this.props.masters.totalElements}
                                                    onTableChange={this.handleTableChange}/>
                     : null}
-                <DeleteModal acceptDelete={this.removeMaster}
-                             openDelete={this.state.openDelete}
-                             closeDelete={this.onCloseDeleteModal}
+                <DeleteModal accept={this.removeMaster}
+                             open={this.state.openDelete}
+                             close={this.onCloseDeleteModal}
+                             entity="мастера" />
+
+                <UpdateModal accept={this.updateMaster}
+                             open={this.state.openUpdate}
+                             update={this.state.row}
+                             handleChange={this.handleUpdateChange}
+                             close={this.onCloseUpdateModal}
                              entity="мастера" />
             </div>
         );
