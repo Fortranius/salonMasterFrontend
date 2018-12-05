@@ -46,14 +46,29 @@ class UpdateModal extends Component {
     constructor() {
         super();
         this.state = {
-            phone: '(  )    -    ',
-            name:'',
-            surname:'',
-            patronymic:'',
-            mail:'',
+            person: {
+                phone: '',
+                name:'',
+                surname:'',
+                patronymic:'',
+                mail:'',
+            }
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    componentDidMount() {
+        this.setState({
+            person: {
+                phone: this.props.update.person.phone?this.props.update.person.phone:'',
+                name: this.props.update.person.name?this.props.update.person.name:'',
+                surname: this.props.update.person.surname?this.props.update.person.surname:'',
+                patronymic: this.props.update.person.patronymic?this.props.update.person.patronymic:'',
+                mail: this.props.update.person.mail?this.props.update.person.mail:'',
+            }
+        });
     }
 
     refused = () => {
@@ -61,11 +76,16 @@ class UpdateModal extends Component {
     };
 
     accept = () => {
-        this.props.accept();
+        this.props.accept(this.state);
     };
 
     handleChange = name => event => {
-        this.props.handleChange(name, event.target.value);
+        this.setState({
+            person: {
+                ...this.state.person,
+                [name]: event.target.value
+            }
+        });
     };
 
     render() {
@@ -78,10 +98,10 @@ class UpdateModal extends Component {
                        onClose={this.refused}
                        closeOnEsc={false} center={false}>
                     <h2>Редактирование {this.props.entity}</h2>
-                    { this.props.update ? <div className="form-group">
+                    { this.state.person ? <div className="form-group">
                         <TextField
                             label="Фамилия"
-                            value={this.props.update.surname}
+                            value={this.state.person.surname}
                             onChange={this.handleChange('surname')}
                             className={classes.textField}
                             type="text"
@@ -89,7 +109,7 @@ class UpdateModal extends Component {
                         />
                         <TextField
                             label="Имя"
-                            value={this.props.update.name}
+                            value={this.state.person.name}
                             onChange={this.handleChange('name')}
                             className={classes.textField}
                             type="text"
@@ -97,7 +117,7 @@ class UpdateModal extends Component {
                         />
                         <TextField
                             label="Отчество"
-                            value={this.props.update.patronymic}
+                            value={this.state.person.patronymic}
                             onChange={this.handleChange('patronymic')}
                             className={classes.textField}
                             type="text"
@@ -106,7 +126,7 @@ class UpdateModal extends Component {
                         <FormControl className={classes.formControl}>
                             <InputLabel htmlFor="phone">Телефон</InputLabel>
                             <Input
-                                value={this.props.update.phone}
+                                value={this.state.person.phone}
                                 id="phone"
                                 onChange={this.handleChange('phone')}
                                 inputComponent={PhoneCustom}
@@ -114,7 +134,7 @@ class UpdateModal extends Component {
                         </FormControl>
                         <TextField
                             label="Почта"
-                            value={this.props.update.mail}
+                            value={this.state.person.mail}
                             onChange={this.handleChange('mail')}
                             className={classes.textField}
                             type="text"

@@ -9,19 +9,19 @@ export default [
         sort: true
     },
     {
-        dataField: 'person.firstname',
+        dataField: 'person.name',
         text: 'Имя',
         filter: textFilter(),
         sort: true
     },
     {
-        dataField: 'person.lastname',
+        dataField: 'person.surname',
         text: 'Фамилия',
         filter: textFilter(),
         sort: true
     },
     {
-        dataField: 'person.midname',
+        dataField: 'person.patronymic',
         text: 'Отчество',
         filter: textFilter(),
         sort: true

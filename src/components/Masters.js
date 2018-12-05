@@ -73,8 +73,10 @@ class Masters extends Component {
         });
     };
 
-    updateMaster() {
-        updateMaster(this.state.row).then(() => {
+    updateMaster(entity) {
+        let master = this.state.row;
+        master.person = entity.person;
+        updateMaster(master).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({
                 openUpdate: false,
@@ -105,12 +107,12 @@ class Masters extends Component {
                              close={this.onCloseDeleteModal}
                              entity="мастера" />
 
-                <UpdateModal accept={this.updateMaster}
+                {this.state.row ? <UpdateModal accept={this.updateMaster}
                              open={this.state.openUpdate}
                              update={this.state.row}
                              handleChange={this.handleUpdateChange}
                              close={this.onCloseUpdateModal}
-                             entity="мастера" />
+                             entity="мастера" />: null}
             </div>
         );
     }

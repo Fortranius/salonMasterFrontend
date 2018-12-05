@@ -14,10 +14,14 @@ export function removeMaster(master) {
 }
 
 export function updateMaster(master) {
-    return fetch("http://localhost:8080/api/master", {
+
+    const options = {
         method: "PUT",
-        body: master
-    })
+        headers: new Headers({'content-type': 'application/json'}),
+        body: JSON.stringify(master)
+    };
+
+    return fetch("http://localhost:8080/api/master", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }
