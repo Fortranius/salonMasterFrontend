@@ -60,15 +60,16 @@ class UpdateModal extends Component {
     }
 
     componentDidMount() {
-        this.setState({
-            person: {
-                phone: this.props.update.person.phone?this.props.update.person.phone:'',
-                name: this.props.update.person.name?this.props.update.person.name:'',
-                surname: this.props.update.person.surname?this.props.update.person.surname:'',
-                patronymic: this.props.update.person.patronymic?this.props.update.person.patronymic:'',
-                mail: this.props.update.person.mail?this.props.update.person.mail:'',
-            }
-        });
+        if (this.props.update)
+            this.setState({
+                person: {
+                    phone: this.props.update.person.phone?this.props.update.person.phone:'',
+                    name: this.props.update.person.name?this.props.update.person.name:'',
+                    surname: this.props.update.person.surname?this.props.update.person.surname:'',
+                    patronymic: this.props.update.person.patronymic?this.props.update.person.patronymic:'',
+                    mail: this.props.update.person.mail?this.props.update.person.mail:'',
+                }
+            });
     }
 
     refused = () => {
@@ -97,8 +98,9 @@ class UpdateModal extends Component {
                        showCloseIcon={false}
                        onClose={this.refused}
                        closeOnEsc={false} center={false}>
-                    <h2>Редактирование {this.props.entity}</h2>
-                    { this.state.person ? <div className="form-group">
+                    { this.props.update ? <h2>Редактирование {this.props.entity}</h2>: null }
+                    { !this.props.update ? <h2>Создание {this.props.entity}</h2>: null }
+                    <div className="form-group">
                         <TextField
                             label="Фамилия"
                             value={this.state.person.surname}
@@ -140,7 +142,7 @@ class UpdateModal extends Component {
                             type="text"
                             margin="normal"
                         />
-                    </div>: null }
+                    </div>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
                             Сохранить

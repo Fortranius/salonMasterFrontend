@@ -14,6 +14,7 @@ class TableRemote extends Component {
         this.handleOnSelect = this.handleOnSelect.bind(this);
         this.removeEntity = this.removeEntity.bind(this);
         this.updateEntity = this.updateEntity.bind(this);
+        this.createEntity = this.createEntity.bind(this);
     }
 
     handleOnSelect = (row) => {
@@ -30,6 +31,10 @@ class TableRemote extends Component {
         this.props.update(this.state.select);
     };
 
+    createEntity() {
+        this.props.create();
+    };
+
     render() {
         const selectRow = {
             mode: 'radio',
@@ -41,7 +46,7 @@ class TableRemote extends Component {
         return (
             <div>
                 <div className="button-group">
-                    <button className="btn btn-primary">
+                    <button onClick = { this.createEntity } className="btn btn-primary">
                         Добавить новго мастера
                     </button>
                     { this.state.select ? <button onClick = { this.removeEntity } className="btn btn-primary">

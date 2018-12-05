@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {getMastersAction} from "../actions/masterActions"
 import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
-import {removeMaster, updateMaster} from "../service/masterService";
+import {removeMaster, updateMaster, createMaster} from "../service/masterService";
 import DeleteModal from "../modal/DeleteModal";
 import UpdateModal from "../modal/UpdateModal";
 
@@ -17,9 +17,11 @@ class Masters extends Component {
         this.state = {
             openDelete: false,
             openUpdate: false,
+            openCreate: false,
             row: undefined
         };
         this.handleTableChange = this.handleTableChange.bind(this);
+
         this.removeMaster = this.removeMaster.bind(this);
         this.onOpenDeleteModal = this.onOpenDeleteModal.bind(this);
         this.onCloseDeleteModal = this.onCloseDeleteModal.bind(this);
@@ -27,6 +29,10 @@ class Masters extends Component {
         this.updateMaster = this.updateMaster.bind(this);
         this.onOpenUpdateModal = this.onOpenUpdateModal.bind(this);
         this.onCloseUpdateModal = this.onCloseUpdateModal.bind(this);
+
+        this.createMaster = this.createMaster.bind(this);
+        this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
+        this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
 
         this.props.masterActions(new PageParams(0, 10));
     }
@@ -45,6 +51,12 @@ class Masters extends Component {
         });
     };
 
+    onOpenCreateModal () {
+        this.setState({
+            openCreate: true,
+        });
+    };
+
     onCloseDeleteModal = () => {
         this.setState({
             openDelete: false,
@@ -56,6 +68,12 @@ class Masters extends Component {
         this.setState({
             openUpdate: false,
             row: undefined
+        });
+    };
+
+    onCloseCreateModal = () => {
+        this.setState({
+            openCreate: false
         });
     };
 
@@ -85,8 +103,13 @@ class Masters extends Component {
         });
     };
 
-    handleUpdateChange = (name, value) => {
-        console.log(value);
+    createMaster(entity) {
+        createMaster(entity).then(() => {
+            this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
+            this.setState({
+                openCreate: false
+            });
+        });
     };
 
     render() {
@@ -99,6 +122,7 @@ class Masters extends Component {
                                                    sizePerPage={this.props.masters.size}
                                                    remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}
+                                                   create={this.onOpenCreateModal}
                                                    totalSize={this.props.masters.totalElements}
                                                    onTableChange={this.handleTableChange}/>
                     : null}
@@ -110,9 +134,13 @@ class Masters extends Component {
                 {this.state.row ? <UpdateModal accept={this.updateMaster}
                              open={this.state.openUpdate}
                              update={this.state.row}
-                             handleChange={this.handleUpdateChange}
                              close={this.onCloseUpdateModal}
                              entity="мастера" />: null}
+
+                <UpdateModal accept={this.createMaster}
+                             open={this.state.openCreate}
+                             close={this.onCloseCreateModal}
+                             entity="мастера" />
             </div>
         );
     }

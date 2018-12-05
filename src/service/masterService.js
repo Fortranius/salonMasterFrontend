@@ -14,9 +14,17 @@ export function removeMaster(master) {
 }
 
 export function updateMaster(master) {
+    return sendRequest(master, "PUT");
+}
+
+export function createMaster(master) {
+    return sendRequest(master, "POST");
+}
+
+function sendRequest(master, method) {
 
     const options = {
-        method: "PUT",
+        method: method,
         headers: new Headers({'content-type': 'application/json'}),
         body: JSON.stringify(master)
     };
