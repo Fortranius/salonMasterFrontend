@@ -40,3 +40,7 @@
     margin: 5px;
     text-align: right;
 }
+
+.container>div>div {
+  width: 400px;
+}
