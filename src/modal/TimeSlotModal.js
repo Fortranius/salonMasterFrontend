@@ -3,6 +3,7 @@ import '../App.css';
 import Modal from 'react-responsive-modal';
 import {withStyles} from '@material-ui/core/styles';
 import AsyncSelect from 'react-select/lib/Async';
+import {Dropdown} from 'semantic-ui-react'
 
 const styles = theme => ({
     container: {
@@ -56,7 +57,29 @@ class TimeSlotModal extends Component {
     constructor() {
         super();
         this.state = {
-            inputValue: ''
+            inputValue: '',
+            isFetching: false,
+            multiple: true,
+            search: true,
+            searchQuery: null,
+            value: [],
+            options: [
+                {
+                    "key": "Mrs. Vladimir Hills",
+                    "text": "Mrs. Vladimir Hills",
+                    "value": "mrs_vladimir_hills"
+                },
+                {
+                    "key": "Schuyler Hintz PhD",
+                    "text": "Schuyler Hintz PhD",
+                    "value": "schuyler_hintz_ph_d"
+                },
+                {
+                    "key": "Madisen Johns",
+                    "text": "Madisen Johns",
+                    "value": "madisen_johns"
+                }
+            ]
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -119,6 +142,19 @@ class TimeSlotModal extends Component {
                             loadOptions={loadOptions}
                             defaultOptions
                             onInputChange={this.handleInputChange}
+                        />
+                        <Dropdown
+                            fluid
+                            selection
+                            multiple={false}
+                            search={true}
+                            options={this.state.options}
+                            value={this.state.value}
+                            placeholder='Add Users'
+                            onChange={this.handleChange}
+                            onSearchChange={this.handleSearchChange}
+                            disabled={this.state.isFetching}
+                            loading={this.state.isFetching}
                         />
                         <hr/>
                         </div>: null }

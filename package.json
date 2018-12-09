@@ -24,7 +24,8 @@
     "react-select": "^2.1.2",
     "react-text-mask": "^5.4.3",
     "redux": "^4.0.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "semantic-ui-react": "^0.83.0"
   },
   "scripts": {
     "start": "react-scripts start",
