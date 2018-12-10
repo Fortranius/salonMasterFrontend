@@ -7,6 +7,24 @@ export function getClients(params) {
         });
 }
 
+export function getClientsByFilter(filter) {
+    return fetch("http://localhost:8080/api/clients/name?filter=" + filter + "&size=100")
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
+export function getClientsByPhone(filter) {
+    return fetch("http://localhost:8080/api/clients/phone/" + filter + "?size=100")
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function removeClient(clientId) {
     return fetch("http://localhost:8080/api/client/" + clientId, {method: "DELETE"})
         .then(handleErrors)
