@@ -3,7 +3,9 @@ import '../App.css';
 import Modal from 'react-responsive-modal';
 import {withStyles} from '@material-ui/core/styles';
 import AsyncPaginate from 'react-select-async-paginate';
-import {getClientsByPhone} from "../service/clientService";
+import {getClientsByFiO, getClientsByPhone} from "../service/clientService";
+import {getMasters, getMastersByFiO} from "../service/masterService";
+import PageParams from "../model/PageParams";
 
 const styles = theme => ({
     container: {
@@ -24,12 +26,42 @@ const styles = theme => ({
     },
 });
 
-async function getOptionClients(search, loadedOptions) {
+async function getOptionClientsByPhone(search, loadedOptions) {
+    if (!search) return;
     const response = await getClientsByPhone(search);
-
     let cachedOptions = response.content.map((d) => ({
         value: d.id,
-        label: d.person.name,
+        label: d.person.phone,
+        person: d
+    }));
+    return {
+        options: cachedOptions,
+        hasMore: true,
+    };
+}
+
+async function getOptionClientsByFIO(search, loadedOptions) {
+    if (!search) return;
+    const response = await getClientsByFiO(search);
+    let cachedOptions = response.content.map((d) => ({
+        value: d.id,
+        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
+        client: d
+    }));
+    return {
+        options: cachedOptions,
+        hasMore: true,
+    };
+}
+
+async function getOptionMastersByFIO(search, loadedOptions) {
+    let response;
+    if (!search) response = await getMasters(new PageParams(0, 100));
+    else response = await getMastersByFiO(search);
+    let cachedOptions = response.content.map((d) => ({
+        value: d.id,
+        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
+        master: d
     }));
     return {
         options: cachedOptions,
@@ -42,11 +74,20 @@ class TimeSlotModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectClient: undefined
+            selectClient: undefined,
+            selectMaster: undefined,
+            selectMasterFio: undefined,
+            selectClientFio: undefined,
+            selectClientPhone: undefined,
+            timeSlot: {
+                selectClient: undefined,
+                selectMaster: undefined,
+            }
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleInputClientChange = this.handleInputClientChange.bind(this);
+        this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
     }
 
     refused = () => {
@@ -54,12 +95,40 @@ class TimeSlotModal extends Component {
     };
 
     accept = () => {
-        this.props.accept(this.state);
+        let timeSlot = {
+            client: this.state.selectClient,
+            master: this.state.selectMaster,
+            startSlot: this.props.start,
+            endSlot: this.props.end,
+            price: 400
+        };
+        this.props.accept(timeSlot);
     };
 
-    handleInputChange = (newValue) => {
+    handleInputClientChange = (newValue) => {
         this.setState({
-            selectClient: newValue
+            selectClient: newValue.client,
+            selectClientFio: {
+                value: newValue.value.id,
+                label: newValue.client.person.name + " " + newValue.client.person.surname + " " + newValue.client.person.patronymic,
+                client: newValue.client
+            },
+            selectClientPhone: {
+                value: newValue.value.id,
+                label: newValue.client.person.phone,
+                client: newValue.client
+            }
+        });
+    };
+
+    handleInputMasterChange = (newValue) => {
+        this.setState({
+            selectMaster: newValue.master,
+            selectMasterFio: {
+                value: newValue.value.id,
+                label: newValue.master.person.name + " " + newValue.master.person.surname + " " + newValue.master.person.patronymic,
+                master: newValue.master
+            }
         });
     };
 
@@ -100,12 +169,56 @@ class TimeSlotModal extends Component {
                             <hr/>
                         </div>
                         <hr/>
+                        <div className="row">
+                            <div className="col-sm">
+                                ФИО клиента:
+                            </div>
+                        </div>
                         <AsyncPaginate
-                            value={this.state.selectClient}
-                            loadOptions={getOptionClients}
-                            onChange={this.handleInputChange}
+                            value={this.state.selectClientFio}
+                            loadOptions={getOptionClientsByFIO}
+                            onChange={this.handleInputClientChange}
                         />
                         <hr/>
+                        <div className="row">
+                            <div className="col-sm">
+                                Телефон клиента:
+                            </div>
+                        </div>
+                        <AsyncPaginate
+                            value={this.state.selectClientPhone}
+                            loadOptions={getOptionClientsByPhone}
+                            onChange={this.handleInputClientChange}
+                        />
+                        <hr/>
+                        <div className="row">
+                            <div className="col-sm">
+                                Мастер:
+                            </div>
+                        </div>
+                        <AsyncPaginate
+                            value={this.state.selectMasterFio}
+                            loadOptions={getOptionMastersByFIO}
+                            onChange={this.handleInputMasterChange}
+                        />
+                        <hr/>
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-sm">
+                                    Цена:
+                                </div>
+                                <div className="col-sm">
+                                    {this.props.start.toLocaleTimeString()}
+                                </div>
+                                <div className="col-sm">
+                                    Услуга:
+                                </div>
+                                <div className="col-sm">
+                                    {this.props.end.toLocaleTimeString()}
+                                </div>
+                            </div>
+                            <hr/>
+                        </div>
                         </div>: null }
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>

@@ -4,6 +4,7 @@ import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import events from '../data/events'
 import TimeSlotModal from "../modal/TimeSlotModal";
+import {createTimeSlot} from "../service/timeSlotService";
 
 class Calendar extends Component {
 
@@ -38,8 +39,12 @@ class Calendar extends Component {
         });
     };
 
-    saveTimeSlot = () => {
-        console.log(this.state);
+    saveTimeSlot(timeSlot) {
+        createTimeSlot(timeSlot).then(() => {
+            this.setState({
+                open: false
+            });
+        });
     };
 
     render() {
