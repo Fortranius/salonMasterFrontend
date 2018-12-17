@@ -27,6 +27,7 @@ class Calendar extends Component {
         this.onOpenTimeSlotModal = this.onOpenTimeSlotModal.bind(this);
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
         this.saveTimeSlot = this.saveTimeSlot.bind(this);
+        this.onNavigate = this.onNavigate.bind(this);
     }
 
     onCloseTimeSlotModal = () => {
@@ -53,6 +54,20 @@ class Calendar extends Component {
         });
     };
 
+    onNavigate(date, view) {
+        let start, end;
+        console.log(date);
+        console.log(view);
+        if (view === 'month') {
+            start = moment(date).startOf('month').startOf('week');
+            end = moment(date).endOf('month').endOf('week');
+            console.log(start);
+            console.log(end);
+        }
+
+        return {start, end};
+    };
+
     render() {
         const localizer = BigCalendar.momentLocalizer(moment);
         return (
@@ -69,6 +84,7 @@ class Calendar extends Component {
                     views={{week: true, day: true}}
                     onSelectEvent={event => alert(event.title)}
                     onSelectSlot={this.onOpenTimeSlotModal}
+                    onNavigate={this.onNavigate}
                 />
                 <TimeSlotModal accept={this.saveTimeSlot}
                                open={this.state.open} start={this.state.timeSlot.start}
