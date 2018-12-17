@@ -4,7 +4,8 @@ import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import events from '../data/events'
 import TimeSlotModal from "../modal/TimeSlotModal";
-import {createTimeSlot} from "../service/timeSlotService";
+import {createTimeSlot, getTimeSlotsByDate} from "../service/timeSlotService";
+import PageParams from "../model/PageParams";
 
 class Calendar extends Component {
 
@@ -18,6 +19,11 @@ class Calendar extends Component {
                 end: undefined
             }
         };
+
+        getTimeSlotsByDate(new Date(), new Date(), new PageParams(0, 10)).then(data => {
+            console.log('11111111 ', data);
+        });
+
         this.onOpenTimeSlotModal = this.onOpenTimeSlotModal.bind(this);
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
         this.saveTimeSlot = this.saveTimeSlot.bind(this);

@@ -7,6 +7,18 @@ export function getTimeSlots(params) {
         });
 }
 
+export function getTimeSlotsByDate(start, end, params) {
+    return fetch("http://localhost:8080/api/timeSlotsByDate?start=" + start +
+        "&end=" + end +
+        "&page=" + params.page +
+        "&size=" + params.size)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function removeTimeSlot(timeSlot) {
     return fetch("http://localhost:8080/api/timeSlot/" + timeSlot, {method: "DELETE"})
         .then(handleErrors)
