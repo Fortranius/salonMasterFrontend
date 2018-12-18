@@ -1,0 +1,1 @@
+export const GET_TIME_SLOTS = "GET_TIME_SLOTS";
