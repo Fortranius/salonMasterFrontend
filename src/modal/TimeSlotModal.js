@@ -92,6 +92,17 @@ class TimeSlotModal extends Component {
 
     refused = () => {
         this.props.close();
+        this.setState({
+            selectClient: undefined,
+            selectMaster: undefined,
+            selectMasterFio: undefined,
+            selectClientFio: undefined,
+            selectClientPhone: undefined,
+            timeSlot: {
+                selectClient: undefined,
+                selectMaster: undefined,
+            }
+        });
     };
 
     accept = () => {
@@ -103,6 +114,18 @@ class TimeSlotModal extends Component {
             price: 400
         };
         this.props.accept(timeSlot);
+
+        this.setState({
+            selectClient: undefined,
+            selectMaster: undefined,
+            selectMasterFio: undefined,
+            selectClientFio: undefined,
+            selectClientPhone: undefined,
+            timeSlot: {
+                selectClient: undefined,
+                selectMaster: undefined,
+            }
+        });
     };
 
     handleInputClientChange = (newValue) => {
