@@ -13,7 +13,6 @@ export default (state = {timeSlots: []}, action) => {
                 };
                 return event;
             });
-            console.log(evants);
             return { ...state, timeSlots:evants};
         default:
             return state

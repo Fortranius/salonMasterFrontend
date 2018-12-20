@@ -6,6 +6,12 @@ import AsyncPaginate from 'react-select-async-paginate';
 import {getClientsByFiO, getClientsByPhone} from "../service/clientService";
 import {getMasters, getMastersByFiO} from "../service/masterService";
 import PageParams from "../model/PageParams";
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from 'react-select';
+import moment from "moment/moment";
+import hoursOptions from '../data/hoursOptions'
+import minutesOptions from '../data/minutesOptions'
 
 const styles = theme => ({
     container: {
@@ -19,10 +25,7 @@ const styles = theme => ({
         width: 200
     },
     formControl: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
-        marginTop: 16,
-        width: 200
+        display: 'flex'
     },
 });
 
@@ -90,31 +93,42 @@ class TimeSlotModal extends Component {
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
     }
 
+    componentDidMount() {
+        let start = moment.unix(this.props.start).toDate();
+        let end = moment.unix(this.props.end).toDate();
+        this.setState({
+            startHour: start.getHours(),
+            startMinutes: start.getMinutes(),
+            endHour: end.getHours(),
+            endMinutes: end.getMinutes()
+        });
+    }
+
     refused = () => {
         this.props.close();
-        this.setState({
-            selectClient: undefined,
-            selectMaster: undefined,
-            selectMasterFio: undefined,
-            selectClientFio: undefined,
-            selectClientPhone: undefined,
-            timeSlot: {
-                selectClient: undefined,
-                selectMaster: undefined,
-            }
-        });
+        this.clear();
     };
 
     accept = () => {
+        this.setState({
+            submit: true
+        });
         let timeSlot = {
             client: this.state.selectClient,
             master: this.state.selectMaster,
-            startSlot: this.props.start,
-            endSlot: this.props.end,
+            startSlot: this.state.startSlot,
+            endSlot: this.state.endSlot,
             price: 400
         };
-        this.props.accept(timeSlot);
 
+        if (!this.state.selectClient || !this.state.selectMaster)
+            return false;
+
+        this.props.accept(timeSlot);
+        this.clear();
+    };
+
+    clear() {
         this.setState({
             selectClient: undefined,
             selectMaster: undefined,
@@ -126,7 +140,7 @@ class TimeSlotModal extends Component {
                 selectMaster: undefined,
             }
         });
-    };
+    }
 
     handleInputClientChange = (newValue) => {
         this.setState({
@@ -155,7 +169,14 @@ class TimeSlotModal extends Component {
         });
     };
 
+    validate(field) {
+        if (!this.state.submit)
+            return false;
+        return (!this.state || !this.state[field]);
+    }
+
     render() {
+        const { classes } = this.props;
         return (
             <div>
                 <Modal open={this.props.open}
@@ -164,8 +185,7 @@ class TimeSlotModal extends Component {
                        onClose={this.refused}
                        closeOnEsc={false} center={false}>
                     { this.props.start ? <div>
-
-                        <div className="container">
+                        <div className="container selectDiv">
                             <div className="row">
                                 <div className="col-sm">
                                     Дата заказа:
@@ -176,17 +196,45 @@ class TimeSlotModal extends Component {
                             </div>
                             <hr/>
                             <div className="row">
-                                <div className="col-sm">
+                                <div className="col-sm-2">
                                     Время начала:
                                 </div>
                                 <div className="col-sm">
-                                    {this.props.start.toLocaleTimeString()}
+                                    <div className="inlineDiv">
+                                        <Select
+                                            value={this.state.startHour}
+                                            options={hoursOptions}
+                                            placeholder={''}
+                                            className='selectStyle'
+                                        />
+                                        <div className="quote">:</div>
+                                        <Select
+                                            value={this.state.startMinutes}
+                                            options={minutesOptions}
+                                            placeholder={''}
+                                            className='selectStyle'
+                                        />
+                                    </div>
                                 </div>
-                                <div className="col-sm">
+                                <div className="col-sm-2">
                                     Время завершения:
                                 </div>
                                 <div className="col-sm">
-                                    {this.props.end.toLocaleTimeString()}
+                                    <div className="inlineDiv">
+                                        <Select
+                                            value={this.state.endHour}
+                                            options={hoursOptions}
+                                            placeholder={''}
+                                            className='selectStyle'
+                                        />
+                                        <div className="quote">:</div>
+                                        <Select
+                                            value={this.state.endMinutes}
+                                            options={minutesOptions}
+                                            placeholder={''}
+                                            className='selectStyle'
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <hr/>
@@ -201,7 +249,11 @@ class TimeSlotModal extends Component {
                             value={this.state.selectClientFio}
                             loadOptions={getOptionClientsByFIO}
                             onChange={this.handleInputClientChange}
+                            placeholder={'Выберите ФИО клиента'}
                         />
+                        <FormControl className={classes.formControl} error={this.validate('selectClient')} aria-describedby="selectClient-error-text">
+                            { this.validate('selectClient') ? <FormHelperText id="selectClient-error-text">Поле не может быть пустым</FormHelperText>: null }
+                        </FormControl>
                         <hr/>
                         <div className="row">
                             <div className="col-sm">
@@ -212,7 +264,11 @@ class TimeSlotModal extends Component {
                             value={this.state.selectClientPhone}
                             loadOptions={getOptionClientsByPhone}
                             onChange={this.handleInputClientChange}
+                            placeholder={'Выберите телефон клиента'}
                         />
+                        <FormControl className={classes.formControl} error={this.validate('selectClientPhone')} aria-describedby="selectClientPhone-error-text">
+                            { this.validate('selectClientPhone') ? <FormHelperText id="selectClientPhone-error-text">Поле не может быть пустым</FormHelperText>: null }
+                        </FormControl>
                         <hr/>
                         <div className="row">
                             <div className="col-sm">
@@ -223,7 +279,11 @@ class TimeSlotModal extends Component {
                             value={this.state.selectMasterFio}
                             loadOptions={getOptionMastersByFIO}
                             onChange={this.handleInputMasterChange}
+                            placeholder={'Выберите мастера'}
                         />
+                        <FormControl className={classes.formControl} error={this.validate('selectMaster')} aria-describedby="selectMaster-error-text">
+                            { this.validate('selectMaster') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
+                        </FormControl>
                         <hr/>
                         <div className="container">
                             <div className="row">
