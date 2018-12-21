@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import '../App.css';
+import '../react-day-picker.css';
 import Modal from 'react-responsive-modal';
 import {withStyles} from '@material-ui/core/styles';
 import AsyncPaginate from 'react-select-async-paginate';
@@ -9,9 +10,15 @@ import PageParams from "../model/PageParams";
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from 'react-select';
-import moment from "moment/moment";
 import hoursOptions from '../data/hoursOptions'
 import minutesOptions from '../data/minutesOptions'
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import NumberFormat from 'react-number-format';
+import TextField from '@material-ui/core/TextField';
+
+import MomentLocaleUtils, {parseDate} from 'react-day-picker/moment';
+
+import 'moment/locale/ru';
 
 const styles = theme => ({
     container: {
@@ -72,6 +79,26 @@ async function getOptionMastersByFIO(search, loadedOptions) {
     };
 }
 
+function NumberFormatCustom(props) {
+    const { inputRef, onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={inputRef}
+            onValueChange={values => {
+                onChange({
+                    target: {
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator
+            prefix="$"
+        />
+    );
+}
+
 class TimeSlotModal extends Component {
 
     constructor(props) {
@@ -85,22 +112,46 @@ class TimeSlotModal extends Component {
             timeSlot: {
                 selectClient: undefined,
                 selectMaster: undefined,
-            }
+            },
+            startHour: { value: 10, label: '10' },
+            startMinutes: { value: 0, label: '00' },
+            endHour: { value: 10, label: '10' },
+            endMinutes: { value: 0, label: '00' },
+            date: new Date(),
+            price: 0
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleInputClientChange = this.handleInputClientChange.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
+
+        this.handleChangeStartHour = this.handleChangeStartHour.bind(this);
+        this.handleChangeStartMinutes = this.handleChangeStartMinutes.bind(this);
+        this.handleChangeEndHour = this.handleChangeEndHour.bind(this);
+        this.handleChangeEndMinutes = this.handleChangeEndMinutes.bind(this);
+        this.handleChangeDate = this.handleChangeDate.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     componentDidMount() {
-        let start = moment.unix(this.props.start).toDate();
-        let end = moment.unix(this.props.end).toDate();
         this.setState({
-            startHour: start.getHours(),
-            startMinutes: start.getMinutes(),
-            endHour: end.getHours(),
-            endMinutes: end.getMinutes()
+            date: this.props.start,
+            startHour: {
+                value: this.props.start.getHours(),
+                label: this.props.start.getHours()
+            },
+            startMinutes: {
+                value: this.props.start.getMinutes(),
+                label: this.props.start.getMinutes().toString().length < 2 ? '0' + this.props.start.getMinutes().toString():this.props.start.getMinutes()
+            },
+            endHour: {
+                value: this.props.end.getHours(),
+                label: this.props.end.getHours()
+            },
+            endMinutes: {
+                value: this.props.end.getMinutes(),
+                label: this.props.end.getMinutes().toString().length < 2 ? '0' + this.props.end.getMinutes().toString():this.props.end.getMinutes()
+            }
         });
     }
 
@@ -113,16 +164,24 @@ class TimeSlotModal extends Component {
         this.setState({
             submit: true
         });
+
+        if (!this.state.selectClient || !this.state.selectMaster || !this.state.date)
+            return false;
+
+        let startDate = new Date(this.state.date);
+        startDate.setHours(this.state.startHour.value);
+        startDate.setMinutes(this.state.startMinutes.value);
+        let endDate = new Date(this.state.date);
+        endDate.setHours(this.state.endHour.value);
+        endDate.setMinutes(this.state.endMinutes.value);
+
         let timeSlot = {
             client: this.state.selectClient,
             master: this.state.selectMaster,
-            startSlot: this.state.startSlot,
-            endSlot: this.state.endSlot,
-            price: 400
+            startSlot: startDate,
+            endSlot: endDate,
+            price: this.state.price
         };
-
-        if (!this.state.selectClient || !this.state.selectMaster)
-            return false;
 
         this.props.accept(timeSlot);
         this.clear();
@@ -135,10 +194,17 @@ class TimeSlotModal extends Component {
             selectMasterFio: undefined,
             selectClientFio: undefined,
             selectClientPhone: undefined,
+            submit: false,
             timeSlot: {
                 selectClient: undefined,
                 selectMaster: undefined,
-            }
+            },
+            startHour: { value: 10, label: '10' },
+            startMinutes: { value: 0, label: '00' },
+            endHour: { value: 10, label: '10' },
+            endMinutes: { value: 0, label: '00' },
+            date: new Date(),
+            price: 0
         });
     }
 
@@ -169,6 +235,39 @@ class TimeSlotModal extends Component {
         });
     };
 
+    handleChangeStartHour = (newValue) => {
+        this.setState({
+            startHour: newValue
+        });
+    };
+    handleChangeStartMinutes = (newValue) => {
+        this.setState({
+            startMinutes: newValue
+        });
+    };
+    handleChangeEndHour = (newValue) => {
+        this.setState({
+            endHour: newValue
+        });
+    };
+    handleChangeEndMinutes = (newValue) => {
+        this.setState({
+            endMinutes: newValue
+        });
+    };
+
+    handleChangeDate = (newValue) => {
+        this.setState({
+            date: newValue
+        });
+    };
+
+    handleChange = name => event => {
+        this.setState({
+            [name]: event.target.value
+        });
+    };
+
     validate(field) {
         if (!this.state.submit)
             return false;
@@ -187,11 +286,19 @@ class TimeSlotModal extends Component {
                     { this.props.start ? <div>
                         <div className="container selectDiv">
                             <div className="row">
-                                <div className="col-sm">
+                                <div className="col-sm-2">
                                     Дата заказа:
                                 </div>
                                 <div className="col-sm">
-                                    {this.props.start.toLocaleDateString()}
+                                    <DayPickerInput
+                                        placeholder={`Дата заказа`}
+                                        parseDate={parseDate}
+                                        value={this.state.date}
+                                        onDayChange={this.handleChangeDate}
+                                        dayPickerProps={{
+                                            locale: 'ru',
+                                            localeUtils: MomentLocaleUtils,
+                                        }}/>
                                 </div>
                             </div>
                             <hr/>
@@ -205,6 +312,7 @@ class TimeSlotModal extends Component {
                                             value={this.state.startHour}
                                             options={hoursOptions}
                                             placeholder={''}
+                                            onChange={this.handleChangeStartHour}
                                             className='selectStyle'
                                         />
                                         <div className="quote">:</div>
@@ -212,6 +320,7 @@ class TimeSlotModal extends Component {
                                             value={this.state.startMinutes}
                                             options={minutesOptions}
                                             placeholder={''}
+                                            onChange={this.handleChangeStartMinutes}
                                             className='selectStyle'
                                         />
                                     </div>
@@ -225,6 +334,7 @@ class TimeSlotModal extends Component {
                                             value={this.state.endHour}
                                             options={hoursOptions}
                                             placeholder={''}
+                                            onChange={this.handleChangeEndHour}
                                             className='selectStyle'
                                         />
                                         <div className="quote">:</div>
@@ -232,6 +342,7 @@ class TimeSlotModal extends Component {
                                             value={this.state.endMinutes}
                                             options={minutesOptions}
                                             placeholder={''}
+                                            onChange={this.handleChangeEndMinutes}
                                             className='selectStyle'
                                         />
                                     </div>
@@ -291,13 +402,20 @@ class TimeSlotModal extends Component {
                                     Цена:
                                 </div>
                                 <div className="col-sm">
-                                    {this.props.start.toLocaleTimeString()}
+                                    <TextField
+                                        className={classes.formControl}
+                                        value={this.state.price}
+                                        onChange={this.handleChange('price')}
+                                        InputProps={{
+                                            inputComponent: NumberFormatCustom,
+                                        }}
+                                    />
                                 </div>
                                 <div className="col-sm">
                                     Услуга:
                                 </div>
                                 <div className="col-sm">
-                                    {this.props.end.toLocaleTimeString()}
+                                    Стрижка
                                 </div>
                             </div>
                             <hr/>

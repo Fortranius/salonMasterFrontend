@@ -41,7 +41,11 @@ class Calendar extends Component {
 
     onCloseTimeSlotModal = () => {
         this.setState({
-            open: false
+            open: false,
+            timeSlot: {
+                start: undefined,
+                end: undefined
+            },
         });
     };
 
@@ -59,7 +63,11 @@ class Calendar extends Component {
         createTimeSlot(timeSlot).then(() => {
             this.props.timeSlotActions(this.state.startWeek, this.state.endWeek, new PageParams(0, 10));
             this.setState({
-                open: false
+                open: false,
+                timeSlot: {
+                    start: undefined,
+                    end: undefined
+                },
             });
         });
     };
@@ -99,16 +107,17 @@ class Calendar extends Component {
                     defaultView={BigCalendar.Views.WEEK}
                     min={new Date(2017, 10, 0, 10, 0, 0)}
                     max={new Date(2017, 10, 0, 22, 0, 0)}
-                    views={{week: true, day: true}}
+                    views={{week: true}}
                     onSelectEvent={event => alert(event.title)}
                     onSelectSlot={this.onOpenTimeSlotModal}
                     onNavigate={this.onNavigate}
+                    messages={{'today': "Текущая неделя", "previous":'Предыдущая неделя', "next":"Следующая неделя"}}
                 />
-                <TimeSlotModal accept={this.saveTimeSlot}
+                {this.state.timeSlot.start ? <TimeSlotModal accept={this.saveTimeSlot}
                                open={this.state.open} start={this.state.timeSlot.start}
                                end={this.state.timeSlot.end}
                                close={this.onCloseTimeSlotModal}
-                               entity="клиента"/>
+                               entity="клиента"/>: null}
             </div>
         );
     }
