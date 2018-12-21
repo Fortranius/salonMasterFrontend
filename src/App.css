@@ -44,3 +44,20 @@
 .container>div>div {
   width: 400px;
 }
+
+.selectDiv>div>div {
+  width: 100px;
+}
+
+.inlineDiv {
+  display: inline-flex;
+}
+
+.selectStyle {
+  border: none;
+  width: 100px;
+}
+
+.quote {
+  margin: 10px;
+}
