@@ -25,10 +25,7 @@ class Calendar extends Component {
 
         this.state = {
             open: false,
-            timeSlot: {
-                start: undefined,
-                end: undefined
-            },
+            event: {},
             startWeek: start,
             endWeek: endFormat
         };
@@ -36,22 +33,27 @@ class Calendar extends Component {
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
         this.saveTimeSlot = this.saveTimeSlot.bind(this);
         this.onNavigate = this.onNavigate.bind(this);
+        this.onSelectEvent = this.onSelectEvent.bind(this);
         this.props.timeSlotActions(start, endFormat, new PageParams(0, 10));
     }
 
     onCloseTimeSlotModal = () => {
         this.setState({
             open: false,
-            timeSlot: {
-                start: undefined,
-                end: undefined
-            },
+            event: {}
+        });
+    };
+
+    onSelectEvent = (event) => {
+        this.setState({
+            event: event,
+            open: true
         });
     };
 
     onOpenTimeSlotModal = ({start, end}) => {
         this.setState({
-            timeSlot: {
+            event: {
                 start: start,
                 end: end
             },
@@ -64,10 +66,7 @@ class Calendar extends Component {
             this.props.timeSlotActions(this.state.startWeek, this.state.endWeek, new PageParams(0, 10));
             this.setState({
                 open: false,
-                timeSlot: {
-                    start: undefined,
-                    end: undefined
-                },
+                event: {}
             });
         });
     };
@@ -108,16 +107,16 @@ class Calendar extends Component {
                     min={new Date(2017, 10, 0, 10, 0, 0)}
                     max={new Date(2017, 10, 0, 22, 0, 0)}
                     views={{week: true}}
-                    onSelectEvent={event => alert(event.title)}
+                    onSelectEvent={this.onSelectEvent}
                     onSelectSlot={this.onOpenTimeSlotModal}
                     onNavigate={this.onNavigate}
                     messages={{'today': "Текущая неделя", "previous":'Предыдущая неделя', "next":"Следующая неделя"}}
                 />
-                {this.state.timeSlot.start ? <TimeSlotModal accept={this.saveTimeSlot}
-                               open={this.state.open} start={this.state.timeSlot.start}
-                               end={this.state.timeSlot.end}
-                               close={this.onCloseTimeSlotModal}
-                               entity="клиента"/>: null}
+                {this.state.event.start ? <TimeSlotModal
+                    accept={this.saveTimeSlot}
+                    event={this.state.event}
+                    open={this.state.open}
+                    close={this.onCloseTimeSlotModal}/>: null}
             </div>
         );
     }

@@ -94,7 +94,7 @@ function NumberFormatCustom(props) {
                 });
             }}
             thousandSeparator
-            prefix="$"
+            prefix="₽"
         />
     );
 }
@@ -109,15 +109,12 @@ class TimeSlotModal extends Component {
             selectMasterFio: undefined,
             selectClientFio: undefined,
             selectClientPhone: undefined,
-            timeSlot: {
-                selectClient: undefined,
-                selectMaster: undefined,
-            },
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
+            id: undefined,
             price: 0
         };
         this.refused = this.refused.bind(this);
@@ -134,24 +131,55 @@ class TimeSlotModal extends Component {
     }
 
     componentDidMount() {
+        let selectMasterFio, selectClientFio, selectClientPhone;
+        if (this.props.event.timeSlot) {
+            selectMasterFio = {
+                value: this.props.event.timeSlot.master.id,
+                label: this.props.event.timeSlot.master.person.name
+                    + " " + this.props.event.timeSlot.master.person.surname
+                    + " " + this.props.event.timeSlot.master.person.patronymic,
+                master: this.props.event.timeSlot.master
+            };
+            selectClientFio = {
+                value: this.props.event.timeSlot.client.id,
+                label: this.props.event.timeSlot.client.person.name
+                    + " " + this.props.event.timeSlot.client.person.surname
+                    + " " + this.props.event.timeSlot.client.person.patronymic,
+                client: this.props.event.timeSlot.client
+            };
+            selectClientPhone = {
+                value: this.props.event.timeSlot.client.id,
+                label: this.props.event.timeSlot.client.person.phone,
+                client: this.props.event.timeSlot.client
+            };
+        }
         this.setState({
-            date: this.props.start,
+            date: this.props.event.start,
+            id: this.props.event.id,
+            price: this.props.event.timeSlot ? this.props.event.timeSlot.price : 0,
             startHour: {
-                value: this.props.start.getHours(),
-                label: this.props.start.getHours()
+                value: this.props.event.start.getHours(),
+                label: this.props.event.start.getHours()
             },
             startMinutes: {
-                value: this.props.start.getMinutes(),
-                label: this.props.start.getMinutes().toString().length < 2 ? '0' + this.props.start.getMinutes().toString():this.props.start.getMinutes()
+                value: this.props.event.start.getMinutes(),
+                label: this.props.event.start.getMinutes().toString().length < 2 ? '0' +
+                    this.props.event.start.getMinutes().toString():this.props.event.start.getMinutes()
             },
             endHour: {
-                value: this.props.end.getHours(),
-                label: this.props.end.getHours()
+                value: this.props.event.end.getHours(),
+                label: this.props.event.end.getHours()
             },
             endMinutes: {
-                value: this.props.end.getMinutes(),
-                label: this.props.end.getMinutes().toString().length < 2 ? '0' + this.props.end.getMinutes().toString():this.props.end.getMinutes()
-            }
+                value: this.props.event.end.getMinutes(),
+                label: this.props.event.end.getMinutes().toString().length < 2 ? '0' +
+                    this.props.event.end.getMinutes().toString():this.props.event.end.getMinutes()
+            },
+            selectMasterFio: selectMasterFio,
+            selectClientFio: selectClientFio,
+            selectClientPhone: selectClientPhone,
+            selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
+            selectMaster: this.props.event.timeSlot ? this.props.event.timeSlot.master : undefined,
         });
     }
 
@@ -176,6 +204,7 @@ class TimeSlotModal extends Component {
         endDate.setMinutes(this.state.endMinutes.value);
 
         let timeSlot = {
+            id: this.state.id,
             client: this.state.selectClient,
             master: this.state.selectMaster,
             startSlot: startDate,
@@ -195,10 +224,6 @@ class TimeSlotModal extends Component {
             selectClientFio: undefined,
             selectClientPhone: undefined,
             submit: false,
-            timeSlot: {
-                selectClient: undefined,
-                selectMaster: undefined,
-            },
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
@@ -283,7 +308,7 @@ class TimeSlotModal extends Component {
                        showCloseIcon={false}
                        onClose={this.refused}
                        closeOnEsc={false} center={false}>
-                    { this.props.start ? <div>
+                    { this.props.event ? <div>
                         <div className="container selectDiv">
                             <div className="row">
                                 <div className="col-sm-2">
