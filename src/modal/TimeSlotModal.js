@@ -131,7 +131,7 @@ class TimeSlotModal extends Component {
     }
 
     componentDidMount() {
-        let selectMasterFio, selectClientFio, selectClientPhone;
+        let selectMasterFio, selectClientFio, selectClientPhone, selectMaster;
         if (this.props.event.timeSlot) {
             selectMasterFio = {
                 value: this.props.event.timeSlot.master.id,
@@ -152,6 +152,7 @@ class TimeSlotModal extends Component {
                 label: this.props.event.timeSlot.client.person.phone,
                 client: this.props.event.timeSlot.client
             };
+            selectMaster = this.props.event.timeSlot ? this.props.event.timeSlot.master : undefined;
         } else if (this.props.selectMaster) {
             selectMasterFio = {
                 value: this.props.selectMaster.master.id,
@@ -160,6 +161,7 @@ class TimeSlotModal extends Component {
                 + " " + this.props.selectMaster.master.person.patronymic,
                 master: this.props.selectMaster.master
             };
+            selectMaster = this.props.selectMaster.master;
         }
         this.setState({
             date: this.props.event.start,
@@ -187,7 +189,7 @@ class TimeSlotModal extends Component {
             selectClientFio: selectClientFio,
             selectClientPhone: selectClientPhone,
             selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
-            selectMaster: this.props.event.timeSlot ? this.props.event.timeSlot.master : undefined,
+            selectMaster: selectMaster
         });
     }
 

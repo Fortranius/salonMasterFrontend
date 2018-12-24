@@ -4,7 +4,7 @@ import moment from "moment/moment";
 export default (state = {timeSlots: []}, action) => {
     switch (action.type) {
         case GET_TIME_SLOTS:
-            let evants = action.payload.content.map(timeSlot => {
+            let evants = action.payload.map(timeSlot => {
                 let event = {
                     id: timeSlot.id,
                     title: timeSlot.master.person.name,

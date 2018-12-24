@@ -39,7 +39,7 @@ class Calendar extends Component {
         end.setSeconds(59);
 
         let start = moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss');
-        let endFormat = moment(moment().startOf('week').isoWeekday(7).toDate()).format('YYYY-MM-DD HH:mm:ss');
+        let endFormat = moment(end).format('YYYY-MM-DD HH:mm:ss');
 
         this.state = {
             open: false,
@@ -96,7 +96,7 @@ class Calendar extends Component {
     };
 
     onNavigate(date, view) {
-        let end = new Date(moment(date).startOf('isoWeek').toDate());
+        let end = new Date(moment(date).endOf('isoWeek').toDate());
         end.setHours(23);
         end.setMinutes(59);
         end.setSeconds(59);
@@ -104,7 +104,11 @@ class Calendar extends Component {
         let start = moment(new Date(moment(date).startOf('isoWeek').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let endFormat = moment(end).format('YYYY-MM-DD HH:mm:ss');
 
-        this.props.timeSlotActions(start, endFormat, this.state.selectMaster.master, new PageParams(0, 100));
+        this.props.timeSlotActions(
+            start,
+            endFormat,
+            this.state.selectMaster ? this.state.selectMaster.master : "",
+            new PageParams(0, 100));
 
         this.setState({
             startWeek: start,
