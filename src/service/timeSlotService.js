@@ -1,23 +1,15 @@
-export function getTimeSlotsByDate(start, end, params) {
+export function getTimeSlotsByDate(start, end, master, params) {
+    let masterId = master ? master.id : "";
     return fetch("http://localhost:8080/api/timeSlotsByDate?start=" + start +
         "&end=" + end +
         "&page=" + params.page +
-        "&size=" + params.size)
+        "&size=" + params.size +
+        "&masterId=" + masterId)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
             return val;
         });
-}
-
-export function removeTimeSlot(timeSlot) {
-    return fetch("http://localhost:8080/api/timeSlot/" + timeSlot, {method: "DELETE"})
-        .then(handleErrors)
-        .then(function(res){ return res })
-}
-
-export function updateTimeSlot(timeSlot) {
-    return sendRequest(timeSlot, "PUT");
 }
 
 export function createTimeSlot(timeSlot) {
