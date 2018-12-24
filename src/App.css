@@ -61,3 +61,11 @@
 .quote {
   margin: 10px;
 }
+
+.show-select-master {
+  z-index: 9999999;
+}
+
+.hide-select-master {
+  z-index: 1;
+}

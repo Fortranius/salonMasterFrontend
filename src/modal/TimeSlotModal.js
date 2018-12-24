@@ -152,6 +152,14 @@ class TimeSlotModal extends Component {
                 label: this.props.event.timeSlot.client.person.phone,
                 client: this.props.event.timeSlot.client
             };
+        } else if (this.props.selectMaster) {
+            selectMasterFio = {
+                value: this.props.selectMaster.master.id,
+                label: this.props.selectMaster.master.person.name
+                + " " + this.props.selectMaster.master.person.surname
+                + " " + this.props.selectMaster.master.person.patronymic,
+                master: this.props.selectMaster.master
+            };
         }
         this.setState({
             date: this.props.event.start,

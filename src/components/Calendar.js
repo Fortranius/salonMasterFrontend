@@ -9,6 +9,24 @@ import 'moment/locale/ru';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {getTimeSlotsByDateAction} from "../actions/timeSlotActions";
+import AsyncPaginate from 'react-select-async-paginate';
+import {getMasters, getMastersByFiO} from "../service/masterService";
+
+
+async function getOptionMasters(search, loadedOptions) {
+    let response;
+    if (!search) response = await getMasters(new PageParams(0, 100));
+    else response = await getMastersByFiO(search);
+    let cachedOptions = response.content.map((d) => ({
+        value: d.id,
+        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
+        master: d
+    }));
+    return {
+        options: cachedOptions,
+        hasMore: true,
+    };
+}
 
 class Calendar extends Component {
 
@@ -27,14 +45,16 @@ class Calendar extends Component {
             open: false,
             event: {},
             startWeek: start,
-            endWeek: endFormat
+            endWeek: endFormat,
+            selectMaster: undefined
         };
         this.onOpenTimeSlotModal = this.onOpenTimeSlotModal.bind(this);
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
         this.saveTimeSlot = this.saveTimeSlot.bind(this);
         this.onNavigate = this.onNavigate.bind(this);
         this.onSelectEvent = this.onSelectEvent.bind(this);
-        this.props.timeSlotActions(start, endFormat, new PageParams(0, 10));
+        this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
+        this.props.timeSlotActions(start, endFormat, undefined, new PageParams(0, 100));
     }
 
     onCloseTimeSlotModal = () => {
@@ -63,7 +83,11 @@ class Calendar extends Component {
 
     saveTimeSlot(timeSlot) {
         createTimeSlot(timeSlot).then(() => {
-            this.props.timeSlotActions(this.state.startWeek, this.state.endWeek, new PageParams(0, 10));
+            this.props.timeSlotActions(
+                this.state.startWeek,
+                this.state.endWeek,
+                this.state.selectMaster.master,
+                new PageParams(0, 100));
             this.setState({
                 open: false,
                 event: {}
@@ -80,11 +104,26 @@ class Calendar extends Component {
         let start = moment(new Date(moment(date).startOf('isoWeek').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let endFormat = moment(end).format('YYYY-MM-DD HH:mm:ss');
 
-        this.props.timeSlotActions(start, endFormat, new PageParams(0, 10));
+        this.props.timeSlotActions(start, endFormat, this.state.selectMaster.master, new PageParams(0, 100));
 
         this.setState({
             startWeek: start,
             endWeek: endFormat
+        });
+    };
+
+    handleInputMasterChange = (newValue) => {
+        this.props.timeSlotActions(
+            this.state.startWeek,
+            this.state.endWeek,
+            newValue.master,
+            new PageParams(0, 100));
+        this.setState({
+            selectMaster: {
+                value: newValue.value.id,
+                label: newValue.master.person.name + " " + newValue.master.person.surname + " " + newValue.master.person.patronymic,
+                master: newValue.master
+            }
         });
     };
 
@@ -97,6 +136,23 @@ class Calendar extends Component {
         const localizer = BigCalendar.momentLocalizer(moment);
         return (
             <div>
+                <div className="container" >
+                    <div className="row">
+                        <div className="col-sm-2">
+                            ФИО мастера:
+                        </div>
+                        <div className={"col-sm-4 " + (this.state.open ? 'hide-select-master' : 'show-select-master')}>
+                            <AsyncPaginate
+                                value={this.state.selectMaster}
+                                loadOptions={getOptionMasters}
+                                onChange={this.handleInputMasterChange}
+                                placeholder={'Выберите мастера'}
+                            />
+                        </div>
+                        <div className="col-sm"/>
+                    </div>
+                </div>
+                <hr/>
                 <BigCalendar
                     localizer={localizer}
                     events={this.props.timeSlots}
@@ -115,6 +171,7 @@ class Calendar extends Component {
                 {this.state.event.start ? <TimeSlotModal
                     accept={this.saveTimeSlot}
                     event={this.state.event}
+                    selectMaster={this.state.selectMaster}
                     open={this.state.open}
                     close={this.onCloseTimeSlotModal}/>: null}
             </div>
