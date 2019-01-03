@@ -61,13 +61,20 @@ class ServiceModal extends Component {
         this.state = {
             service: {
                 description: '',
-                maxPrice: 0,
-                minPrice: 0
+                maxPrice: '',
+                minPrice: ''
             },
             submit: false
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
+    }
+
+    componentDidMount() {
+        if (this.props.select)
+            this.setState({
+                service: this.props.select
+            });
     }
 
     refused = () => {
@@ -79,8 +86,11 @@ class ServiceModal extends Component {
         this.setState({
             submit: true
         });
-        this.props.accept(this.state.service);
-        this.clear();
+        if (this.state.service.description
+            && this.state.service.minPrice) {
+            this.props.accept(this.state.service);
+            this.clear();
+        }
     };
 
     clear() {

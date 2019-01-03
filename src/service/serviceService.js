@@ -7,8 +7,21 @@ export function getServices() {
         });
 }
 
+export function getServicesByDescription(description) {
+    return fetch("http://localhost:8080/api/services/description/" + description)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function createService(service) {
     return sendRequest(service, "POST");
+}
+
+export function updateService(service) {
+    return sendRequest(service, "PUT");
 }
 
 function sendRequest(master, method) {

@@ -19,6 +19,7 @@ import TextField from '@material-ui/core/TextField';
 import MomentLocaleUtils, {parseDate} from 'react-day-picker/moment';
 
 import 'moment/locale/ru';
+import {getServices, getServicesByDescription} from "../service/serviceService";
 
 const styles = theme => ({
     container: {
@@ -46,7 +47,7 @@ async function getOptionClientsByPhone(search, loadedOptions) {
     }));
     return {
         options: cachedOptions,
-        hasMore: true,
+        hasMore: true
     };
 }
 
@@ -60,7 +61,7 @@ async function getOptionClientsByFIO(search, loadedOptions) {
     }));
     return {
         options: cachedOptions,
-        hasMore: true,
+        hasMore: true
     };
 }
 
@@ -75,7 +76,26 @@ async function getOptionMastersByFIO(search, loadedOptions) {
     }));
     return {
         options: cachedOptions,
-        hasMore: true,
+        hasMore: true
+    };
+}
+
+async function getOptionServicesByDescription(search, loadedOptions) {
+    let response;
+    if (!search) response = await getServices();
+    else response = await getServicesByDescription(search);
+    console.log(response);
+
+
+    let cachedOptions = response.map((d) => ({
+        value: d.id,
+        label: d.description,
+        service: d
+    }));
+    console.log(cachedOptions);
+    return {
+        options: cachedOptions,
+        hasMore: true
     };
 }
 
@@ -104,11 +124,13 @@ class TimeSlotModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            selectService: undefined,
             selectClient: undefined,
             selectMaster: undefined,
             selectMasterFio: undefined,
             selectClientFio: undefined,
             selectClientPhone: undefined,
+            selectServiceByDescription: undefined,
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
@@ -121,6 +143,7 @@ class TimeSlotModal extends Component {
         this.accept = this.accept.bind(this);
         this.handleInputClientChange = this.handleInputClientChange.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
+        this.handleInputServiceChange = this.handleInputServiceChange.bind(this);
 
         this.handleChangeStartHour = this.handleChangeStartHour.bind(this);
         this.handleChangeStartMinutes = this.handleChangeStartMinutes.bind(this);
@@ -128,10 +151,11 @@ class TimeSlotModal extends Component {
         this.handleChangeEndMinutes = this.handleChangeEndMinutes.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleInputServiceChange = this.handleInputServiceChange.bind(this);
     }
 
     componentDidMount() {
-        let selectMasterFio, selectClientFio, selectClientPhone, selectMaster;
+        let selectMasterFio, selectClientFio, selectClientPhone, selectMaster, selectService, selectServiceByDescription;
         if (this.props.event.timeSlot) {
             selectMasterFio = {
                 value: this.props.event.timeSlot.master.id,
@@ -152,7 +176,14 @@ class TimeSlotModal extends Component {
                 label: this.props.event.timeSlot.client.person.phone,
                 client: this.props.event.timeSlot.client
             };
+            if (this.props.event.timeSlot.service)
+                selectServiceByDescription = {
+                    value: this.props.event.timeSlot.service.id,
+                    label: this.props.event.timeSlot.service.description,
+                    service: this.props.event.timeSlot.service
+                };
             selectMaster = this.props.event.timeSlot ? this.props.event.timeSlot.master : undefined;
+            selectService = this.props.event.timeSlot ? this.props.event.timeSlot.service : undefined;
         } else if (this.props.selectMaster) {
             selectMasterFio = {
                 value: this.props.selectMaster.master.id,
@@ -188,8 +219,10 @@ class TimeSlotModal extends Component {
             selectMasterFio: selectMasterFio,
             selectClientFio: selectClientFio,
             selectClientPhone: selectClientPhone,
+            selectServiceByDescription : selectServiceByDescription,
             selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
-            selectMaster: selectMaster
+            selectMaster: selectMaster,
+            selectService: selectService
         });
     }
 
@@ -203,7 +236,7 @@ class TimeSlotModal extends Component {
             submit: true
         });
 
-        if (!this.state.selectClient || !this.state.selectMaster || !this.state.date)
+        if (!this.state.selectClient || !this.state.selectMaster || !this.state.date || !this.state.selectService)
             return false;
 
         let startDate = new Date(this.state.date);
@@ -219,15 +252,16 @@ class TimeSlotModal extends Component {
             master: this.state.selectMaster,
             startSlot: startDate,
             endSlot: endDate,
-            price: this.state.price
+            price: this.state.price,
+            service: this.state.selectService
         };
-
         this.props.accept(timeSlot);
         this.clear();
     };
 
     clear() {
         this.setState({
+            selectService: undefined,
             selectClient: undefined,
             selectMaster: undefined,
             selectMasterFio: undefined,
@@ -243,16 +277,27 @@ class TimeSlotModal extends Component {
         });
     }
 
+    handleInputServiceChange = (newValue) => {
+        this.setState({
+            selectService: newValue.service,
+            selectServiceByDescription: {
+                value: newValue.value,
+                label: newValue.service.description,
+                service: newValue.service
+            },
+        });
+    };
+
     handleInputClientChange = (newValue) => {
         this.setState({
             selectClient: newValue.client,
             selectClientFio: {
-                value: newValue.value.id,
+                value: newValue.value,
                 label: newValue.client.person.name + " " + newValue.client.person.surname + " " + newValue.client.person.patronymic,
                 client: newValue.client
             },
             selectClientPhone: {
-                value: newValue.value.id,
+                value: newValue.value,
                 label: newValue.client.person.phone,
                 client: newValue.client
             }
@@ -263,7 +308,7 @@ class TimeSlotModal extends Component {
         this.setState({
             selectMaster: newValue.master,
             selectMasterFio: {
-                value: newValue.value.id,
+                value: newValue.value,
                 label: newValue.master.person.name + " " + newValue.master.person.surname + " " + newValue.master.person.patronymic,
                 master: newValue.master
             }
@@ -433,7 +478,21 @@ class TimeSlotModal extends Component {
                         <hr/>
                         <div className="container">
                             <div className="row">
+                                <div className="col-sm-2">
+                                    Услуга:
+                                </div>
                                 <div className="col-sm">
+                                    <AsyncPaginate
+                                        value={this.state.selectServiceByDescription}
+                                        loadOptions={getOptionServicesByDescription}
+                                        onChange={this.handleInputServiceChange}
+                                        placeholder={'Выберите услугу'}
+                                    />
+                                    <FormControl className={classes.formControl} error={this.validate('selectService')} aria-describedby="selectService-error-text">
+                                        { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                    </FormControl>
+                                </div>
+                                <div className="col-sm-2">
                                     Цена:
                                 </div>
                                 <div className="col-sm">
@@ -445,12 +504,6 @@ class TimeSlotModal extends Component {
                                             inputComponent: NumberFormatCustom,
                                         }}
                                     />
-                                </div>
-                                <div className="col-sm">
-                                    Услуга:
-                                </div>
-                                <div className="col-sm">
-                                    Стрижка
                                 </div>
                             </div>
                             <hr/>

@@ -86,7 +86,7 @@ class Calendar extends Component {
             this.props.timeSlotActions(
                 this.state.startWeek,
                 this.state.endWeek,
-                this.state.selectMaster.master,
+                this.state.selectMaster ? this.state.selectMaster.master : undefined,
                 new PageParams(0, 100));
             this.setState({
                 open: false,
