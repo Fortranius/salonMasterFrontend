@@ -137,7 +137,8 @@ class TimeSlotModal extends Component {
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
             id: undefined,
-            price: 0
+            price: 0,
+            status: 'NEW'
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -152,10 +153,17 @@ class TimeSlotModal extends Component {
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleInputServiceChange = this.handleInputServiceChange.bind(this);
+        this.setStatus = this.setStatus.bind(this);
     }
 
     componentDidMount() {
-        let selectMasterFio, selectClientFio, selectClientPhone, selectMaster, selectService, selectServiceByDescription;
+        let selectMasterFio,
+            selectClientFio,
+            selectClientPhone,
+            selectMaster,
+            selectService,
+            selectServiceByDescription,
+            status;
         if (this.props.event.timeSlot) {
             selectMasterFio = {
                 value: this.props.event.timeSlot.master.id,
@@ -182,8 +190,9 @@ class TimeSlotModal extends Component {
                     label: this.props.event.timeSlot.service.description,
                     service: this.props.event.timeSlot.service
                 };
-            selectMaster = this.props.event.timeSlot ? this.props.event.timeSlot.master : undefined;
-            selectService = this.props.event.timeSlot ? this.props.event.timeSlot.service : undefined;
+            selectMaster = this.props.event.timeSlot.master ? this.props.event.timeSlot.master : undefined;
+            selectService = this.props.event.timeSlot.service ? this.props.event.timeSlot.service : undefined;
+            status = this.props.event.timeSlot.status ? this.props.event.timeSlot.status : 'NEW';
         } else if (this.props.selectMaster) {
             selectMasterFio = {
                 value: this.props.selectMaster.master.id,
@@ -222,7 +231,8 @@ class TimeSlotModal extends Component {
             selectServiceByDescription : selectServiceByDescription,
             selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
             selectMaster: selectMaster,
-            selectService: selectService
+            selectService: selectService,
+            status: status
         });
     }
 
@@ -253,7 +263,8 @@ class TimeSlotModal extends Component {
             startSlot: startDate,
             endSlot: endDate,
             price: this.state.price,
-            service: this.state.selectService
+            service: this.state.selectService,
+            status: this.state.status
         };
         this.props.accept(timeSlot);
         this.clear();
@@ -273,7 +284,8 @@ class TimeSlotModal extends Component {
             endHour: { value: 10, label: '10' },
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
-            price: 0
+            price: 0,
+            status: 'NEW'
         });
     }
 
@@ -348,6 +360,12 @@ class TimeSlotModal extends Component {
         });
     };
 
+    setStatus(status) {
+        this.setState({
+            status: status
+        });
+    }
+
     validate(field) {
         if (!this.state.submit)
             return false;
@@ -379,6 +397,17 @@ class TimeSlotModal extends Component {
                                             locale: 'ru',
                                             localeUtils: MomentLocaleUtils,
                                         }}/>
+                                </div>
+                                <div className="col-sm">
+                                    <button onClick={() => this.setStatus('NEW')} className={"btn status-button " + (this.state.status === 'NEW' ? 'active-status-button' : '')}>
+                                        Новый
+                                    </button>
+                                    <button onClick={() => this.setStatus('CANCELED')} className={"btn status-button " + (this.state.status === 'CANCELED' ? 'active-status-button' : '')}>
+                                        Отменен
+                                    </button>
+                                    <button onClick={() => this.setStatus('DONE')} className={"btn status-button " + (this.state.status === 'DONE' ? 'active-status-button' : '')}>
+                                        Завершен
+                                    </button>
                                 </div>
                             </div>
                             <hr/>

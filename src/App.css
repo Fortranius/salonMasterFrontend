@@ -69,3 +69,14 @@
 .hide-select-master {
   z-index: 1;
 }
+
+.status-button {
+  margin: 2px;
+  border-radius: 0rem;
+  cursor: pointer;
+}
+
+.active-status-button {
+  background-color: #86d555;
+  color: white;
+}

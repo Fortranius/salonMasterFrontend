@@ -170,6 +170,27 @@ class Calendar extends Component {
                     onSelectEvent={this.onSelectEvent}
                     onSelectSlot={this.onOpenTimeSlotModal}
                     onNavigate={this.onNavigate}
+                    eventPropGetter={
+                        (event, start, end, isSelected) => {
+                            let newStyle = {
+                                backgroundColor: "lightgrey",
+                                borderRadius: "0px",
+                                border: "none"
+                            };
+                            if (event.timeSlot.status === 'NEW'){
+                                newStyle.backgroundColor = "#df47fb"
+                            }
+                            if (event.timeSlot.status === 'CANCELED'){
+                                newStyle.backgroundColor = "#f30808"
+                            }
+                            if (event.timeSlot.status === 'DONE'){
+                                newStyle.backgroundColor = "rgb(12, 19, 243)"
+                            }
+                            return {
+                                style: newStyle
+                            };
+                        }
+                    }
                     messages={{'today': "Текущая неделя", "previous":'Предыдущая неделя', "next":"Следующая неделя"}}
                 />
                 {this.state.event.start ? <TimeSlotModal
