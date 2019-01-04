@@ -184,7 +184,7 @@ class Calendar extends Component {
                                 newStyle.backgroundColor = "#f30808"
                             }
                             if (event.timeSlot.status === 'DONE'){
-                                newStyle.backgroundColor = "rgb(12, 19, 243)"
+                                newStyle.backgroundColor = "#0c13f3"
                             }
                             return {
                                 style: newStyle
