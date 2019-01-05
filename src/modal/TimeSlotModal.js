@@ -232,7 +232,7 @@ class TimeSlotModal extends Component {
             selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
             selectMaster: selectMaster,
             selectService: selectService,
-            status: status
+            status: status ? status : 'NEW'
         });
     }
 

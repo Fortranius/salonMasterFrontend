@@ -7,6 +7,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
+import Select from 'react-select';
+import {getServices} from "../service/serviceService";
 
 const styles = theme => ({
     container: {
@@ -24,6 +26,12 @@ const styles = theme => ({
         marginRight: theme.spacing.unit,
         marginTop:16,
         width: 200
+    },
+    formControlServices: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        marginTop:16,
+        width: 400
     },
 });
 
@@ -59,12 +67,24 @@ class UpdateModal extends Component {
                 surname:'',
                 patronymic:'',
                 mail:'',
+                services:[]
             },
-            submit: false
+            submit: false,
+            selectedServices: [],
+            services: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleChange = this.handleChange.bind(this);
+
+        getServices().then(data => {
+            let services = data.map(service => {
+                return { value: service.id, label: service.description, service: service };
+            });
+            this.setState({
+                services: services
+            });
+        });
     }
 
     componentDidMount() {
@@ -80,8 +100,26 @@ class UpdateModal extends Component {
             });
     }
 
+    clear() {
+        this.setState({
+            person: {
+                phone: '',
+                name:'',
+                surname:'',
+                patronymic:'',
+                mail:'',
+                services:[]
+            },
+            submit: false,
+            selectedServices: [],
+            services: []
+        });
+    }
+
+
     refused = () => {
         this.props.close();
+        this.clear();
     };
 
     accept = () => {
@@ -92,8 +130,12 @@ class UpdateModal extends Component {
             && this.state.person.surname
             && this.state.person.patronymic
             && this.state.person.mail
-            && this.state.person.phone.length === 10)
-        this.props.accept(this.state);
+            && this.state.person.phone.length === 10
+            && ((this.state.person.services && this.state.person.services.length>0)
+                || this.props.entity !== 'мастера')) {
+            this.props.accept(this.state);
+            this.clear();
+        }
     };
 
     handleChange = name => event => {
@@ -110,8 +152,23 @@ class UpdateModal extends Component {
             return false;
         if (field === 'phone')
             return this.state.person.phone.length !== 10;
+        if (field === 'service')
+            return this.state.selectedServices.length === 0;
         return (!this.state.person || !this.state.person[field]);
-    }
+    };
+
+    handleChangeServices = (selectedServices) => {
+        let services = selectedServices.map(option => {
+            return option.service;
+        });
+        this.setState({
+            selectedServices: selectedServices,
+            person: {
+                ...this.state.person,
+                services: services
+            }
+        });
+    };
 
     render() {
         const { classes } = this.props;
@@ -151,6 +208,20 @@ class UpdateModal extends Component {
                             { this.validate('mail') ? <FormHelperText id="mail-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl>
                     </div>
+                    { this.props.entity === 'мастера' ? <div>
+                        <hr/>
+                        <FormControl className={classes.formControlServices} error={this.validate('service')} aria-describedby="service-error-text">
+                            <Select id="service"
+                                isMulti
+                                closeMenuOnSelect={false}
+                                value={this.state.selectedServices}
+                                onChange={this.handleChangeServices}
+                                placeholder="Выберите услуги"
+                                options={this.state.services}
+                            />
+                            { this.validate('service') ? <FormHelperText id="service-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
+                        </FormControl>
+                    </div>: null }
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
                             Сохранить
