@@ -7,7 +7,10 @@ export default (state = {timeSlots: []}, action) => {
             let evants = action.payload.map(timeSlot => {
                 let event = {
                     id: timeSlot.id,
-                    title: timeSlot.master.person.name,
+                    title: "Мастер: " + timeSlot.master.person.name
+                    + " " + timeSlot.master.person.surname
+                    + " " + timeSlot.master.person.patronymic
+                    + " &#13;" + timeSlot.master.person.surname,
                     timeSlot: timeSlot,
                     start: moment.unix(timeSlot.startSlot).toDate(),
                     end: moment.unix(timeSlot.endSlot).toDate(),

@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {getMastersAction} from "../actions/masterActions"
 import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
-import {removeMaster, updateMaster, createMaster} from "../service/masterService";
+import {createMaster, removeMaster, updateMaster} from "../service/masterService";
 import DeleteModal from "../modal/DeleteModal";
 import UpdateModal from "../modal/UpdateModal";
 
@@ -104,6 +104,7 @@ class Masters extends Component {
     };
 
     createMaster(entity) {
+        console.log(entity);
         createMaster(entity).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({

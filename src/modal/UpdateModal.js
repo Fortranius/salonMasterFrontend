@@ -66,12 +66,12 @@ class UpdateModal extends Component {
                 name:'',
                 surname:'',
                 patronymic:'',
-                mail:'',
-                services:[]
+                mail:''
             },
+            services:[],
             submit: false,
             selectedServices: [],
-            services: []
+            optionServices: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -82,7 +82,7 @@ class UpdateModal extends Component {
                 return { value: service.id, label: service.description, service: service };
             });
             this.setState({
-                services: services
+                optionServices: services
             });
         });
     }
@@ -107,12 +107,12 @@ class UpdateModal extends Component {
                 name:'',
                 surname:'',
                 patronymic:'',
-                mail:'',
-                services:[]
+                mail:''
             },
+            services:[],
             submit: false,
             selectedServices: [],
-            services: []
+            optionServices: []
         });
     }
 
@@ -131,7 +131,7 @@ class UpdateModal extends Component {
             && this.state.person.patronymic
             && this.state.person.mail
             && this.state.person.phone.length === 10
-            && ((this.state.person.services && this.state.person.services.length>0)
+            && ((this.state.services && this.state.services.length>0)
                 || this.props.entity !== 'мастера')) {
             this.props.accept(this.state);
             this.clear();
@@ -163,10 +163,7 @@ class UpdateModal extends Component {
         });
         this.setState({
             selectedServices: selectedServices,
-            person: {
-                ...this.state.person,
-                services: services
-            }
+            services: services
         });
     };
 
@@ -217,7 +214,7 @@ class UpdateModal extends Component {
                                 value={this.state.selectedServices}
                                 onChange={this.handleChangeServices}
                                 placeholder="Выберите услуги"
-                                options={this.state.services}
+                                options={this.state.optionServices}
                             />
                             { this.validate('service') ? <FormHelperText id="service-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
                         </FormControl>

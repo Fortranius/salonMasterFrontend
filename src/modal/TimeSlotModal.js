@@ -297,6 +297,7 @@ class TimeSlotModal extends Component {
                 label: newValue.service.description,
                 service: newValue.service
             },
+            price: newValue.service.minPrice
         });
     };
 
