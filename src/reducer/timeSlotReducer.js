@@ -7,10 +7,14 @@ export default (state = {timeSlots: []}, action) => {
             let evants = action.payload.map(timeSlot => {
                 let event = {
                     id: timeSlot.id,
-                    title: "Мастер: " + timeSlot.master.person.name
-                    + " " + timeSlot.master.person.surname
-                    + " " + timeSlot.master.person.patronymic
-                    + " &#13;" + timeSlot.master.person.surname,
+                    title: "\nМастер: " + timeSlot.master.person.name
+                        + " " + timeSlot.master.person.surname
+                        + " " + timeSlot.master.person.patronymic
+                        + " \nКлиент: " + timeSlot.client.person.name
+                        + " " + timeSlot.client.person.surname
+                        + " " + timeSlot.client.person.patronymic
+                        + " \nУслуга: " + timeSlot.service.description
+                        + " Цена: " + timeSlot.price,
                     timeSlot: timeSlot,
                     start: moment.unix(timeSlot.startSlot).toDate(),
                     end: moment.unix(timeSlot.endSlot).toDate(),

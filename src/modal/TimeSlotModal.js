@@ -84,9 +84,6 @@ async function getOptionServicesByDescription(search, loadedOptions) {
     let response;
     if (!search) response = await getServices();
     else response = await getServicesByDescription(search);
-    console.log(response);
-
-
     let cachedOptions = response.map((d) => ({
         value: d.id,
         label: d.description,

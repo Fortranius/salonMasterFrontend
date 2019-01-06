@@ -104,7 +104,6 @@ class Masters extends Component {
     };
 
     createMaster(entity) {
-        console.log(entity);
         createMaster(entity).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({

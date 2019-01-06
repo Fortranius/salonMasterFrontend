@@ -49,9 +49,6 @@ class TableRemote extends Component {
                     <button onClick = { this.createEntity } className="btn btn-primary">
                         Добавить нового {this.props.entity}
                     </button>
-                    { this.state.select ? <button onClick = { this.removeEntity } className="btn btn-primary">
-                        Удалить {this.props.entity}
-                    </button>: null }
                     { this.state.select ? <button onClick = { this.updateEntity } className="btn btn-primary">
                         Редактировать {this.props.entity}
                     </button>: null }

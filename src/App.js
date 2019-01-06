@@ -5,6 +5,8 @@ import Clients from './components/Clients';
 import Masters from './components/Masters';
 import Calendar from "./components/Calendar";
 import Services from "./components/Services";
+import Products from "./components/Products";
+import Expenses from "./components/Expenses";
 
 class App extends Component {
   render() {
@@ -17,6 +19,8 @@ class App extends Component {
                         <li><Link to={'/masters'} className="nav-link">Мастера</Link></li>
                         <li><Link to={'/clients'} className="nav-link">Клиенты</Link></li>
                         <li><Link to={'/services'} className="nav-link">Услуги</Link></li>
+                        <li><Link to={'/products'} className="nav-link">Товар</Link></li>
+                        <li><Link to={'/expenses'} className="nav-link">Расходы</Link></li>
                     </ul>
                 </nav>
                 <hr />
@@ -25,6 +29,8 @@ class App extends Component {
                     <Route path='/masters' component={Masters} />
                     <Route path='/clients' component={Clients} />
                     <Route path='/services' component={Services} />
+                    <Route path='/products' component={Products} />
+                    <Route path='/expenses' component={Expenses} />
                 </Switch>
             </div>
         </Router>
