@@ -7,6 +7,7 @@ import Calendar from "./components/Calendar";
 import Services from "./components/Services";
 import Products from "./components/Products";
 import Expenses from "./components/Expenses";
+import Dashboard from "./components/Dashboard";
 
 class App extends Component {
   render() {
@@ -21,6 +22,7 @@ class App extends Component {
                         <li><Link to={'/services'} className="nav-link">Услуги</Link></li>
                         <li><Link to={'/products'} className="nav-link">Товар</Link></li>
                         <li><Link to={'/expenses'} className="nav-link">Расходы</Link></li>
+                        <li><Link to={'/dashboard'} className="nav-link">Статистика</Link></li>
                     </ul>
                 </nav>
                 <hr />
@@ -31,6 +33,7 @@ class App extends Component {
                     <Route path='/services' component={Services} />
                     <Route path='/products' component={Products} />
                     <Route path='/expenses' component={Expenses} />
+                    <Route path='/dashboard' component={Dashboard} />
                 </Switch>
             </div>
         </Router>
