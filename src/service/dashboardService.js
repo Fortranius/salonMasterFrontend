@@ -1,5 +1,5 @@
-export function getDashboardMasters() {
-    return fetch("http://localhost:8080/dashboard/masters")
+export function getDashboardMasters(start, end) {
+    return fetch("http://localhost:8080/dashboard/mastersBetweenStart?start=" + start + "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {

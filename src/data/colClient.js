@@ -21,6 +21,7 @@ export default [
     },
     {
         dataField: 'person.phone',
+        text: 'Телефон',
         sort: true
     },
     {

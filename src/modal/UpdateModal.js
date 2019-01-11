@@ -88,16 +88,22 @@ class UpdateModal extends Component {
     }
 
     componentDidMount() {
-        if (this.props.update)
+        if (this.props.update) {
+            let selectedServices = this.props.update.services.map(service => {
+                return { value: service.id, label: service.description, service: service };
+            });
             this.setState({
                 person: {
-                    phone: this.props.update.person.phone?this.props.update.person.phone:'',
-                    name: this.props.update.person.name?this.props.update.person.name:'',
-                    surname: this.props.update.person.surname?this.props.update.person.surname:'',
-                    patronymic: this.props.update.person.patronymic?this.props.update.person.patronymic:'',
-                    mail: this.props.update.person.mail?this.props.update.person.mail:'',
-                }
+                    phone: this.props.update.person.phone ? this.props.update.person.phone : '',
+                    name: this.props.update.person.name ? this.props.update.person.name : '',
+                    surname: this.props.update.person.surname ? this.props.update.person.surname : '',
+                    patronymic: this.props.update.person.patronymic ? this.props.update.person.patronymic : '',
+                    mail: this.props.update.person.mail ? this.props.update.person.mail : '',
+                },
+                services: this.props.update.services,
+                selectedServices: selectedServices
             });
+        }
     }
 
     clear() {

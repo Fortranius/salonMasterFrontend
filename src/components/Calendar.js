@@ -139,7 +139,7 @@ class Calendar extends Component {
         });
         const localizer = BigCalendar.momentLocalizer(moment);
         return (
-            <div>
+            <div className="main-div">
                 <div className="container" >
                     <div className="row">
                         <div className="col-sm-2">

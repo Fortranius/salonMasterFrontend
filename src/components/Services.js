@@ -90,7 +90,7 @@ class Services extends Component {
             onSelect: this.handleOnSelect,
         };
         return (
-            <div>
+            <div className="main-div">
                 <div className="button-group">
                     <button onClick = { this.onOpenCreateModal } className="btn btn-primary">
                         Добавить новую услугу

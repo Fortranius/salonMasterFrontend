@@ -89,7 +89,6 @@ async function getOptionServicesByDescription(search, loadedOptions) {
         label: d.description,
         service: d
     }));
-    console.log(cachedOptions);
     return {
         options: cachedOptions,
         hasMore: true
@@ -98,7 +97,6 @@ async function getOptionServicesByDescription(search, loadedOptions) {
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
-
     return (
         <NumberFormat
             {...other}

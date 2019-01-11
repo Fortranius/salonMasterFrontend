@@ -94,6 +94,7 @@ class Masters extends Component {
     updateMaster(entity) {
         let master = this.state.row;
         master.person = entity.person;
+        master.services = entity.services;
         updateMaster(master).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({
@@ -114,7 +115,7 @@ class Masters extends Component {
 
     render() {
         return (
-            <div>
+            <div className="main-div">
                 {this.props.masters ? <TableRemote data={this.props.masters.content}
                                                    page={this.props.masters.number + 1}
                                                    columns={colMaster}

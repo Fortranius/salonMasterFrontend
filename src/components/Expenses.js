@@ -82,7 +82,7 @@ class Expenses extends Component {
 
     render() {
         return (
-            <div>
+            <div className="main-div">
                 {this.props.expenses ? <TableRemote data={this.props.expenses.content}
                                                    page={this.props.expenses.number + 1}
                                                    columns={colExpense}

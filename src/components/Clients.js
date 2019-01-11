@@ -6,7 +6,7 @@ import PageParams from "../model/PageParams";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getClientsAction} from "../actions/clientActions";
-import {removeClient, updateClient, createClient} from "../service/clientService";
+import {createClient, removeClient, updateClient} from "../service/clientService";
 import DeleteModal from "../modal/DeleteModal";
 import UpdateModal from "../modal/UpdateModal";
 
@@ -114,7 +114,7 @@ class Clients extends Component {
 
     render() {
         return (
-            <div>
+            <div className="main-div">
                 {this.props.clients ? <TableRemote data={this.props.clients.content}
                                                    page={this.props.clients.number + 1}
                                                    columns={colClient}
