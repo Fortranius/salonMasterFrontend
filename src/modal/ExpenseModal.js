@@ -9,6 +9,9 @@ import {getProducts, getProductsByDescription} from "../service/productService";
 import {getMasters, getMastersByFiO} from "../service/masterService";
 import PageParams from "../model/PageParams";
 import TextField from '@material-ui/core/TextField';
+import MomentLocaleUtils, {parseDate} from "react-day-picker/moment";
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import moment from "moment/moment";
 
 const styles = theme => ({
     container: {
@@ -61,6 +64,7 @@ class ExpenseModal extends Component {
         super();
         this.state = {
             id: undefined,
+            date: new Date(),
             selectProduct: undefined,
             selectMaster: undefined,
             selectProductByDescription: undefined,
@@ -73,12 +77,14 @@ class ExpenseModal extends Component {
         this.handleInputProductChange = this.handleInputProductChange.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeDate = this.handleChangeDate.bind(this);
     }
 
     componentDidMount() {
         if (this.props.update) {
             this.setState({
                 id: this.props.update.id,
+                date: this.props.update.date ? moment.unix(this.props.update.date).toDate() : new Date(),
                 countProduct: this.props.update.countProduct,
                 selectProduct: this.props.update.product,
                 selectMaster: this.props.update.master,
@@ -101,6 +107,7 @@ class ExpenseModal extends Component {
     clear() {
         this.setState({
             id: undefined,
+            date: new Date(),
             selectProduct: undefined,
             selectMaster: undefined,
             selectProductByDescription: undefined,
@@ -121,9 +128,11 @@ class ExpenseModal extends Component {
             submit: true
         });
         if (this.state.selectProduct
-            && this.state.selectMaster) {
+            && this.state.selectMaster
+            && this.state.date) {
             let expense = {
                 id: this.state.id,
+                date: this.state.date,
                 product: this.state.selectProduct,
                 master: this.state.selectMaster,
                 countProduct: this.state.countProduct
@@ -161,6 +170,12 @@ class ExpenseModal extends Component {
                 countProduct: event.target.value
             });
         }
+    };
+
+    handleChangeDate = (newValue) => {
+        this.setState({
+            date: newValue
+        });
     };
 
     validate(field) {
@@ -219,6 +234,25 @@ class ExpenseModal extends Component {
                                 />
                                 <FormControl className={classes.formControl} error={this.validate('selectMaster')} aria-describedby="selectMaster-error-text">
                                     { this.validate('selectMaster') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                </FormControl>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-sm-2">
+                                Дата:
+                            </div>
+                            <div className="col-sm">
+                                <DayPickerInput
+                                    placeholder={`Дата расхода`}
+                                    parseDate={parseDate}
+                                    value={this.state.date}
+                                    onDayChange={this.handleChangeDate}
+                                    dayPickerProps={{
+                                        locale: 'ru',
+                                        localeUtils: MomentLocaleUtils,
+                                    }}/>
+                                <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
+                                    { this.validate('date') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
                             </div>
                         </div>

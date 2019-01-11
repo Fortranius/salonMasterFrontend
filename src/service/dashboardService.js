@@ -7,8 +7,8 @@ export function getDashboardMasters(start, end) {
         });
 }
 
-export function getDashboardAll() {
-    return fetch("http://localhost:8080/dashboard/all")
+export function getDashboardAll(start, end) {
+    return fetch("http://localhost:8080/dashboard/all?start=" + start + "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {

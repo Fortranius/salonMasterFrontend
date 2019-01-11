@@ -19,7 +19,9 @@ class Dashboard extends Component {
         };
         this.handleChangeStartDate = this.handleChangeStartDate.bind(this);
         this.handleChangeEndDate = this.handleChangeEndDate.bind(this);
-        this.getDashboardAll();
+        this.getDashboardAll(
+            moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+            moment(moment().startOf('week').isoWeekday(7).toDate()).format('YYYY-MM-DD HH:mm:ss'));
         this.getDashboardMasters(
             moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss'),
             moment(moment().startOf('week').isoWeekday(7).toDate()).format('YYYY-MM-DD HH:mm:ss'));
@@ -41,22 +43,22 @@ class Dashboard extends Component {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Расходы',
-                            backgroundColor: 'rgba(255,150,132,0.2)',
-                            borderColor: 'rgba(255,150,132,1)',
+                            label: 'Доходы',
+                            backgroundColor: '#FF6384',
+                            borderColor: '#FF6384',
                             borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(255,150,132,0.4)',
-                            hoverBorderColor: 'rgba(255,150,132,1)',
-                            data: costs
+                            hoverBackgroundColor: '#FF6384',
+                            hoverBorderColor: '#FF6384',
+                            data: incomes
                         },
                         {
-                            label: 'Доходы',
-                            backgroundColor: 'rgba(255,99,132,0.2)',
-                            borderColor: 'rgba(255,99,132,1)',
+                            label: 'Расходы',
+                            backgroundColor: '#36A2EB',
+                            borderColor: '#36A2EB',
                             borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-                            hoverBorderColor: 'rgba(255,99,132,1)',
-                            data: incomes
+                            hoverBackgroundColor: '#36A2EB',
+                            hoverBorderColor: '#36A2EB',
+                            data: costs
                         }
                     ]
                 }
@@ -64,8 +66,8 @@ class Dashboard extends Component {
         });
     }
 
-    getDashboardAll() {
-        getDashboardAll().then(data => {
+    getDashboardAll(start, end) {
+        getDashboardAll(start, end).then(data => {
             this.setState({
                 all: {
                     labels: [
@@ -76,13 +78,11 @@ class Dashboard extends Component {
                         data: [data.income,data.cost],
                         backgroundColor: [
                             '#FF6384',
-                            '#36A2EB',
-                            '#FFCE56'
+                            '#36A2EB'
                         ],
                         hoverBackgroundColor: [
                             '#FF6384',
-                            '#36A2EB',
-                            '#FFCE56'
+                            '#36A2EB'
                         ]
                     }]
                 }
@@ -94,12 +94,21 @@ class Dashboard extends Component {
         this.getDashboardMasters(
             moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'),
             moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+        this.getDashboardAll(
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
         this.setState({
             start: newValue
         });
     };
 
     handleChangeEndDate = (newValue) => {
+        this.getDashboardMasters(
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'));
+        this.getDashboardAll(
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'));
         this.setState({
             end: newValue
         });
@@ -110,8 +119,8 @@ class Dashboard extends Component {
             <div className="main-div">
                 <div className="container" >
                     <div className="row">
-                        <div className="col-sm-2">
-                            С
+                        <div className="col-sm-2 title-margin-date">
+                            c
                         </div>
                         <div className="col-sm">
                             <DayPickerInput
@@ -125,7 +134,7 @@ class Dashboard extends Component {
                                 }}
                             />
                         </div>
-                        <div className="col-sm-2">
+                        <div className="col-sm-2 title-margin-date">
                             по
                         </div>
                         <div className="col-sm">

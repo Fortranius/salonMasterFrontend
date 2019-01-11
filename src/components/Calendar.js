@@ -142,7 +142,7 @@ class Calendar extends Component {
             <div className="main-div">
                 <div className="container" >
                     <div className="row">
-                        <div className="col-sm-2">
+                        <div className="col-sm-2 title-margin">
                             ФИО мастера:
                         </div>
                         <div className={"col-sm-4 " + (this.state.open ? 'hide-select-master' : 'show-select-master')}>

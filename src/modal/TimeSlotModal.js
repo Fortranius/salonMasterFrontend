@@ -380,7 +380,7 @@ class TimeSlotModal extends Component {
                     { this.props.event ? <div>
                         <div className="container selectDiv">
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin-date">
                                     Дата заказа:
                                 </div>
                                 <div className="col-sm">
@@ -408,7 +408,7 @@ class TimeSlotModal extends Component {
                             </div>
                             <hr/>
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin">
                                     Время начала:
                                 </div>
                                 <div className="col-sm">
@@ -503,7 +503,7 @@ class TimeSlotModal extends Component {
                         <hr/>
                         <div className="container">
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin">
                                     Услуга:
                                 </div>
                                 <div className="col-sm">
@@ -517,7 +517,7 @@ class TimeSlotModal extends Component {
                                         { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
                                     </FormControl>
                                 </div>
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin-date">
                                     Цена:
                                 </div>
                                 <div className="col-sm">
