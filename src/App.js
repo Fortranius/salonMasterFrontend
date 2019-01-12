@@ -8,6 +8,8 @@ import Services from "./components/Services";
 import Products from "./components/Products";
 import Expenses from "./components/Expenses";
 import Dashboard from "./components/Dashboard";
+import LoginPage from "./components/LoginPage";
+import {PrivateRoute} from './route/PrivateRoute';
 
 class App extends Component {
   render() {
@@ -27,13 +29,14 @@ class App extends Component {
                 </nav>
                 <hr />
                 <Switch>
-                    <Route exact path='/' component={Calendar} />
-                    <Route path='/masters' component={Masters} />
-                    <Route path='/clients' component={Clients} />
-                    <Route path='/services' component={Services} />
-                    <Route path='/products' component={Products} />
-                    <Route path='/expenses' component={Expenses} />
-                    <Route path='/dashboard' component={Dashboard} />
+                    <Route path="/login" component={LoginPage} />
+                    <PrivateRoute exact path='/' component={Calendar} />
+                    <PrivateRoute path="/masters" component={Masters} />
+                    <PrivateRoute path="/clients" component={Clients} />
+                    <PrivateRoute path="/services" component={Services} />
+                    <PrivateRoute path="/products" component={Products} />
+                    <PrivateRoute path="/expenses" component={Expenses} />
+                    <PrivateRoute path="/dashboard" component={Dashboard} />
                 </Switch>
             </div>
         </Router>

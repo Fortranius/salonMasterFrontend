@@ -92,3 +92,14 @@
 .title-margin-date {
   margin-top: 5px;
 }
+.help-block {
+  color: #cb2c15;
+}
+
+.login-form {
+  margin-left: 40%;
+  margin-right: 40%;
+}
+.login-div {
+  width: 100%;
+}
