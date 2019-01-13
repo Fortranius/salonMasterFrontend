@@ -117,8 +117,7 @@ class UpdateModal extends Component {
             },
             services:[],
             submit: false,
-            selectedServices: [],
-            optionServices: []
+            selectedServices: []
         });
     }
 
