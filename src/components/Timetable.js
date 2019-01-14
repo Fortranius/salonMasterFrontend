@@ -28,7 +28,7 @@ async function getOptionMasters(search, loadedOptions) {
     };
 }
 
-class Calendar extends Component {
+class Timetable extends Component {
 
     constructor(props) {
         super(props);
@@ -214,4 +214,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Calendar);
+export default connect(mapStateToProps, mapDispatchToProps)(Timetable);

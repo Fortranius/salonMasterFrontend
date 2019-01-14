@@ -1,1 +1,2 @@
 export const GET_MASTERS = "GET_MASTERS";
+export const GET_ALL_MASTERS = "GET_ALL_MASTERS";
