@@ -7,6 +7,15 @@ export function getMasters(params) {
         });
 }
 
+export function getAllMasters() {
+    return fetch("http://localhost:8080/api/allMasters")
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function getMastersByFiO(fio) {
     return fetch("http://localhost:8080/api/masters/fio/" + fio + "?page=0&size=100")
         .then(handleErrors)

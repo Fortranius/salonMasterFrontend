@@ -84,15 +84,11 @@ async function getOptionServicesByDescription(search, loadedOptions) {
     let response;
     if (!search) response = await getServices();
     else response = await getServicesByDescription(search);
-    console.log(response);
-
-
     let cachedOptions = response.map((d) => ({
         value: d.id,
         label: d.description,
         service: d
     }));
-    console.log(cachedOptions);
     return {
         options: cachedOptions,
         hasMore: true
@@ -101,7 +97,6 @@ async function getOptionServicesByDescription(search, loadedOptions) {
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
-
     return (
         <NumberFormat
             {...other}
@@ -232,7 +227,7 @@ class TimeSlotModal extends Component {
             selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
             selectMaster: selectMaster,
             selectService: selectService,
-            status: status
+            status: status ? status : 'NEW'
         });
     }
 
@@ -297,6 +292,7 @@ class TimeSlotModal extends Component {
                 label: newValue.service.description,
                 service: newValue.service
             },
+            price: newValue.service.minPrice
         });
     };
 
@@ -384,7 +380,7 @@ class TimeSlotModal extends Component {
                     { this.props.event ? <div>
                         <div className="container selectDiv">
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin-date">
                                     Дата заказа:
                                 </div>
                                 <div className="col-sm">
@@ -412,7 +408,7 @@ class TimeSlotModal extends Component {
                             </div>
                             <hr/>
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin">
                                     Время начала:
                                 </div>
                                 <div className="col-sm">
@@ -507,7 +503,7 @@ class TimeSlotModal extends Component {
                         <hr/>
                         <div className="container">
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin">
                                     Услуга:
                                 </div>
                                 <div className="col-sm">
@@ -521,7 +517,7 @@ class TimeSlotModal extends Component {
                                         { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
                                     </FormControl>
                                 </div>
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 title-margin-date">
                                     Цена:
                                 </div>
                                 <div className="col-sm">

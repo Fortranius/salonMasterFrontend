@@ -28,7 +28,7 @@ async function getOptionMasters(search, loadedOptions) {
     };
 }
 
-class Calendar extends Component {
+class TimeTable extends Component {
 
     constructor(props) {
         super(props);
@@ -139,10 +139,10 @@ class Calendar extends Component {
         });
         const localizer = BigCalendar.momentLocalizer(moment);
         return (
-            <div>
+            <div className="main-div">
                 <div className="container" >
                     <div className="row">
-                        <div className="col-sm-2">
+                        <div className="col-sm-2 title-margin">
                             ФИО мастера:
                         </div>
                         <div className={"col-sm-4 " + (this.state.open ? 'hide-select-master' : 'show-select-master')}>
@@ -163,10 +163,13 @@ class Calendar extends Component {
                     startAccessor="start"
                     endAccessor="end"
                     selectable={true}
-                    defaultView={BigCalendar.Views.WEEK}
+                    defaultView={BigCalendar.Views.DAY}
                     min={new Date(2017, 10, 0, 10, 0, 0)}
                     max={new Date(2017, 10, 0, 22, 0, 0)}
-                    views={{week: true}}
+                    views={{day: true}}
+                    step={30}
+                    toolbar={false}
+                    timeslots={1}
                     onSelectEvent={this.onSelectEvent}
                     onSelectSlot={this.onOpenTimeSlotModal}
                     onNavigate={this.onNavigate}
@@ -184,14 +187,13 @@ class Calendar extends Component {
                                 newStyle.backgroundColor = "#f30808"
                             }
                             if (event.timeSlot.status === 'DONE'){
-                                newStyle.backgroundColor = "#0c13f3"
+                                newStyle.backgroundColor = "#56CB51"
                             }
                             return {
                                 style: newStyle
                             };
                         }
                     }
-                    messages={{'today': "Текущая неделя", "previous":'Предыдущая неделя', "next":"Следующая неделя"}}
                 />
                 {this.state.event.start ? <TimeSlotModal
                     accept={this.saveTimeSlot}
@@ -214,4 +216,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Calendar);
+export default connect(mapStateToProps, mapDispatchToProps)(TimeTable);

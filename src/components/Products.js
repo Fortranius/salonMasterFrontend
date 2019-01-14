@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import '../App.css';
 import BootstrapTable from 'react-bootstrap-table-next';
-import colService from "../data/colService";
-import ServiceModal from "../modal/ServiceModal";
-import {createService, getServices, updateService} from "../service/serviceService";
+import colProduct from "../data/colProduct";
+import ProductModal from "../modal/ProductModal";
+import {createProduct, getProducts, updateProduct} from "../service/productService";
 
-class Services extends Component {
+class Products extends Component {
 
     constructor(props) {
         super(props);
@@ -14,23 +14,23 @@ class Services extends Component {
             openCreate: false,
             openUpdate: false
         };
-        this.createService = this.createService.bind(this);
-        this.updateService = this.updateService.bind(this);
+        this.createProduct = this.createProduct.bind(this);
+        this.updateProduct = this.updateProduct.bind(this);
         this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
         this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
         this.onCloseUpdateModal = this.onCloseUpdateModal.bind(this);
         this.onOpenUpdateModal = this.onOpenUpdateModal.bind(this);
         this.handleOnSelect = this.handleOnSelect.bind(this);
-        getServices().then(data => {
+        getProducts().then(data => {
             this.setState({
                 data: data
             });
         });
     }
 
-    createService(entity) {
-        createService(entity).then(() => {
-            getServices().then(data => {
+    createProduct(entity) {
+        createProduct(entity).then(() => {
+            getProducts().then(data => {
                 this.setState({
                     openCreate: false,
                     data: data
@@ -39,9 +39,9 @@ class Services extends Component {
         });
     };
 
-    updateService(entity) {
-        updateService(entity).then(() => {
-            getServices().then(data => {
+    updateProduct(entity) {
+        updateProduct(entity).then(() => {
+            getProducts().then(data => {
                 this.setState({
                     openUpdate: false,
                     data: data,
@@ -93,22 +93,22 @@ class Services extends Component {
             <div className="main-div">
                 <div className="button-group">
                     <button onClick = { this.onOpenCreateModal } className="btn btn-primary">
-                        Добавить новую услугу
+                        Добавить товар
                     </button>
                     { this.state.select ? <button onClick = { this.onOpenUpdateModal } className="btn btn-primary">
-                        Редактировать услугу
+                        Изменить товар
                     </button> : null }
                 </div>
                 {this.state.data ? <BootstrapTable
                     keyField="id"
                     selectRow={ selectRow }
                     data={this.state.data}
-                    columns={colService}
+                    columns={colProduct}
                 />: null}
-                <ServiceModal accept={this.createService}
+                <ProductModal accept={this.createProduct}
                               open={this.state.openCreate}
                               close={this.onCloseCreateModal} />
-                {this.state.openUpdate ? <ServiceModal accept={this.updateService}
+                {this.state.openUpdate ? <ProductModal accept={this.updateProduct}
                               open={this.state.openUpdate}
                               select={this.state.select}
                               close={this.onCloseUpdateModal} /> : null }
@@ -117,4 +117,4 @@ class Services extends Component {
     }
 }
 
-export default Services;
+export default Products;

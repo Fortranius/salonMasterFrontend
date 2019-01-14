@@ -80,3 +80,50 @@
   background-color: #86d555;
   color: white;
 }
+
+.main-div {
+  margin: 5px;
+}
+
+.title-margin {
+  margin-top: 10px;
+}
+
+.title-margin-date {
+  margin-top: 5px;
+}
+.help-block {
+  color: #cb2c15;
+}
+
+.login-form {
+  margin-left: 40%;
+  margin-right: 40%;
+}
+.login-div {
+  width: 100%;
+}
+
+.react-calendar__navigation button {
+  min-width: 24px !important;
+}
+
+.react-calendar{
+  background-color: rgba(79, 88, 87, 0.54) !important;
+  margin-bottom: 10px;
+  -webkit-box-shadow:0px 1px 1px #de1dde;
+  -moz-box-shadow:0px 1px 1px #de1dde;
+  box-shadow:0px 1px 1px #a972a9;
+}
+
+time, .react-calendar__navigation__arrow, .react-calendar__navigation__label, .react-calendar__month-view__weekdays__weekday{
+  color: white;
+}
+
+#root{
+  height: auto;
+}
+
+.div-side-nav {
+  height: auto;
+}
