@@ -28,7 +28,7 @@ async function getOptionMasters(search, loadedOptions) {
     };
 }
 
-class Timetable extends Component {
+class TimeTable extends Component {
 
     constructor(props) {
         super(props);
@@ -163,10 +163,13 @@ class Timetable extends Component {
                     startAccessor="start"
                     endAccessor="end"
                     selectable={true}
-                    defaultView={BigCalendar.Views.WEEK}
+                    defaultView={BigCalendar.Views.DAY}
                     min={new Date(2017, 10, 0, 10, 0, 0)}
                     max={new Date(2017, 10, 0, 22, 0, 0)}
-                    views={{week: true}}
+                    views={{day: true}}
+                    step={30}
+                    toolbar={false}
+                    timeslots={1}
                     onSelectEvent={this.onSelectEvent}
                     onSelectSlot={this.onOpenTimeSlotModal}
                     onNavigate={this.onNavigate}
@@ -191,7 +194,6 @@ class Timetable extends Component {
                             };
                         }
                     }
-                    messages={{'today': "Текущая неделя", "previous":'Предыдущая неделя', "next":"Следующая неделя"}}
                 />
                 {this.state.event.start ? <TimeSlotModal
                     accept={this.saveTimeSlot}
@@ -214,4 +216,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Timetable);
+export default connect(mapStateToProps, mapDispatchToProps)(TimeTable);

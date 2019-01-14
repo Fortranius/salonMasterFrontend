@@ -3,7 +3,7 @@ import {Route, Switch} from 'react-router-dom';
 import './App.css';
 import Clients from './components/Clients';
 import Masters from './components/Masters';
-import Timetable from "./components/Timetable";
+import Timetable from "./components/TimeTable";
 import Services from "./components/Services";
 import Products from "./components/Products";
 import Expenses from "./components/Expenses";

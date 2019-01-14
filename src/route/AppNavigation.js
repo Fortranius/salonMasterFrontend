@@ -28,6 +28,7 @@ export class AppNavigation extends React.Component {
 
     render() {
         return (
+            <div className="div-side-nav">
             <SideNav theme={theme} defaultSelectedPath={"timetable"}>
                 <Nav id="timetable">
                     <NavIcon>
@@ -39,8 +40,8 @@ export class AppNavigation extends React.Component {
                     <NavIcon>
                         <Icon icon={home} />
                     </NavIcon>
-                   {this.props.masters.map((master) => {
-                        return <Nav id={master.id}>{master.person.surname + master.person.name}</Nav>;
+                    {this.props.masters.map((master) => {
+                        return <Nav key={master.id} id={master.id}>{master.person.surname + master.person.name}</Nav>;
                     })}
                     <Text>Сотрдники</Text>
                 </Nav> : null}
@@ -69,6 +70,7 @@ export class AppNavigation extends React.Component {
                     <Text>Товары</Text>
                 </Nav>
             </SideNav>
+            </div>
         );
     }
 }
