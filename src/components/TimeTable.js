@@ -80,7 +80,8 @@ class TimeTable extends Component {
                 let master = timeSlots.find(s => s.master.id === id).master;
                 return {
                     id: id,
-                    title: master.person.name
+                    title: master.person.name,
+                    master: master
                 };
             });
             this.setState({
@@ -100,7 +101,6 @@ class TimeTable extends Component {
     };
 
     onSelectEvent = (event) => {
-        console.log(event);
         this.setState({
             event: event,
             open: true
@@ -108,11 +108,17 @@ class TimeTable extends Component {
     };
 
     onOpenTimeSlotModal = (event) => {
-        console.log(event);
+        let master = this.state.timeSlots.resources.find(resource => resource.id === event.resourceId).master;
+        console.log(master);
         this.setState({
             event: {
                 start: event.start,
                 end: event.end
+            },
+            selectMaster: {
+                value: master.id,
+                label: master.person.name + " " + master.person.surname + " " + master.person.patronymic,
+                master: master
             },
             open: true
         });
