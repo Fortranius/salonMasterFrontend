@@ -3,15 +3,13 @@ import '../App.css';
 import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import TimeSlotModal from "../modal/TimeSlotModal";
-import {createTimeSlot} from "../service/timeSlotService";
+import {createTimeSlot, getTimeSlotsByDate} from "../service/timeSlotService";
 import PageParams from "../model/PageParams";
 import 'moment/locale/ru';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {getTimeSlotsByDateAction} from "../actions/timeSlotActions";
-import AsyncPaginate from 'react-select-async-paginate';
 import {getMasters, getMastersByFiO} from "../service/masterService";
-
 
 async function getOptionMasters(search, loadedOptions) {
     let response;
@@ -46,7 +44,8 @@ class TimeTable extends Component {
             event: {},
             startWeek: start,
             endWeek: endFormat,
-            selectMaster: undefined
+            selectMaster: undefined,
+            timeSlots:undefined
         };
         this.onOpenTimeSlotModal = this.onOpenTimeSlotModal.bind(this);
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
@@ -54,7 +53,43 @@ class TimeTable extends Component {
         this.onNavigate = this.onNavigate.bind(this);
         this.onSelectEvent = this.onSelectEvent.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
-        this.props.timeSlotActions(start, endFormat, undefined, new PageParams(0, 100));
+        this.setTimeSlots(start, endFormat, undefined);
+    }
+
+    setTimeSlots(start, end) {
+        getTimeSlotsByDate(start, end).then(timeSlots => {
+            let evants = timeSlots.map(timeSlot => {
+                let event = {
+                    id: timeSlot.id,
+                    resourceId: timeSlot.master.id,
+                    title: "\nМастер: " + timeSlot.master.person.name
+                    + " " + timeSlot.master.person.surname
+                    + " " + timeSlot.master.person.patronymic
+                    + " \nКлиент: " + timeSlot.client.person.name
+                    + " " + timeSlot.client.person.surname
+                    + " " + timeSlot.client.person.patronymic
+                    + " \nУслуга: " + timeSlot.service.description
+                    + " Цена: " + timeSlot.price,
+                    timeSlot: timeSlot,
+                    start: moment.unix(timeSlot.startSlot).toDate(),
+                    end: moment.unix(timeSlot.endSlot).toDate()
+                };
+                return event;
+            });
+            let resources = Array.from(new Set(timeSlots.map(s => s.master.id))).map(id => {
+                let master = timeSlots.find(s => s.master.id === id).master;
+                return {
+                    id: id,
+                    title: master.person.name
+                };
+            });
+            this.setState({
+                timeSlots: {
+                    evants: evants,
+                    resources: resources
+                }
+            });
+        });
     }
 
     onCloseTimeSlotModal = () => {
@@ -65,17 +100,19 @@ class TimeTable extends Component {
     };
 
     onSelectEvent = (event) => {
+        console.log(event);
         this.setState({
             event: event,
             open: true
         });
     };
 
-    onOpenTimeSlotModal = ({start, end}) => {
+    onOpenTimeSlotModal = (event) => {
+        console.log(event);
         this.setState({
             event: {
-                start: start,
-                end: end
+                start: event.start,
+                end: event.end
             },
             open: true
         });
@@ -83,11 +120,7 @@ class TimeTable extends Component {
 
     saveTimeSlot(timeSlot) {
         createTimeSlot(timeSlot).then(() => {
-            this.props.timeSlotActions(
-                this.state.startWeek,
-                this.state.endWeek,
-                this.state.selectMaster ? this.state.selectMaster.master : undefined,
-                new PageParams(0, 100));
+            this.setTimeSlots(this.state.startWeek, this.state.endWeek);
             this.setState({
                 open: false,
                 event: {}
@@ -104,11 +137,7 @@ class TimeTable extends Component {
         let start = moment(new Date(moment(date).startOf('isoWeek').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let endFormat = moment(end).format('YYYY-MM-DD HH:mm:ss');
 
-        this.props.timeSlotActions(
-            start,
-            endFormat,
-            this.state.selectMaster ? this.state.selectMaster.master : "",
-            new PageParams(0, 100));
+        this.setTimeSlots(start, endFormat);
 
         this.setState({
             startWeek: start,
@@ -117,11 +146,7 @@ class TimeTable extends Component {
     };
 
     handleInputMasterChange = (newValue) => {
-        this.props.timeSlotActions(
-            this.state.startWeek,
-            this.state.endWeek,
-            newValue.master,
-            new PageParams(0, 100));
+        this.setTimeSlots(this.state.startWeek, this.state.endWeek,);
         this.setState({
             selectMaster: {
                 value: newValue.value.id,
@@ -137,29 +162,14 @@ class TimeTable extends Component {
                 dow: 1
             }
         });
+
         const localizer = BigCalendar.momentLocalizer(moment);
         return (
             <div className="main-div">
-                <div className="container" >
-                    <div className="row">
-                        <div className="col-sm-2 title-margin">
-                            ФИО мастера:
-                        </div>
-                        <div className={"col-sm-4 " + (this.state.open ? 'hide-select-master' : 'show-select-master')}>
-                            <AsyncPaginate
-                                value={this.state.selectMaster}
-                                loadOptions={getOptionMasters}
-                                onChange={this.handleInputMasterChange}
-                                placeholder={'Выберите мастера'}
-                            />
-                        </div>
-                        <div className="col-sm"/>
-                    </div>
-                </div>
-                <hr/>
-                <BigCalendar
+                { this.state.timeSlots ? <BigCalendar
                     localizer={localizer}
-                    events={this.props.timeSlots}
+                    events={this.state.timeSlots.evants}
+                    resources={this.state.timeSlots.resources}
                     startAccessor="start"
                     endAccessor="end"
                     selectable={true}
@@ -194,7 +204,7 @@ class TimeTable extends Component {
                             };
                         }
                     }
-                />
+                />: null}
                 {this.state.event.start ? <TimeSlotModal
                     accept={this.saveTimeSlot}
                     event={this.state.event}
@@ -207,7 +217,8 @@ class TimeTable extends Component {
 }
 
 const mapStateToProps = state => ({
-    timeSlots: state.timeSlotReducer.timeSlots
+    timeSlots: state.timeSlotReducer.timeSlots,
+    resources: state.timeSlotReducer.resources
 });
 
 function mapDispatchToProps(dispatch) {

@@ -1,10 +1,6 @@
-export function getTimeSlotsByDate(start, end, master, params) {
-    let masterId = master ? master.id : "";
+export function getTimeSlotsByDate(start, end) {
     return fetch("http://localhost:8080/api/timeSlotsByDate?start=" + start +
-        "&end=" + end +
-        "&page=" + params.page +
-        "&size=" + params.size +
-        "&masterId=" + masterId)
+        "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
