@@ -4,27 +4,11 @@ import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import TimeSlotModal from "../modal/TimeSlotModal";
 import {createTimeSlot, getTimeSlotsByDate} from "../service/timeSlotService";
-import PageParams from "../model/PageParams";
 import 'moment/locale/ru';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {getTimeSlotsByDateAction} from "../actions/timeSlotActions";
-import {getMasters, getMastersByFiO} from "../service/masterService";
-
-async function getOptionMasters(search, loadedOptions) {
-    let response;
-    if (!search) response = await getMasters(new PageParams(0, 100));
-    else response = await getMastersByFiO(search);
-    let cachedOptions = response.content.map((d) => ({
-        value: d.id,
-        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
-        master: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true,
-    };
-}
+import {getAllMasters} from "../service/masterService";
 
 class TimeTable extends Component {
 
@@ -62,8 +46,8 @@ class TimeTable extends Component {
                 let event = {
                     id: timeSlot.id,
                     resourceId: timeSlot.master.id,
-                    title: "\nМастер: " + timeSlot.master.person.name
-                    + " " + timeSlot.master.person.surname
+                    title: "\nМастер: " + timeSlot.master.person.surname
+                    + " " + timeSlot.master.person.name
                     + " " + timeSlot.master.person.patronymic
                     + " \nКлиент: " + timeSlot.client.person.name
                     + " " + timeSlot.client.person.surname
@@ -76,19 +60,20 @@ class TimeTable extends Component {
                 };
                 return event;
             });
-            let resources = Array.from(new Set(timeSlots.map(s => s.master.id))).map(id => {
-                let master = timeSlots.find(s => s.master.id === id).master;
-                return {
-                    id: id,
-                    title: master.person.name,
-                    master: master
-                };
-            });
-            this.setState({
-                timeSlots: {
-                    evants: evants,
-                    resources: resources
-                }
+            getAllMasters().then(masters => {
+                let resources = masters.map(master => {
+                    return {
+                        id: master.id,
+                        title: master.person.name,
+                        master: master
+                    };
+                });
+                this.setState({
+                    timeSlots: {
+                        evants: evants,
+                        resources: resources
+                    }
+                });
             });
         });
     }

@@ -466,6 +466,7 @@ class TimeSlotModal extends Component {
                             loadOptions={getOptionClientsByFIO}
                             onChange={this.handleInputClientChange}
                             placeholder={'Выберите ФИО клиента'}
+                            onBlurResetsInput={false}
                         />
                         <FormControl className={classes.formControl} error={this.validate('selectClient')} aria-describedby="selectClient-error-text">
                             { this.validate('selectClient') ? <FormHelperText id="selectClient-error-text">Поле не может быть пустым</FormHelperText>: null }

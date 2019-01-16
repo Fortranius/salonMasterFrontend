@@ -127,3 +127,14 @@ time, .react-calendar__navigation__arrow, .react-calendar__navigation__label, .r
 .div-side-nav {
   height: auto;
 }
+
+.rbc-row-content {
+  display: none;
+}
+.rbc-timeslot-group{
+  min-height: 30px;
+}
+
+.rbc-day-slot .rbc-event-content {
+  font-size: 8pt;
+}
