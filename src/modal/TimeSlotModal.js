@@ -17,9 +17,8 @@ import NumberFormat from 'react-number-format';
 import TextField from '@material-ui/core/TextField';
 
 import MomentLocaleUtils, {parseDate} from 'react-day-picker/moment';
-
 import 'moment/locale/ru';
-import {getServices, getServicesByDescription} from "../service/serviceService";
+import Autosuggest from 'react-autosuggest';
 
 const styles = theme => ({
     container: {
@@ -37,57 +36,14 @@ const styles = theme => ({
     },
 });
 
-async function getOptionClientsByPhone(search, loadedOptions) {
-    if (!search) return;
-    const response = await getClientsByPhone(search);
-    let cachedOptions = response.content.map((d) => ({
-        value: d.id,
-        label: d.person.phone,
-        person: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true
-    };
-}
-
-async function getOptionClientsByFIO(search, loadedOptions) {
-    if (!search) return;
-    const response = await getClientsByFiO(search);
-    let cachedOptions = response.content.map((d) => ({
-        value: d.id,
-        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
-        client: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true
-    };
-}
-
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
     if (!search) response = await getMasters(new PageParams(0, 100));
     else response = await getMastersByFiO(search);
     let cachedOptions = response.content.map((d) => ({
         value: d.id,
-        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
+        label: d.person.name,
         master: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true
-    };
-}
-
-async function getOptionServicesByDescription(search, loadedOptions) {
-    let response;
-    if (!search) response = await getServices();
-    else response = await getServicesByDescription(search);
-    let cachedOptions = response.map((d) => ({
-        value: d.id,
-        label: d.description,
-        service: d
     }));
     return {
         options: cachedOptions,
@@ -114,18 +70,48 @@ function NumberFormatCustom(props) {
     );
 }
 
+const getClientName = client => client.person.name;
+const getClientPhone = client => client.person.phone;
+const getServiceDescription = service => service.description;
+
+const renderClient = client => {
+    return (
+        <span>{client.person.name}</span>
+    );
+};
+
+const renderService = service => {
+    return (
+        <span>{service.description}</span>
+    );
+};
+
+const renderSectionTitle = section => {
+    return (
+        <strong>{section.title}</strong>
+    );
+};
+
+const getSectionClients = section => {
+    return section.clients;
+};
+
+const getSectionServices = section => {
+    return section.services;
+};
+
 class TimeSlotModal extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             selectService: undefined,
-            selectClient: undefined,
+            selectServiceByDescription: '',
             selectMaster: undefined,
-            selectMasterFio: undefined,
-            selectClientFio: undefined,
-            selectClientPhone: undefined,
-            selectServiceByDescription: undefined,
+            selectMasterName: undefined,
+            selectClient: undefined,
+            selectClientName: '',
+            selectClientPhone: '',
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
@@ -133,67 +119,66 @@ class TimeSlotModal extends Component {
             date: new Date(),
             id: undefined,
             price: 0,
-            status: 'NEW'
+            status: 'NEW',
+            value: '',
+            services:[],
+            clients: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
-        this.handleInputClientChange = this.handleInputClientChange.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
-        this.handleInputServiceChange = this.handleInputServiceChange.bind(this);
-
         this.handleChangeStartHour = this.handleChangeStartHour.bind(this);
         this.handleChangeStartMinutes = this.handleChangeStartMinutes.bind(this);
         this.handleChangeEndHour = this.handleChangeEndHour.bind(this);
         this.handleChangeEndMinutes = this.handleChangeEndMinutes.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleInputServiceChange = this.handleInputServiceChange.bind(this);
         this.setStatus = this.setStatus.bind(this);
     }
 
     componentDidMount() {
-        let selectMasterFio,
-            selectClientFio,
-            selectClientPhone,
+        let selectMasterName,
             selectMaster,
+            selectClient,
+            selectClientName,
+            selectClientPhone,
+            services,
             selectService,
             selectServiceByDescription,
             status;
         if (this.props.event.timeSlot) {
-            selectMasterFio = {
+            selectMasterName = {
                 value: this.props.event.timeSlot.master.id,
-                label: this.props.event.timeSlot.master.person.name
-                    + " " + this.props.event.timeSlot.master.person.surname
-                    + " " + this.props.event.timeSlot.master.person.patronymic,
+                label: this.props.event.timeSlot.master.person.name,
                 master: this.props.event.timeSlot.master
             };
-            selectClientFio = {
-                value: this.props.event.timeSlot.client.id,
-                label: this.props.event.timeSlot.client.person.name
-                    + " " + this.props.event.timeSlot.client.person.surname
-                    + " " + this.props.event.timeSlot.client.person.patronymic,
-                client: this.props.event.timeSlot.client
-            };
-            selectClientPhone = {
-                value: this.props.event.timeSlot.client.id,
-                label: this.props.event.timeSlot.client.person.phone,
-                client: this.props.event.timeSlot.client
-            };
-            if (this.props.event.timeSlot.service)
-                selectServiceByDescription = {
-                    value: this.props.event.timeSlot.service.id,
-                    label: this.props.event.timeSlot.service.description,
-                    service: this.props.event.timeSlot.service
-                };
             selectMaster = this.props.event.timeSlot.master ? this.props.event.timeSlot.master : undefined;
-            selectService = this.props.event.timeSlot.service ? this.props.event.timeSlot.service : undefined;
             status = this.props.event.timeSlot.status ? this.props.event.timeSlot.status : 'NEW';
+            selectClient = this.props.event.timeSlot.client;
+            selectClientName = this.props.event.timeSlot.client.person.name;
+            selectClientPhone = this.props.event.timeSlot.client.person.phone;
+            selectService = this.props.event.timeSlot.service;
+            selectServiceByDescription = this.props.event.timeSlot.service.description;
+            services = this.props.event.timeSlot.master.services.map(service => {
+                return {
+                    title: service.description,
+                    services: [
+                        service
+                    ]
+                }
+            });
         } else if (this.props.selectMaster) {
-            selectMasterFio = {
+            services = this.props.selectMaster.master.services.map(service => {
+                return {
+                    title: service.description,
+                    services: [
+                        service
+                    ]
+                }
+            });
+            selectMasterName = {
                 value: this.props.selectMaster.master.id,
-                label: this.props.selectMaster.master.person.name
-                + " " + this.props.selectMaster.master.person.surname
-                + " " + this.props.selectMaster.master.person.patronymic,
+                label: this.props.selectMaster.master.person.name,
                 master: this.props.selectMaster.master
             };
             selectMaster = this.props.selectMaster.master;
@@ -220,14 +205,16 @@ class TimeSlotModal extends Component {
                 label: this.props.event.end.getMinutes().toString().length < 2 ? '0' +
                     this.props.event.end.getMinutes().toString():this.props.event.end.getMinutes()
             },
-            selectMasterFio: selectMasterFio,
-            selectClientFio: selectClientFio,
-            selectClientPhone: selectClientPhone,
-            selectServiceByDescription : selectServiceByDescription,
-            selectClient: this.props.event.timeSlot ? this.props.event.timeSlot.client : undefined,
+            selectMasterName: selectMasterName,
             selectMaster: selectMaster,
+            status: status ? status : 'NEW',
+
+            selectClient: selectClient,
+            selectClientName: selectClientName,
+            selectClientPhone: selectClientPhone,
+            services: services,
             selectService: selectService,
-            status: status ? status : 'NEW'
+            selectServiceByDescription: selectServiceByDescription
         });
     }
 
@@ -241,7 +228,19 @@ class TimeSlotModal extends Component {
             submit: true
         });
 
-        if (!this.state.selectClient || !this.state.selectMaster || !this.state.date || !this.state.selectService)
+        let client = this.state.selectClient;
+
+        if (this.state.selectClientName && this.state.selectClientPhone) {
+            if (!client)
+                client = {
+                    person: {
+                        name: this.state.selectClientName,
+                        phone: this.state.selectClientPhone
+                    }
+                }
+        }
+
+        if (!client || !this.state.selectMaster || !this.state.date || !this.state.selectService)
             return false;
 
         let startDate = new Date(this.state.date);
@@ -253,7 +252,7 @@ class TimeSlotModal extends Component {
 
         let timeSlot = {
             id: this.state.id,
-            client: this.state.selectClient,
+            client: client,
             master: this.state.selectMaster,
             startSlot: startDate,
             endSlot: endDate,
@@ -268,11 +267,12 @@ class TimeSlotModal extends Component {
     clear() {
         this.setState({
             selectService: undefined,
+            selectServiceByDescription: '',
             selectClient: undefined,
             selectMaster: undefined,
-            selectMasterFio: undefined,
-            selectClientFio: undefined,
-            selectClientPhone: undefined,
+            selectMasterName: undefined,
+            selectClientName: '',
+            selectClientPhone: '',
             submit: false,
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
@@ -280,44 +280,30 @@ class TimeSlotModal extends Component {
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
             price: 0,
-            status: 'NEW'
+            status: 'NEW',
+            services:[],
+            clients:[]
         });
     }
 
-    handleInputServiceChange = (newValue) => {
-        this.setState({
-            selectService: newValue.service,
-            selectServiceByDescription: {
-                value: newValue.value,
-                label: newValue.service.description,
-                service: newValue.service
-            },
-            price: newValue.service.minPrice
-        });
-    };
-
-    handleInputClientChange = (newValue) => {
-        this.setState({
-            selectClient: newValue.client,
-            selectClientFio: {
-                value: newValue.value,
-                label: newValue.client.person.name + " " + newValue.client.person.surname + " " + newValue.client.person.patronymic,
-                client: newValue.client
-            },
-            selectClientPhone: {
-                value: newValue.value,
-                label: newValue.client.person.phone,
-                client: newValue.client
+    handleInputMasterChange = (newValue) => {
+        let options = newValue.master.services.map(service => {
+            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + '₽': '';
+            return {
+                title: service.minPrice + '₽' + maxPrice,
+                services: [
+                    service
+                ]
             }
         });
-    };
-
-    handleInputMasterChange = (newValue) => {
         this.setState({
             selectMaster: newValue.master,
-            selectMasterFio: {
+            services: options,
+            selectService: undefined,
+            selectServiceByDescription: '',
+            selectMasterName: {
                 value: newValue.value,
-                label: newValue.master.person.name + " " + newValue.master.person.surname + " " + newValue.master.person.patronymic,
+                label: newValue.master.person.name,
                 master: newValue.master
             }
         });
@@ -368,8 +354,137 @@ class TimeSlotModal extends Component {
         return (!this.state || !this.state[field]);
     }
 
+    onClientsFetchRequestedByName = ({ value }) => {
+        getClientsByFiO(value).then(clients => {
+            let options = clients.map(client => {
+                return {
+                    title: client.person.phone,
+                    clients: [
+                        client
+                    ]
+                }
+            });
+            this.setState({
+                clients: options
+            });
+        });
+    };
+
+    onClientsFetchRequestedByPhone = ({ value }) => {
+        getClientsByPhone(value).then(clients => {
+            let options = clients.map(client => {
+                return {
+                    title: client.person.phone,
+                    clients: [
+                        client
+                    ]
+                }
+            });
+            this.setState({
+                clients: options
+            });
+        });
+    };
+
+    onServicesByDescription = ({ value }) => {
+        const inputValue = value.trim().toLowerCase();
+        const inputLength = inputValue.length;
+        let options = this.state.selectMaster.services.filter(service =>
+            service.description.toLowerCase().slice(0, inputLength) === inputValue
+        ).map(service => {
+            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + '₽': '';
+            return {
+                title: service.minPrice + '₽' + maxPrice,
+                services: [
+                    service
+                ]
+            }
+        });
+        this.setState({
+            services: options
+        });
+    };
+
+    onClientsClearRequested = () => {
+        this.setState({
+            clients: []
+        });
+    };
+
+    onServicesClearRequested = () => {
+        let options = this.state.selectMaster.services.map(service => {
+            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + '₽': '';
+            return {
+                title: service.minPrice + '₽' + maxPrice,
+                services: [
+                    service
+                ]
+            }
+        });
+        this.setState({
+            services: options
+        });
+    };
+
+    onChangeClientName = (event, { newValue }) => {
+        this.setState({
+            selectClientName: newValue,
+            selectClient: undefined
+        });
+    };
+
+    onChangeClientPhone = (event, { newValue }) => {
+        this.setState({
+            selectClientPhone: newValue,
+            selectClient: undefined
+        });
+    };
+
+    onChangeServiceDescription = (event, { newValue }) => {
+        this.setState({
+            selectService: undefined,
+            selectServiceByDescription: newValue
+        });
+    };
+
+    onClientSelected = (event, { suggestion })  => {
+        this.setState({
+            selectClient: suggestion,
+            selectClientName: suggestion.person.name,
+            selectClientPhone: suggestion.person.phone
+        });
+    };
+
+    onServiceSelected = (event, { suggestion })  => {
+        this.setState({
+            selectService: suggestion,
+            price: suggestion.minPrice,
+            selectServiceByDescription: suggestion.description
+        });
+    };
+
+    shouldRenderSuggestions = (value) => {
+        return value.trim().length > -1;
+    };
+
     render() {
         const { classes } = this.props;
+        const inputClientNameProps = {
+            placeholder: 'Введите имя клиента',
+            value:  this.state.selectClientName,
+            onChange: this.onChangeClientName
+        };
+        const inputClientPhoneProps = {
+            placeholder: 'Введите телефон клиента',
+            value: this.state.selectClientPhone,
+            onChange: this.onChangeClientPhone
+        };
+
+        const inputServiceProps = {
+            placeholder: '',
+            value: this.state.selectServiceByDescription,
+            onChange: this.onChangeServiceDescription
+        };
         return (
             <div>
                 <Modal open={this.props.open}
@@ -458,18 +573,25 @@ class TimeSlotModal extends Component {
                         <hr/>
                         <div className="row">
                             <div className="col-sm">
-                                ФИО клиента:
+                                Имя клиента:
                             </div>
                         </div>
-                        <AsyncPaginate
-                            value={this.state.selectClientFio}
-                            loadOptions={getOptionClientsByFIO}
-                            onChange={this.handleInputClientChange}
-                            placeholder={'Выберите ФИО клиента'}
-                            onBlurResetsInput={false}
+
+                        <Autosuggest
+                            suggestions={this.state.clients}
+                            multiSection={true}
+                            onSuggestionsFetchRequested={this.onClientsFetchRequestedByName}
+                            onSuggestionsClearRequested={this.onClientsClearRequested}
+                            getSuggestionValue={getClientName}
+                            renderSuggestion={renderClient}
+                            renderSectionTitle={renderSectionTitle}
+                            getSectionSuggestions={getSectionClients}
+                            inputProps={inputClientNameProps}
+                            onSuggestionSelected={this.onClientSelected}
                         />
-                        <FormControl className={classes.formControl} error={this.validate('selectClient')} aria-describedby="selectClient-error-text">
-                            { this.validate('selectClient') ? <FormHelperText id="selectClient-error-text">Поле не может быть пустым</FormHelperText>: null }
+
+                        <FormControl className={classes.formControl} error={this.validate('selectClientName')} aria-describedby="selectClientName-error-text">
+                            { this.validate('selectClientName') ? <FormHelperText id="selectClientName-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl>
                         <hr/>
                         <div className="row">
@@ -477,12 +599,20 @@ class TimeSlotModal extends Component {
                                 Телефон клиента:
                             </div>
                         </div>
-                        <AsyncPaginate
-                            value={this.state.selectClientPhone}
-                            loadOptions={getOptionClientsByPhone}
-                            onChange={this.handleInputClientChange}
-                            placeholder={'Выберите телефон клиента'}
+
+                        <Autosuggest
+                            suggestions={this.state.clients}
+                            multiSection={true}
+                            onSuggestionsFetchRequested={this.onClientsFetchRequestedByPhone}
+                            onSuggestionsClearRequested={this.onClientsClearRequested}
+                            getSuggestionValue={getClientPhone}
+                            renderSuggestion={renderClient}
+                            renderSectionTitle={renderSectionTitle}
+                            getSectionSuggestions={getSectionClients}
+                            inputProps={inputClientPhoneProps}
+                            onSuggestionSelected={this.onClientSelected}
                         />
+
                         <FormControl className={classes.formControl} error={this.validate('selectClientPhone')} aria-describedby="selectClientPhone-error-text">
                             { this.validate('selectClientPhone') ? <FormHelperText id="selectClientPhone-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl>
@@ -493,7 +623,7 @@ class TimeSlotModal extends Component {
                             </div>
                         </div>
                         <AsyncPaginate
-                            value={this.state.selectMasterFio}
+                            value={this.state.selectMasterName}
                             loadOptions={getOptionMastersByFIO}
                             onChange={this.handleInputMasterChange}
                             placeholder={'Выберите мастера'}
@@ -508,12 +638,20 @@ class TimeSlotModal extends Component {
                                     Услуга:
                                 </div>
                                 <div className="col-sm">
-                                    <AsyncPaginate
-                                        value={this.state.selectServiceByDescription}
-                                        loadOptions={getOptionServicesByDescription}
-                                        onChange={this.handleInputServiceChange}
-                                        placeholder={'Выберите услугу'}
-                                    />
+                                    {this.state.selectMaster ? <Autosuggest
+                                        suggestions={this.state.services}
+                                        multiSection={true}
+                                        onSuggestionsFetchRequested={this.onServicesByDescription}
+                                        onSuggestionsClearRequested={this.onServicesClearRequested}
+                                        getSuggestionValue={getServiceDescription}
+                                        renderSuggestion={renderService}
+                                        renderSectionTitle={renderSectionTitle}
+                                        getSectionSuggestions={getSectionServices}
+                                        inputProps={inputServiceProps}
+                                        onSuggestionSelected={this.onServiceSelected}
+                                        focusInputOnSuggestionClick={true}
+                                        shouldRenderSuggestions={this.shouldRenderSuggestions}
+                                    />: null }
                                     <FormControl className={classes.formControl} error={this.validate('selectService')} aria-describedby="selectService-error-text">
                                         { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
                                     </FormControl>
@@ -534,7 +672,7 @@ class TimeSlotModal extends Component {
                             </div>
                             <hr/>
                         </div>
-                        </div>: null }
+                    </div>: null }
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
                             Сохранить

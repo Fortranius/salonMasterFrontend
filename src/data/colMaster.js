@@ -8,19 +8,15 @@ export default [
         text: 'Имя'
     },
     {
-        dataField: 'person.surname',
-        text: 'Фамилия'
-    },
-    {
-        dataField: 'person.patronymic',
-        text: 'Отчество'
-    },
-    {
         dataField: 'person.phone',
         text: 'Телефон'
     },
     {
         dataField: 'person.mail',
         text: 'Почта'
+    },
+    {
+        dataField: 'type',
+        text: 'Категория'
     }
 ]

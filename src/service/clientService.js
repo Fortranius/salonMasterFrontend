@@ -7,8 +7,8 @@ export function getClients(params) {
         });
 }
 
-export function getClientsByFiO(fio) {
-    return fetch("http://localhost:8080/api/clients/fio/" + fio + "?page=0&size=100")
+export function getClientsByFiO(name) {
+    return fetch("http://localhost:8080/api/clients/name/" + name)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -17,7 +17,7 @@ export function getClientsByFiO(fio) {
 }
 
 export function getClientsByPhone(filter) {
-    return fetch("http://localhost:8080/api/clients/phone/" + filter + "?page=0&size=100")
+    return fetch("http://localhost:8080/api/clients/phone/" + filter)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {

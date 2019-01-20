@@ -7,8 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import Select from 'react-select';
-import {getServices} from "../service/serviceService";
+import ServiceList from './components/ServiceItem';
 
 const styles = theme => ({
     container: {
@@ -35,7 +34,7 @@ const styles = theme => ({
     },
 });
 
-function NumberFormatCustom(props) {
+function NumberFormatCustomPhone(props) {
     const { inputRef, onChange, ...other } = props;
 
     return (
@@ -56,6 +55,25 @@ function NumberFormatCustom(props) {
     );
 }
 
+function NumberFormatCustomSum(props) {
+    const { inputRef, onChange, ...other } = props;
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={inputRef}
+            onValueChange={values => {
+                onChange({
+                    target: {
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator
+            prefix="₽"
+        />
+    );
+}
+
 class UpdateModal extends Component {
 
     constructor() {
@@ -64,36 +82,27 @@ class UpdateModal extends Component {
             person: {
                 phone: '',
                 name:'',
-                surname:'',
-                patronymic:'',
                 mail:''
             },
+            service: {
+                description: '',
+                minPrice: 0,
+                maxPrice: 0
+            },
+            type: '',
             services:[],
             submit: false,
-            selectedServices: [],
-            optionServices: []
+            submitService: false
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleChange = this.handleChange.bind(this);
-
-        getServices().then(data => {
-            let services = data.map(service => {
-                return { value: service.id, label: service.description, service: service };
-            });
-            this.setState({
-                optionServices: services
-            });
-        });
+        this.handleChangePerson = this.handleChangePerson.bind(this);
+        this.handleChangeService = this.handleChangeService.bind(this);
     }
 
     componentDidMount() {
         if (this.props.update) {
-            let selectedServices = [];
-            if (this.props.update.services)
-                selectedServices = this.props.update.services.map(service => {
-                    return { value: service.id, label: service.description, service: service };
-                });
             this.setState({
                 person: {
                     phone: this.props.update.person.phone ? this.props.update.person.phone : '',
@@ -102,8 +111,7 @@ class UpdateModal extends Component {
                     patronymic: this.props.update.person.patronymic ? this.props.update.person.patronymic : '',
                     mail: this.props.update.person.mail ? this.props.update.person.mail : '',
                 },
-                services: this.props.update.services,
-                selectedServices: selectedServices
+                services: this.props.update.services
             });
         }
     }
@@ -113,13 +121,17 @@ class UpdateModal extends Component {
             person: {
                 phone: '',
                 name:'',
-                surname:'',
-                patronymic:'',
                 mail:''
             },
+            type: '',
             services:[],
+            service: {
+                description: '',
+                minPrice: 0,
+                maxPrice: 0
+            },
             submit: false,
-            selectedServices: []
+            submitService: false
         });
     }
 
@@ -134,9 +146,6 @@ class UpdateModal extends Component {
             submit: true
         });
         if (this.state.person.name
-            && this.state.person.surname
-            && this.state.person.patronymic
-            && this.state.person.mail
             && this.state.person.phone.length === 10
             && ((this.state.services && this.state.services.length>0)
                 || this.props.entity !== 'мастера')) {
@@ -147,8 +156,23 @@ class UpdateModal extends Component {
 
     handleChange = name => event => {
         this.setState({
+            [name]: event.target.value
+        });
+    };
+
+    handleChangePerson = name => event => {
+        this.setState({
             person: {
                 ...this.state.person,
+                [name]: event.target.value
+            }
+        });
+    };
+
+    handleChangeService = name => event => {
+        this.setState({
+            service: {
+                ...this.state.service,
                 [name]: event.target.value
             }
         });
@@ -159,19 +183,37 @@ class UpdateModal extends Component {
             return false;
         if (field === 'phone')
             return this.state.person.phone.length !== 10;
-        if (field === 'service')
-            return this.state.selectedServices.length === 0;
         return (!this.state.person || !this.state.person[field]);
     };
 
-    handleChangeServices = (selectedServices) => {
-        let services = selectedServices.map(option => {
-            return option.service;
-        });
+    validateService(field) {
+        if (!this.state.submitService)
+            return false;
+        return (!this.state.service || !this.state.service[field]);
+    };
+
+    removeService = (serviceIndex)  => {
+        this.setState({services: this.state.services.splice(serviceIndex, 1)});
+    };
+
+    addService = ()  => {
         this.setState({
-            selectedServices: selectedServices,
-            services: services
+            submitService: true
         });
+        if (this.state.service.description
+            && this.state.service.minPrice) {
+            let services = this.state.services;
+            services.push(this.state.service);
+            this.setState({
+                services: services,
+                service: {
+                    description: '',
+                    minPrice: 0,
+                    maxPrice: 0
+                },
+                submitService:false
+            });
+        }
     };
 
     render() {
@@ -186,46 +228,53 @@ class UpdateModal extends Component {
                     { this.props.update ? <h2>Редактирование {this.props.entity}</h2>: null }
                     { !this.props.update ? <h2>Создание {this.props.entity}</h2>: null }
                     <div className={classes.container}>
-                        <FormControl className={classes.formControl} error={this.validate('surname')} aria-describedby="surname-error-text">
-                            <InputLabel htmlFor="surname">Фамиля</InputLabel>
-                            <Input id="surname" value={this.state.person.surname} onChange={this.handleChange('surname')} />
-                            { this.validate('surname') ? <FormHelperText id="surname-error-text">Поле не может быть пустым</FormHelperText>: null }
-                        </FormControl>
                         <FormControl className={classes.formControl} error={this.validate('name')} aria-describedby="name-error-text">
                             <InputLabel htmlFor="name">Имя</InputLabel>
-                            <Input id="name" value={this.state.person.name} onChange={this.handleChange('name')} />
+                            <Input id="name" value={this.state.person.name} onChange={this.handleChangePerson('name')} />
                             { this.validate('name') ? <FormHelperText id="name-error-text">Поле не может быть пустым</FormHelperText>: null }
-                        </FormControl>
-                        <FormControl className={classes.formControl} error={this.validate('patronymic')} aria-describedby="patronymic-error-text">
-                            <InputLabel htmlFor="patronymic">Отчество</InputLabel>
-                            <Input id="patronymic" value={this.state.person.patronymic} onChange={this.handleChange('patronymic')} />
-                            { this.validate('patronymic') ? <FormHelperText id="patronymic-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl>
                         <FormControl className={classes.formControl} error={this.validate('phone')} aria-describedby="phone-error-text">
                             <InputLabel htmlFor="phone">Телефон</InputLabel>
-                            <Input id="phone" value={this.state.person.phone} inputComponent={NumberFormatCustom} onChange={this.handleChange('phone')} />
+                            <Input id="phone" value={this.state.person.phone} inputComponent={NumberFormatCustomPhone} onChange={this.handleChangePerson('phone')} />
                             { this.validate('phone') ? <FormHelperText id="phone-error-text">Телефон введен неверно</FormHelperText>: null }
                         </FormControl>
                         <FormControl className={classes.formControl} error={this.validate('mail')} aria-describedby="mail-error-text">
                             <InputLabel htmlFor="mail">Почта</InputLabel>
-                            <Input id="mail" value={this.state.person.mail} onChange={this.handleChange('mail')} />
-                            { this.validate('mail') ? <FormHelperText id="mail-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            <Input id="mail" value={this.state.person.mail} onChange={this.handleChangePerson('mail')} />
+                        </FormControl>
+                        <FormControl className={classes.formControl} error={this.validate('type')} aria-describedby="type-error-text">
+                            <InputLabel htmlFor="type">Категория</InputLabel>
+                            <Input id="type" value={this.state.type} onChange={this.handleChange('type')} />
+                            { this.validate('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl>
                     </div>
+                    <hr/>
                     { this.props.entity === 'мастера' ? <div>
-                        <hr/>
-                        <FormControl className={classes.formControlServices} error={this.validate('service')} aria-describedby="service-error-text">
-                            <Select id="service"
-                                isMulti
-                                closeMenuOnSelect={false}
-                                value={this.state.selectedServices}
-                                onChange={this.handleChangeServices}
-                                placeholder="Выберите услуги"
-                                options={this.state.optionServices}
-                            />
-                            { this.validate('service') ? <FormHelperText id="service-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
-                        </FormControl>
-                    </div>: null }
+                        <div className="row">
+                            <div className="col-sm">
+                                Услуги мастера:
+                            </div>
+                        </div>
+                        <ServiceList services={this.state.services} isRemove={!this.props.update} removeService={this.removeService}/>
+                        <div className={classes.container}>
+                            <FormControl className={classes.formControl} error={this.validateService('description')} aria-describedby="description-error-text">
+                                <InputLabel htmlFor="description">Описание</InputLabel>
+                                <Input id="description" value={this.state.service.description} onChange={this.handleChangeService('description')} />
+                                { this.validateService('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                            <FormControl className={classes.formControl} error={this.validateService('minPrice')} aria-describedby="minPrice-error-text">
+                                <InputLabel htmlFor="minPrice">Минимальная цена</InputLabel>
+                                <Input id="minPrice" value={this.state.service.minPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('minPrice')} />
+                                { this.validateService('minPrice') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                            <FormControl className={classes.formControl} aria-describedby="maxPrice-error-text">
+                                <InputLabel htmlFor="maxPrice">Максимальная цена</InputLabel>
+                                <Input id="maxPrice" value={this.state.service.maxPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('maxPrice')} />
+                            </FormControl>
+                            <button className="btn btn-default add-service-button" onClick={this.addService}>+</button>
+                        </div>
+                    </div>: null}
+                    <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
                             Сохранить

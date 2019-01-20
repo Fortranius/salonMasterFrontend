@@ -10,16 +10,6 @@ export default [
         sort: true
     },
     {
-        dataField: 'person.surname',
-        text: 'Фамилия',
-        sort: true
-    },
-    {
-        dataField: 'person.patronymic',
-        text: 'Отчество',
-        sort: true
-    },
-    {
         dataField: 'person.phone',
         text: 'Телефон',
         sort: true
@@ -27,6 +17,11 @@ export default [
     {
         dataField: 'person.mail',
         text: 'Почта',
+        sort: true
+    },
+    {
+        dataField: 'description',
+        text: 'Описание',
         sort: true
     }
 ]

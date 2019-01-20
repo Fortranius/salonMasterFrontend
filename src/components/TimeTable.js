@@ -46,12 +46,8 @@ class TimeTable extends Component {
                 let event = {
                     id: timeSlot.id,
                     resourceId: timeSlot.master.id,
-                    title: "\nМастер: " + timeSlot.master.person.surname
-                    + " " + timeSlot.master.person.name
-                    + " " + timeSlot.master.person.patronymic
+                    title: "\nМастер: "+ " " + timeSlot.master.person.name
                     + " \nКлиент: " + timeSlot.client.person.name
-                    + " " + timeSlot.client.person.surname
-                    + " " + timeSlot.client.person.patronymic
                     + " \nУслуга: " + timeSlot.service.description
                     + " Цена: " + timeSlot.price,
                     timeSlot: timeSlot,
@@ -94,7 +90,6 @@ class TimeTable extends Component {
 
     onOpenTimeSlotModal = (event) => {
         let master = this.state.timeSlots.resources.find(resource => resource.id === event.resourceId).master;
-        console.log(master);
         this.setState({
             event: {
                 start: event.start,
@@ -102,7 +97,7 @@ class TimeTable extends Component {
             },
             selectMaster: {
                 value: master.id,
-                label: master.person.name + " " + master.person.surname + " " + master.person.patronymic,
+                label: master.person.name,
                 master: master
             },
             open: true
@@ -141,7 +136,7 @@ class TimeTable extends Component {
         this.setState({
             selectMaster: {
                 value: newValue.value.id,
-                label: newValue.master.person.name + " " + newValue.master.person.surname + " " + newValue.master.person.patronymic,
+                label: newValue.master.person.name,
                 master: newValue.master
             }
         });

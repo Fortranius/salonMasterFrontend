@@ -16,8 +16,8 @@ export function getAllMasters() {
         });
 }
 
-export function getMastersByFiO(fio) {
-    return fetch("http://localhost:8080/api/masters/fio/" + fio + "?page=0&size=100")
+export function getMastersByFiO(name) {
+    return fetch("http://localhost:8080/api/masters/name/" + name)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
