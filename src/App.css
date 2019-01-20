@@ -114,6 +114,10 @@
   -webkit-box-shadow:0px 1px 1px #de1dde;
   -moz-box-shadow:0px 1px 1px #de1dde;
   box-shadow:0px 1px 1px #a972a9;
+
+  border: none !important;
+  font-size: 10px !important;
+
 }
 
 time, .react-calendar__navigation__arrow, .react-calendar__navigation__label, .react-calendar__month-view__weekdays__weekday{
@@ -226,4 +230,22 @@ body {
   height: 30px;
   margin-top: 30px;
   cursor: pointer;
+}
+
+main {
+  padding-left: 190px;
+}
+
+nav {
+  width: 180px;
+  min-width: 190px !important;
+  color: white;
+}
+
+.react-calendar__tile {
+  padding: 5px 5px !important;
+}
+
+.sidenav---sidenav---_2tBP {
+  background: #2b4f3e !important;
 }

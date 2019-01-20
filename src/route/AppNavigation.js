@@ -23,13 +23,16 @@ export class AppNavigation extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            selectedPath: ''
+        };
         this.props.masterActions();
     }
 
     render() {
         return (
             <div className="div-side-nav">
-            <SideNav theme={theme} defaultSelectedPath={"timetable"}>
+            <SideNav theme={theme} selectedPath={this.state.selectedPath} onItemSelection={this.onItemSelection} defaultSelectedPath={"timetable"}>
                 <Nav id="timetable">
                     <NavIcon>
                         <Icon icon={simple} />
