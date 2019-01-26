@@ -93,10 +93,10 @@ class Products extends Component {
             <div className="main-div">
                 <div className="button-group">
                     <button onClick = { this.onOpenCreateModal } className="btn btn-primary">
-                        Добавить товар
+                        Добавить аксессуар
                     </button>
                     { this.state.select ? <button onClick = { this.onOpenUpdateModal } className="btn btn-primary">
-                        Изменить товар
+                        Изменить аксессуар
                     </button> : null }
                 </div>
                 {this.state.data ? <BootstrapTable

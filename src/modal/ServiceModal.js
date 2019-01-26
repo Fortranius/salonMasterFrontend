@@ -48,8 +48,7 @@ function NumberFormatCustom(props) {
                     },
                 });
             }}
-            thousandSeparator
-            prefix="₽"
+            thousandSeparator={' '}
         />
     );
 }
@@ -141,12 +140,12 @@ class ServiceModal extends Component {
                     <div>
                         <div className={classes.container}>
                             <FormControl className={classes.formControl} error={this.validate('minPrice')} aria-describedby="minPrice-error-text">
-                                <InputLabel htmlFor="minPrice">Минимальная цена</InputLabel>
+                                <InputLabel htmlFor="minPrice">Минимальная цена (руб.)</InputLabel>
                                 <Input id="minPrice" inputComponent={NumberFormatCustom} value={this.state.service.minPrice} onChange={this.handleChange('minPrice')} />
                                 { this.validate('minPrice') ? <FormHelperText id="minPrice-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                             <FormControl className={classes.formControl} error={this.validate('maxPrice')} aria-describedby="maxPrice-error-text">
-                                <InputLabel htmlFor="maxPrice">Максимальная цена</InputLabel>
+                                <InputLabel htmlFor="maxPrice">Максимальная цена (руб.)</InputLabel>
                                 <Input id="maxPrice" inputComponent={NumberFormatCustom} value={this.state.service.maxPrice} onChange={this.handleChange('maxPrice')} />
                             </FormControl>
                         </div>

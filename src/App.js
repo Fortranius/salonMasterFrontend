@@ -38,7 +38,7 @@ class App extends Component {
                             }}>
                             <SideNav.Nav defaultSelected="">
                                 <Title>Укротитель волос</Title>
-                                <Calendar onChange={date => history.push("?date=" + date)}/>
+                                <Calendar onChange={date => history.push("/?date=" + date)}/>
                                 <NavItem eventKey="">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-home" style={{fontSize: '1.75em'}}/>
@@ -69,7 +69,7 @@ class App extends Component {
                                         <i className="fa fa-fw fa-product-hunt" style={{fontSize: '1.75em'}}/>
                                     </NavIcon>
                                     <NavText>
-                                        Товары
+                                        Аксессуары
                                     </NavText>
                                 </NavItem>
                                 <NavItem eventKey="expenses">

@@ -276,3 +276,54 @@ li a:hover {
 .time_slot_modal {
   width: 1000px;
 }
+
+.btn-primary {
+  background-color: #9c9e9f;
+  border: none;
+  border-radius: 0px;
+}
+
+.btn-primary:hover {
+  box-shadow: 1px 2px #888888;
+  background-color: #1c9f88;
+  border-radius: 0px;
+}
+
+body {
+  background-color: #e4e4e1;
+}
+
+.table-bordered td, .table-bordered th {
+  border: 1px solid black;
+}
+
+.rbc-calendar {
+  background-color: #cecec8;
+}
+
+.rbc-time-content > .rbc-time-gutter {
+  background-color: #cecec8;
+}
+
+.rbc-time-view-resources .rbc-time-gutter, .rbc-time-view-resources .rbc-time-header-gutter {
+  background-color: #cecec8;
+}
+
+.rbc-time-content > .rbc-day-slot {
+  background-color: #e1e1dc;
+}
+
+.page-item.active .page-link {
+  background-color: #9c9e9f;
+  border: none;
+  border-radius: 0px;
+}
+
+.DayPickerInput>input {
+  background-color: #b4a2a2 !important;
+  color: white !important;
+}
+
+h2 {
+  font-style: italic;
+}

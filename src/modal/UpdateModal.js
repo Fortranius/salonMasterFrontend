@@ -68,8 +68,7 @@ function NumberFormatCustomSum(props) {
                     },
                 });
             }}
-            thousandSeparator
-            prefix="₽"
+            thousandSeparator={' '}
         />
     );
 }
@@ -267,12 +266,12 @@ class UpdateModal extends Component {
                                 { this.validateService('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                             <FormControl className={classes.formControl} error={this.validateService('minPrice')} aria-describedby="minPrice-error-text">
-                                <InputLabel htmlFor="minPrice">Минимальная цена</InputLabel>
+                                <InputLabel htmlFor="minPrice">Минимальная цена (руб.)</InputLabel>
                                 <Input id="minPrice" value={this.state.service.minPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('minPrice')} />
                                 { this.validateService('minPrice') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                             <FormControl className={classes.formControl} aria-describedby="maxPrice-error-text">
-                                <InputLabel htmlFor="maxPrice">Максимальная цена</InputLabel>
+                                <InputLabel htmlFor="maxPrice">Максимальная цена (руб.)</InputLabel>
                                 <Input id="maxPrice" value={this.state.service.maxPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('maxPrice')} />
                             </FormControl>
                             <button className="btn btn-default add-service-button" onClick={this.addService}>+</button>

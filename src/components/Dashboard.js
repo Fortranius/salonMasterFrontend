@@ -3,7 +3,7 @@ import '../App.css';
 import '../style.css';
 import {Bar, Pie} from 'react-chartjs-2';
 import {getDashboardAll, getDashboardMasters} from "../service/dashboardService";
-import MomentLocaleUtils, {parseDate} from "react-day-picker/moment";
+import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
 
@@ -125,6 +125,7 @@ class Dashboard extends Component {
                             <DayPickerInput
                                 placeholder={``}
                                 parseDate={parseDate}
+                                formatDate={formatDate}
                                 value={this.state.start}
                                 onDayChange={this.handleChangeStartDate}
                                 dayPickerProps={{
@@ -140,6 +141,7 @@ class Dashboard extends Component {
                             <DayPickerInput
                                 placeholder={``}
                                 parseDate={parseDate}
+                                formatDate={formatDate}
                                 value={this.state.end}
                                 onDayChange={this.handleChangeEndDate}
                                 dayPickerProps={{

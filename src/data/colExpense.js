@@ -9,7 +9,7 @@ export default [
     },
     {
         dataField: 'product.description',
-        text: 'Наименование товара'
+        text: 'Наименование аксессуара'
     },
     {
         dataField: 'countProduct',

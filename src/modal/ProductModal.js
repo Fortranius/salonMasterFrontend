@@ -48,8 +48,7 @@ function NumberFormatCustom(props) {
                     },
                 });
             }}
-            thousandSeparator
-            prefix="₽"
+            thousandSeparator={' '}
         />
     );
 }
@@ -134,7 +133,7 @@ class ProductModal extends Component {
                                 { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                             <FormControl className={classes.formControl} error={this.validate('price')} aria-describedby="price-error-text">
-                                <InputLabel htmlFor="price">Минимальная цена</InputLabel>
+                                <InputLabel htmlFor="price">Минимальная цена (руб.)</InputLabel>
                                 <Input id="price" inputComponent={NumberFormatCustom} value={this.state.product.price} onChange={this.handleChange('price')} />
                                 { this.validate('price') ? <FormHelperText id="price-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>

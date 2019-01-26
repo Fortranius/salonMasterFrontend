@@ -9,7 +9,7 @@ import {getProducts, getProductsByDescription} from "../service/productService";
 import {getMasters, getMastersByFiO} from "../service/masterService";
 import PageParams from "../model/PageParams";
 import TextField from '@material-ui/core/TextField';
-import MomentLocaleUtils, {parseDate} from "react-day-picker/moment";
+import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
 
@@ -244,6 +244,7 @@ class ExpenseModal extends Component {
                                     parseDate={parseDate}
                                     value={this.state.date}
                                     onDayChange={this.handleChangeDate}
+                                    formatDate={formatDate}
                                     dayPickerProps={{
                                         locale: 'ru',
                                         localeUtils: MomentLocaleUtils,

@@ -36,9 +36,18 @@ class TimeTable extends Component {
         this.setTimeSlots(start, end, undefined);
     }
 
+    componentDidMount() {
+        let date = this.props.location.search.substr(6);
+        if (!date) return;
+        this.setDate(date);
+    }
+
     componentWillReceiveProps(newProps) {
         let date = newProps.location.search.substr(6);;
+        this.setDate(date);
+    }
 
+    setDate(date) {
         let start = moment(new Date(moment(date).startOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let end = moment(new Date(moment(date).endOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
 

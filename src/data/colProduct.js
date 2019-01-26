@@ -5,7 +5,7 @@ export default [
     },
     {
         dataField: 'description',
-        text: 'Название услуги'
+        text: 'Название аксессуара'
     },
     {
         dataField: 'price',
