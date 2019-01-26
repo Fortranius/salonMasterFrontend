@@ -41,14 +41,6 @@
     text-align: right;
 }
 
-.container>div>div {
-  width: 400px;
-}
-
-.selectDiv>div>div {
-  width: 100px;
-}
-
 .inlineDiv {
   display: inline-flex;
 }
@@ -248,4 +240,39 @@ nav {
 
 .sidenav---sidenav---_2tBP {
   background: #2b4f3e !important;
+}
+
+.modal-div {
+  padding-left: 190px;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+}
+
+li a {
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  cursor: pointer;
+  color: #0e17a4;
+}
+
+.styles_modal__gNwvD {
+  max-width: 1100px;
+}
+
+.time-slot-menu {
+  border-right: 1px solid #a19a9a;
+}
+
+.time_slot_modal {
+  width: 1000px;
 }

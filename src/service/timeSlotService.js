@@ -8,6 +8,15 @@ export function getTimeSlotsByDate(start, end) {
         });
 }
 
+export function getTimeSlotsByClientId(clientId) {
+    return fetch("http://localhost:8080/api/timeSlotsByClientId?clientId=" + clientId)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function createTimeSlot(timeSlot) {
     return sendRequest(timeSlot, "POST");
 }

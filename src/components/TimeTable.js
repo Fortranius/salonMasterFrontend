@@ -15,21 +15,17 @@ class TimeTable extends Component {
     constructor(props) {
         super(props);
 
-        let end = moment().startOf('week').isoWeekday(7).toDate();
-        end.setHours(23);
-        end.setMinutes(59);
-        end.setSeconds(59);
-
-        let start = moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss');
-        let endFormat = moment(end).format('YYYY-MM-DD HH:mm:ss');
+        let start = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        let end =  moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
 
         this.state = {
             open: false,
             event: {},
             startWeek: start,
-            endWeek: endFormat,
+            endWeek: end,
             selectMaster: undefined,
-            timeSlots:undefined
+            timeSlots:undefined,
+            date: new Date()
         };
         this.onOpenTimeSlotModal = this.onOpenTimeSlotModal.bind(this);
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
@@ -37,7 +33,22 @@ class TimeTable extends Component {
         this.onNavigate = this.onNavigate.bind(this);
         this.onSelectEvent = this.onSelectEvent.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
-        this.setTimeSlots(start, endFormat, undefined);
+        this.setTimeSlots(start, end, undefined);
+    }
+
+    componentWillReceiveProps(newProps) {
+        let date = newProps.location.search.substr(6);;
+
+        let start = moment(new Date(moment(date).startOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
+        let end = moment(new Date(moment(date).endOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
+
+        this.setTimeSlots(start, end);
+
+        this.setState({
+            date: new Date(date),
+            startWeek: start,
+            endWeek: end
+        });
     }
 
     setTimeSlots(start, end) {
@@ -46,7 +57,7 @@ class TimeTable extends Component {
                 let event = {
                     id: timeSlot.id,
                     resourceId: timeSlot.master.id,
-                    title: "\nМастер: "+ " " + timeSlot.master.person.name
+                    title: "\nМастер: "+ timeSlot.master.person.name
                     + " \nКлиент: " + timeSlot.client.person.name
                     + " \nУслуга: " + timeSlot.service.description
                     + " Цена: " + timeSlot.price,
@@ -153,6 +164,7 @@ class TimeTable extends Component {
         return (
             <div className="main-div">
                 { this.state.timeSlots ? <BigCalendar
+                    date={this.state.date}
                     localizer={localizer}
                     events={this.state.timeSlots.evants}
                     resources={this.state.timeSlots.resources}

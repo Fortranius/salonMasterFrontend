@@ -10,11 +10,8 @@ import Dashboard from "./components/Dashboard";
 import LoginPage from "./components/LoginPage";
 import {PrivateRoute} from './route/PrivateRoute';
 import Calendar from 'react-calendar';
-import SideNav, {Nav, NavIcon, NavItem, NavText, Toggle} from '@trendmicro/react-sidenav';
+import SideNav, {NavIcon, NavItem, NavText} from '@trendmicro/react-sidenav';
 import '@trendmicro/react-sidenav/dist/react-sidenav.css';
-import {getAllMastersAction} from "./actions/masterActions";
-import {bindActionCreators} from "redux";
-import {connect} from "react-redux";
 import {Title} from "./model/containers";
 import 'font-awesome/css/font-awesome.min.css';
 
@@ -25,7 +22,6 @@ class App extends Component {
         this.state = {
             selectedPath: ''
         };
-        this.props.masterActions();
     }
 
     render() {
@@ -42,7 +38,7 @@ class App extends Component {
                             }}>
                             <SideNav.Nav defaultSelected="">
                                 <Title>Укротитель волос</Title>
-                                <Calendar/>
+                                <Calendar onChange={date => history.push("?date=" + date)}/>
                                 <NavItem eventKey="">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-home" style={{fontSize: '1.75em'}}/>
@@ -51,21 +47,15 @@ class App extends Component {
                                         График
                                     </NavText>
                                 </NavItem>
-                                {this.props.masters ? <NavItem eventKey="masters">
+                                <NavItem eventKey="masters">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-user" style={{fontSize: '1.75em'}}/>
                                     </NavIcon>
                                     <NavText>
                                         Мастера
                                     </NavText>
-                                    {this.props.masters.map((master) => {
-                                        return <NavItem key={master.id} eventKey="masters/1" >
-                                            <NavText>
-                                                {master.person.name}
-                                            </NavText>
-                                        </NavItem>;
-                                    })}
-                                </NavItem>: null}
+
+                                </NavItem>
                                 <NavItem eventKey="clients">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-users" style={{fontSize: '1.75em'}}/>
@@ -117,14 +107,4 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-    masters: state.masterReducer.allMasters
-});
-
-function mapDispatchToProps(dispatch) {
-    return {
-        masterActions: bindActionCreators(getAllMastersAction, dispatch)
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

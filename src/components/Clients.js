@@ -84,6 +84,7 @@ class Clients extends Component {
     updateClient(entity) {
         let client = this.state.row;
         client.person = entity.person;
+        client.description = entity.description;
         updateClient(client).then(() => {
             this.props.clientActions(new PageParams(this.props.clients.number, this.props.clients.size));
             this.setState({

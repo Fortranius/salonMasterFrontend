@@ -13,7 +13,6 @@ function login(login, password) {
     return fetch(`http://localhost:8080/api/login`, requestOptions)
         .then(handleResponse)
         .then(user => {
-            console.log(user);
             if (user) {
                 user.authdata = window.btoa(login + ':' + password);
                 localStorage.setItem('user', JSON.stringify(user));

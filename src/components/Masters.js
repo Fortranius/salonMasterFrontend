@@ -95,6 +95,7 @@ class Masters extends Component {
         let master = this.state.row;
         master.person = entity.person;
         master.services = entity.services;
+        master.type = entity.type;
         updateMaster(master).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({

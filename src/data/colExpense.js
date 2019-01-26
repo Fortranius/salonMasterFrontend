@@ -4,7 +4,7 @@ export default [
         text: 'ID'
     },
     {
-        dataField: 'master.person.surname',
+        dataField: 'master.person.name',
         text: 'Мастер'
     },
     {

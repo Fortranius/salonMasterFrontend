@@ -32,7 +32,7 @@ async function getOptionMastersByFIO(search, loadedOptions) {
     else response = await getMastersByFiO(search);
     let cachedOptions = response.content.map((d) => ({
         value: d.id,
-        label: d.person.name + " " + d.person.surname + " " + d.person.patronymic,
+        label: d.person.name,
         master: d
     }));
     return {
@@ -51,7 +51,6 @@ async function getOptionExpensesByDescription(search, loadedOptions) {
         label: d.description,
         product: d
     }));
-    console.log(cachedOptions);
     return {
         options: cachedOptions,
         hasMore: true
@@ -90,9 +89,7 @@ class ExpenseModal extends Component {
                 selectMaster: this.props.update.master,
                 selectMasterFio: {
                     value: this.props.update.master.id,
-                    label: this.props.update.master.person.name
-                    + " " + this.props.update.master.person.surname
-                    + " " + this.props.update.master.person.patronymic,
+                    label: this.props.update.master.person.name,
                     master: this.props.update.master
                 },
                 selectProductByDescription: {
@@ -158,7 +155,7 @@ class ExpenseModal extends Component {
             selectMaster: newValue.master,
             selectMasterFio: {
                 value: newValue.value,
-                label: newValue.master.person.name + " " + newValue.master.person.surname + " " + newValue.master.person.patronymic,
+                label: newValue.master.person.name,
                 master: newValue.master
             }
         });

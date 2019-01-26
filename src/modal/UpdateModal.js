@@ -107,10 +107,9 @@ class UpdateModal extends Component {
                 person: {
                     phone: this.props.update.person.phone ? this.props.update.person.phone : '',
                     name: this.props.update.person.name ? this.props.update.person.name : '',
-                    surname: this.props.update.person.surname ? this.props.update.person.surname : '',
-                    patronymic: this.props.update.person.patronymic ? this.props.update.person.patronymic : '',
                     mail: this.props.update.person.mail ? this.props.update.person.mail : '',
                 },
+                type: this.props.update.type ? this.props.update.type : '',
                 services: this.props.update.services
             });
         }
@@ -219,7 +218,7 @@ class UpdateModal extends Component {
     render() {
         const { classes } = this.props;
         return (
-            <div>
+            <div className="modal-div">
                 <Modal open={this.props.open}
                        closeOnOverlayClick={false}
                        showCloseIcon={false}
@@ -242,11 +241,16 @@ class UpdateModal extends Component {
                             <InputLabel htmlFor="mail">Почта</InputLabel>
                             <Input id="mail" value={this.state.person.mail} onChange={this.handleChangePerson('mail')} />
                         </FormControl>
-                        <FormControl className={classes.formControl} error={this.validate('type')} aria-describedby="type-error-text">
+                        { this.props.entity === 'клиента' ? <FormControl className={classes.formControl} error={this.validate('description')} aria-describedby="description-error-text">
+                            <InputLabel htmlFor="type">Описание</InputLabel>
+                            <Input id="description" value={this.state.description} onChange={this.handleChange('description')} />
+                            { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
+                        </FormControl> : null}
+                        { this.props.entity === 'мастера' ? <FormControl className={classes.formControl} error={this.validate('type')} aria-describedby="type-error-text">
                             <InputLabel htmlFor="type">Категория</InputLabel>
                             <Input id="type" value={this.state.type} onChange={this.handleChange('type')} />
                             { this.validate('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
-                        </FormControl>
+                        </FormControl> : null}
                     </div>
                     <hr/>
                     { this.props.entity === 'мастера' ? <div>

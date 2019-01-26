@@ -9,11 +9,7 @@ export default (state = {timeSlots:[], resources:[]}, action) => {
                     id: timeSlot.id,
                     resourceId: timeSlot.master.id,
                     title: "\nМастер: " + timeSlot.master.person.name
-                        + " " + timeSlot.master.person.surname
-                        + " " + timeSlot.master.person.patronymic
                         + " \nКлиент: " + timeSlot.client.person.name
-                        + " " + timeSlot.client.person.surname
-                        + " " + timeSlot.client.person.patronymic
                         + " \nУслуга: " + timeSlot.service.description
                         + " Цена: " + timeSlot.price,
                     timeSlot: timeSlot,

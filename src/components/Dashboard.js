@@ -26,15 +26,14 @@ class Dashboard extends Component {
             moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss'),
             moment(moment().startOf('week').isoWeekday(7).toDate()).format('YYYY-MM-DD HH:mm:ss'));
     }
+
     getDashboardMasters(start, end) {
         getDashboardMasters(start, end).then(data => {
             let labels = [];
             let incomes = [];
             let costs = [];
             data.forEach(masterPerformance => {
-                labels.push(masterPerformance.master.person.surname + " " +
-                    masterPerformance.master.person.name + " " +
-                    masterPerformance.master.person.patronymic);
+                labels.push(masterPerformance.master.person.name);
                 costs.push(masterPerformance.cost);
                 incomes.push(masterPerformance.income);
             });
