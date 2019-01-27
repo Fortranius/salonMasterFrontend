@@ -359,3 +359,12 @@ h2 {
   outline: none;
   box-shadow: 0 0 0 3px rgba(173, 175, 178, 0.25);
 }
+
+.logo-image {
+  height: 50px;
+  width: 50px;
+}
+
+.react-autosuggest__suggestions-list {
+  width: 100%;
+}

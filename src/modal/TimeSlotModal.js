@@ -182,7 +182,11 @@ class TimeSlotModal extends Component {
             status = this.props.event.timeSlot.status ? this.props.event.timeSlot.status : 'NEW';
             selectClient = this.props.event.timeSlot.client;
             selectClientName = this.props.event.timeSlot.client.person.name;
-            selectClientPhone = this.props.event.timeSlot.client.person.phone;
+
+            selectClientPhone = '+7 (' + this.props.event.timeSlot.client.person.phone.substring(0,3) + ') '
+                + this.props.event.timeSlot.client.person.phone.substring(3, 6) + ' '
+                + this.props.event.timeSlot.client.person.phone.substring(6, 8) + ' '
+                + this.props.event.timeSlot.client.person.phone.substring(8, 10);
             selectService = this.props.event.timeSlot.service;
             selectServiceByDescription = this.props.event.timeSlot.service.description;
             services = this.props.event.timeSlot.master.services.map(service => {
@@ -421,7 +425,10 @@ class TimeSlotModal extends Component {
         getClientsByFiO(value).then(clients => {
             let options = clients.map(client => {
                 return {
-                    title: client.person.phone,
+                    title: '+7 (' + client.person.phone.substring(0,3) + ') '
+                        + client.person.phone.substring(3, 6) + ' '
+                        + client.person.phone.substring(6, 8) + ' '
+                        + client.person.phone.substring(8, 10),
                     clients: [
                         client
                     ]
@@ -434,10 +441,18 @@ class TimeSlotModal extends Component {
     };
 
     onClientsFetchRequestedByPhone = ({ value }) => {
-        getClientsByPhone(value).then(clients => {
+        let phone = '';
+        if (value.length<2) phone = value;
+        else phone = value.substring(4);
+        phone = phone.replace(/[.*-+?^${}()|[\]\\\s]/g, '');
+        phone = phone.substring(0, 10);
+        if (phone) getClientsByPhone(phone).then(clients => {
             let options = clients.map(client => {
                 return {
-                    title: client.person.phone,
+                    title: '+7 (' + client.person.phone.substring(0,3) + ') '
+                        + client.person.phone.substring(3, 6) + ' '
+                        + client.person.phone.substring(6, 8) + ' '
+                        + client.person.phone.substring(8, 10),
                     clients: [
                         client
                     ]
@@ -497,8 +512,15 @@ class TimeSlotModal extends Component {
     };
 
     onChangeClientPhone = (event, { newValue }) => {
+        let phone = '';
+        if (newValue.length === 1) phone = '+7 (' + newValue;
+        else if (newValue.length === 7) phone = newValue + ") ";
+        else if (newValue.length === 12) phone = newValue + " ";
+        else if (newValue.length === 15) phone = newValue + " ";
+        else if (newValue.length > 18) return false;
+        else phone = newValue;
         this.setState({
-            selectClientPhone: newValue,
+            selectClientPhone: phone,
             selectClient: undefined
         });
     };
@@ -514,7 +536,10 @@ class TimeSlotModal extends Component {
         this.setState({
             selectClient: suggestion,
             selectClientName: suggestion.person.name,
-            selectClientPhone: suggestion.person.phone
+            selectClientPhone: '+7 (' + suggestion.person.phone.substring(0,3) + ') '
+                + suggestion.person.phone.substring(3, 6) + ' '
+                + suggestion.person.phone.substring(6, 8) + ' '
+                + suggestion.person.phone.substring(8, 10)
         });
     };
 
@@ -692,9 +717,6 @@ class TimeSlotModal extends Component {
                                         </button>
                                         <button onClick={() => this.setStatus('READY')} className={"btn status-button " + (this.state.status === 'READY' ? 'active-status-button' : '')}>
                                             Клиент подтвердил
-                                        </button>
-                                        <button onClick={() => this.setStatus('DAY_OFF')} className={"btn status-button " + (this.state.status === 'DAY_OFF' ? 'active-status-button' : '')}>
-                                            Выходной
                                         </button>
                                     </div>
                                     <hr/>
