@@ -50,6 +50,11 @@
   width: 100px;
 }
 
+.selectMasterTypeStyle {
+  border: none;
+  width: 400px;
+}
+
 .quote {
   margin: 10px;
 }

@@ -8,6 +8,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import ServiceList from './components/ServiceItem';
+import masterTypeOptions from "../data/masterTypeOptions";
+import Select from 'react-select';
 
 const styles = theme => ({
     container: {
@@ -89,7 +91,8 @@ class UpdateModal extends Component {
                 maxPrice: 0
             },
             type: '',
-            services:[],
+            selectType: undefined,
+            services: [],
             submit: false,
             submitService: false
         };
@@ -102,6 +105,12 @@ class UpdateModal extends Component {
 
     componentDidMount() {
         if (this.props.update) {
+            let selectType = undefined;
+            if (this.props.update.type)
+                selectType = {
+                    value: this.props.update.type,
+                    label: this.props.update.type
+                };
             this.setState({
                 person: {
                     phone: this.props.update.person.phone ? this.props.update.person.phone : '',
@@ -109,6 +118,7 @@ class UpdateModal extends Component {
                     mail: this.props.update.person.mail ? this.props.update.person.mail : '',
                 },
                 type: this.props.update.type ? this.props.update.type : '',
+                selectType: selectType,
                 services: this.props.update.services
             });
         }
@@ -128,6 +138,7 @@ class UpdateModal extends Component {
                 minPrice: 0,
                 maxPrice: 0
             },
+            selectType: undefined,
             submit: false,
             submitService: false
         });
@@ -184,6 +195,12 @@ class UpdateModal extends Component {
         return (!this.state.person || !this.state.person[field]);
     };
 
+    validateState(field) {
+        if (!this.state.submit)
+            return false;
+        return (!this.state || !this.state[field]);
+    };
+
     validateService(field) {
         if (!this.state.submitService)
             return false;
@@ -214,6 +231,13 @@ class UpdateModal extends Component {
                 submitService:false
             });
         }
+    };
+
+    handleChangeTypeMaster = (newValue) => {
+        this.setState({
+            type: newValue.value,
+            selectType: newValue
+        });
     };
 
     render() {
@@ -247,12 +271,18 @@ class UpdateModal extends Component {
                             <Input id="description" value={this.state.description} onChange={this.handleChange('description')} />
                             { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl> : null}
-                        { this.props.entity === 'мастера' ? <FormControl className={classes.formControl} error={this.validate('type')} aria-describedby="type-error-text">
-                            <InputLabel htmlFor="type">Категория</InputLabel>
-                            <Input id="type" value={this.state.type} onChange={this.handleChange('type')} />
-                            { this.validate('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
-                        </FormControl> : null}
                     </div>
+                    { this.props.entity === 'мастера' ? <FormControl className={classes.formControl} error={this.validateState('type')} aria-describedby="type-error-text">
+                        <InputLabel htmlFor="type">Категория</InputLabel>
+                        <Select
+                            value={this.state.selectType}
+                            options={masterTypeOptions}
+                            placeholder={'Выберите категорию'}
+                            onChange={this.handleChangeTypeMaster}
+                            className='selectMasterTypeStyle'
+                        />
+                        { this.validateState('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
+                    </FormControl> : null}
                     <hr/>
                     { this.props.entity === 'мастера' ? <div>
                         <div className="row">

@@ -17,7 +17,7 @@ class ServiceItem extends Component {
             <li className="list-group-item ">
                 <div>
                     {this.props.item.description}: {this.props.item.minPrice} руб.
-                    {this.props.item.maxPrice?<span>-{this.props.item.maxPrice} руб.</span>: null}
+                    {this.props.item.maxPrice?<span> - {this.props.item.maxPrice} руб.</span>: null}
                     { this.props.isRemove ? <button type="button" className="close" onClick={this.onClickDelete}>&times;</button>: null}
                 </div>
             </li>
