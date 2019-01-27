@@ -32,12 +32,28 @@ class Dashboard extends Component {
             let labels = [];
             let incomes = [];
             let costs = [];
+            let countOrders = [];
             data.forEach(masterPerformance => {
                 labels.push(masterPerformance.master.person.name);
                 costs.push(masterPerformance.cost);
                 incomes.push(masterPerformance.income);
+                countOrders.push(masterPerformance.countOrders);
             });
             this.setState({
+                masterOrders: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Количество заказов',
+                            backgroundColor: '#36A2EB',
+                            borderColor: '#36A2EB',
+                            borderWidth: 1,
+                            hoverBackgroundColor: '#36A2EB',
+                            hoverBorderColor: '#36A2EB',
+                            data: countOrders
+                        }
+                    ]
+                },
                 masters: {
                     labels: labels,
                     datasets: [
@@ -157,6 +173,18 @@ class Dashboard extends Component {
                     <h2>Доходы и расходы мастеров</h2>
                     <Bar
                         data={this.state.masters}
+                        width={50}
+                        height={50}
+                        options={{
+                            maintainAspectRatio: false
+                        }}
+                    />
+                    <hr/>
+                </div> : null}
+                {this.state.masterOrders ? <div>
+                    <h2>Количество заказов</h2>
+                    <Bar
+                        data={this.state.masterOrders}
                         width={50}
                         height={50}
                         options={{
