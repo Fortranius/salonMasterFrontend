@@ -191,7 +191,9 @@ class UpdateModal extends Component {
     };
 
     removeService = (serviceIndex)  => {
-        this.setState({services: this.state.services.splice(serviceIndex, 1)});
+        let array = [...this.state.services];
+        array.splice(serviceIndex, 1);
+        this.setState({services: array});
     };
 
     addService = ()  => {

@@ -95,6 +95,7 @@ class TimeTable extends Component {
     }
 
     onCloseTimeSlotModal = () => {
+        this.setTimeSlots(this.state.startWeek, this.state.endWeek);
         this.setState({
             open: false,
             event: {}

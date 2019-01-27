@@ -250,7 +250,7 @@ ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  width: 200px;
+  width: 400px;
 }
 
 li a {
@@ -297,6 +297,14 @@ body {
   border: 1px solid black;
 }
 
+.table-bordered thead td, .table-bordered thead th {
+  border: 1px solid black;
+}
+
+th {
+  border: 1px solid black !im;
+}
+
 .rbc-calendar {
   background-color: #cecec8;
 }
@@ -311,6 +319,7 @@ body {
 
 .rbc-time-content > .rbc-day-slot {
   background-color: #e1e1dc;
+  border-right: 1px solid #9d9696;
 }
 
 .page-item.active .page-link {
@@ -326,4 +335,22 @@ body {
 
 h2 {
   font-style: italic;
+}
+
+.react-calendar__tile--active {
+  background: #90989f !important;
+}
+
+.styles_overlay__CLSq- {
+  padding-left: 210px;
+}
+
+.add-expense-button {
+  height: 30px;
+  cursor: pointer;
+}
+
+.btn.focus, .btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(173, 175, 178, 0.25);
 }

@@ -20,6 +20,8 @@ import MomentLocaleUtils, {parseDate} from 'react-day-picker/moment';
 import 'moment/locale/ru';
 import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
+import {getProducts, getProductsByDescription} from "../service/productService";
+import ExpenseList from "./components/ExpenseItem";
 
 const styles = theme => ({
     container: {
@@ -100,6 +102,21 @@ const getSectionServices = section => {
     return section.services;
 };
 
+async function getOptionExpensesByDescription(search, loadedOptions) {
+    let response;
+    if (!search) response = await getProducts();
+    else response = await getProductsByDescription(search);
+    let cachedOptions = response.map((d) => ({
+        value: d.id,
+        label: d.description,
+        product: d
+    }));
+    return {
+        options: cachedOptions,
+        hasMore: true
+    };
+}
+
 class TimeSlotModal extends Component {
 
     constructor(props) {
@@ -123,7 +140,14 @@ class TimeSlotModal extends Component {
             value: '',
             services:[],
             clients: [],
-            menu:'MAIN'
+            menu:'MAIN',
+            expense: {
+                product: undefined,
+                countProduct: 1
+            },
+            selectProductByDescription: undefined,
+            submitExpense: false,
+            expenses: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -134,6 +158,7 @@ class TimeSlotModal extends Component {
         this.handleChangeEndMinutes = this.handleChangeEndMinutes.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeExpense = this.handleChangeExpense.bind(this);
         this.setStatus = this.setStatus.bind(this);
     }
 
@@ -216,7 +241,8 @@ class TimeSlotModal extends Component {
             services: services,
             selectService: selectService,
             selectServiceByDescription: selectServiceByDescription,
-            menu:'MAIN'
+            menu:'MAIN',
+            expenses: this.props.event.timeSlot ? this.props.event.timeSlot.expenses : []
         });
     }
 
@@ -227,7 +253,8 @@ class TimeSlotModal extends Component {
 
     accept = () => {
         this.setState({
-            submit: true
+            submit: true,
+            menu: 'MAIN'
         });
 
         let client = this.state.selectClient;
@@ -252,6 +279,16 @@ class TimeSlotModal extends Component {
         endDate.setHours(this.state.endHour.value);
         endDate.setMinutes(this.state.endMinutes.value);
 
+        let expenses = this.state.expenses.map(expense => {
+            return {
+                id: expense.id,
+                product: expense.product,
+                countProduct: expense.countProduct,
+                master: this.state.selectMaster,
+                date: new Date()
+            }
+        });
+
         let timeSlot = {
             id: this.state.id,
             client: client,
@@ -260,7 +297,8 @@ class TimeSlotModal extends Component {
             endSlot: endDate,
             price: this.state.price,
             service: this.state.selectService,
-            status: this.state.status
+            status: this.state.status,
+            expenses: expenses
         };
         this.props.accept(timeSlot);
         this.clear();
@@ -285,7 +323,14 @@ class TimeSlotModal extends Component {
             status: 'NEW',
             services:[],
             clients:[],
-            menu:'MAIN'
+            menu:'MAIN',
+            expense: {
+                product: undefined,
+                countProduct: 1
+            },
+            selectProductByDescription: undefined,
+            submitExpense: false,
+            expenses: []
         });
     }
 
@@ -342,6 +387,15 @@ class TimeSlotModal extends Component {
     handleChange = name => event => {
         this.setState({
             [name]: event.target.value
+        });
+    };
+
+    handleChangeExpense = name => event => {
+        this.setState({
+            expense: {
+                ...this.state.expense,
+                [name]: event.target.value
+            }
         });
     };
 
@@ -422,9 +476,9 @@ class TimeSlotModal extends Component {
 
     onServicesClearRequested = () => {
         let options = this.state.selectMaster.services.map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + '₽': '';
+            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
             return {
-                title: service.minPrice + '₽' + maxPrice,
+                title: service.minPrice + ' руб.' + maxPrice,
                 services: [
                     service
                 ]
@@ -476,6 +530,52 @@ class TimeSlotModal extends Component {
         return value.trim().length > -1;
     };
 
+    handleInputProductChange = (newValue) => {
+        this.setState({
+            expense: {
+                ...this.state.expense,
+                product: newValue.product
+            },
+            selectProductByDescription: {
+                value: newValue.value,
+                label: newValue.product.description,
+                product: newValue.product
+            }
+        });
+    };
+
+    addExpense = ()  => {
+        this.setState({
+            submitExpense: true
+        });
+        if (this.state.expense.product
+            && this.state.expense.countProduct) {
+            let expenses = this.state.expenses;
+            expenses.push(this.state.expense);
+            this.setState({
+                selectProductByDescription: undefined,
+                expenses: expenses,
+                expense: {
+                    product: undefined,
+                    countProduct: 1
+                },
+                submitExpense:false
+            });
+        }
+    };
+
+    validateExpense(field) {
+        if (!this.state.submitExpense)
+            return false;
+        return (!this.state.expense || !this.state.expense[field]);
+    };
+
+    removeExpense = (serviceIndex)  => {
+        let array = [...this.state.expenses];
+        array.splice(serviceIndex, 1);
+        this.setState({expenses: array});
+    };
+
     render() {
         const { classes } = this.props;
         const inputClientNameProps = {
@@ -508,6 +608,9 @@ class TimeSlotModal extends Component {
                                     <li>
                                         <a href="#" onClick={() => this.setMenu('MAIN')}>Детали заказа</a>
                                     </li>
+                                    <li>
+                                        <a href="#" onClick={() => this.setMenu('EXPENSE')}>Расходы</a>
+                                    </li>
                                     {this.state.selectClient ? <li>
                                         <a href="#" onClick={() => this.setMenu('HISTORY')}>История посещений</a>
                                     </li> : null}
@@ -516,6 +619,46 @@ class TimeSlotModal extends Component {
                             {this.state.menu === 'HISTORY' ? <div className="col-sm">
                                 <div className="container selectDiv">
                                     <HistoryClients client={this.state.selectClient}/>
+                                </div>
+                            </div> : null}
+                            {this.state.menu === 'EXPENSE' ? <div className="col-sm">
+                                <div className="container selectDiv">
+                                    <div className="row">
+                                        <ExpenseList expenses={this.state.expenses} removeExpense={this.removeExpense}/>
+                                    </div>
+                                    <div className="row">
+                                        <hr/>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-sm-1 title-margin-date">
+                                            Товар:
+                                        </div>
+                                        <div className="col-sm-4">
+                                            <AsyncPaginate
+                                                value={this.state.selectProductByDescription}
+                                                loadOptions={getOptionExpensesByDescription}
+                                                onChange={this.handleInputProductChange}
+                                                placeholder={'Выберите товар'}
+                                            />
+                                            <FormControl className={classes.formControl} error={this.validateExpense('product')} aria-describedby="product-error-text">
+                                                { this.validateExpense('product') ? <FormHelperText id="product-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            </FormControl>
+                                        </div>
+                                        <div className="col-sm-2 title-margin-date">
+                                            Количество:
+                                        </div>
+                                        <div className="col-sm-4">
+                                            <TextField InputLabelProps={{ shrink: true }} value={this.state.expense.countProduct}
+                                                       onChange={this.handleChangeExpense('countProduct')} type="number"/>
+
+                                            <FormControl className={classes.formControl} error={this.validateExpense('countProduct')} aria-describedby="countProduct-error-text">
+                                                { this.validateExpense('countProduct') ? <FormHelperText id="countProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            </FormControl>
+                                        </div>
+                                        <div className="col-sm-1">
+                                            <button className="btn btn-default add-expense-button" onClick={this.addExpense}>+</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div> : null}
                             {this.state.menu === 'MAIN' ? <div className="col-sm">
