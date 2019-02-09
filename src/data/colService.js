@@ -6,13 +6,5 @@ export default [
     {
         dataField: 'description',
         text: 'Название услуги'
-    },
-    {
-        dataField: 'minPrice',
-        text: 'Минимальнаяя цена'
-    },
-    {
-        dataField: 'maxPrice',
-        text: 'Максимальная цена'
     }
 ]

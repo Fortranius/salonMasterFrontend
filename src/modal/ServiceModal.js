@@ -5,7 +5,6 @@ import Modal from 'react-responsive-modal';
 import {withStyles} from '@material-ui/core/styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import NumberFormat from 'react-number-format';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 
@@ -34,34 +33,13 @@ const styles = theme => ({
     }
 });
 
-function NumberFormatCustom(props) {
-    const { inputRef, onChange, ...other } = props;
-
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={inputRef}
-            onValueChange={values => {
-                onChange({
-                    target: {
-                        value: values.value,
-                    },
-                });
-            }}
-            thousandSeparator={' '}
-        />
-    );
-}
-
 class ServiceModal extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             service: {
-                description: '',
-                maxPrice: '',
-                minPrice: ''
+                description: ''
             },
             submit: false
         };
@@ -85,8 +63,7 @@ class ServiceModal extends Component {
         this.setState({
             submit: true
         });
-        if (this.state.service.description
-            && this.state.service.minPrice) {
+        if (this.state.service.description) {
             this.props.accept(this.state.service);
             this.clear();
         }
@@ -95,9 +72,7 @@ class ServiceModal extends Component {
     clear() {
         this.setState({
             service: {
-                description: '',
-                maxPrice: 0,
-                minPrice: 0
+                description: ''
             },
             submit: false
         });
@@ -133,20 +108,6 @@ class ServiceModal extends Component {
                                 <InputLabel htmlFor="description">Описание</InputLabel>
                                 <Input id="description" value={this.state.service.description} onChange={this.handleChange('description')} />
                                 { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
-                            </FormControl>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className={classes.container}>
-                            <FormControl className={classes.formControl} error={this.validate('minPrice')} aria-describedby="minPrice-error-text">
-                                <InputLabel htmlFor="minPrice">Минимальная цена (руб.)</InputLabel>
-                                <Input id="minPrice" inputComponent={NumberFormatCustom} value={this.state.service.minPrice} onChange={this.handleChange('minPrice')} />
-                                { this.validate('minPrice') ? <FormHelperText id="minPrice-error-text">Поле не может быть пустым</FormHelperText>: null }
-                            </FormControl>
-                            <FormControl className={classes.formControl} error={this.validate('maxPrice')} aria-describedby="maxPrice-error-text">
-                                <InputLabel htmlFor="maxPrice">Максимальная цена (руб.)</InputLabel>
-                                <Input id="maxPrice" inputComponent={NumberFormatCustom} value={this.state.service.maxPrice} onChange={this.handleChange('maxPrice')} />
                             </FormControl>
                         </div>
                     </div>

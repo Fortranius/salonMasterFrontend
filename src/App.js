@@ -15,6 +15,7 @@ import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import {Title} from "./model/containers";
 import 'font-awesome/css/font-awesome.min.css';
 import logo from './logo_Lady_Land.png';
+import Services from "./components/Services";
 
 class App extends Component {
 
@@ -55,7 +56,6 @@ class App extends Component {
                                     <NavText>
                                         Мастера
                                     </NavText>
-
                                 </NavItem>
                                 <NavItem eventKey="clients">
                                     <NavIcon>
@@ -81,6 +81,14 @@ class App extends Component {
                                         Расходы
                                     </NavText>
                                 </NavItem>
+                                <NavItem eventKey="services">
+                                    <NavIcon>
+                                        <i className="fa fa-fw fa-cut" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Услуги
+                                    </NavText>
+                                </NavItem>
                                 <NavItem eventKey="dashboard">
                                     <NavIcon>
                                         <i className="fa fa-bar-chart-o fa-fw" style={{fontSize: '1.75em'}}/>
@@ -98,6 +106,7 @@ class App extends Component {
                             <PrivateRoute path="/clients" component={Clients}/>
                             <PrivateRoute path="/products" component={Products}/>
                             <PrivateRoute path="/expenses" component={Expenses}/>
+                            <PrivateRoute path="/services" component={Services}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
                         </main>
                     </React.Fragment>

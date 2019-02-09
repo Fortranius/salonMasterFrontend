@@ -129,6 +129,7 @@ class TimeSlotModal extends Component {
             selectClient: undefined,
             selectClientName: '',
             selectClientPhone: '',
+            clientDescription: '',
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
@@ -168,6 +169,7 @@ class TimeSlotModal extends Component {
             selectClient,
             selectClientName = '',
             selectClientPhone = '',
+            clientDescription = '',
             services,
             selectService,
             selectServiceByDescription = '',
@@ -182,6 +184,7 @@ class TimeSlotModal extends Component {
             status = this.props.event.timeSlot.status ? this.props.event.timeSlot.status : 'NEW';
             selectClient = this.props.event.timeSlot.client;
             selectClientName = this.props.event.timeSlot.client.person.name;
+            clientDescription = this.props.event.timeSlot.client.description ? this.props.event.timeSlot.client.description : '';
 
             selectClientPhone = '+7 (' + this.props.event.timeSlot.client.person.phone.substring(0,3) + ') '
                 + this.props.event.timeSlot.client.person.phone.substring(3, 6) + ' '
@@ -238,7 +241,7 @@ class TimeSlotModal extends Component {
             selectMasterName: selectMasterName,
             selectMaster: selectMaster,
             status: status ? status : 'NEW',
-
+            clientDescription: clientDescription,
             selectClient: selectClient,
             selectClientName: selectClientName,
             selectClientPhone: selectClientPhone,
@@ -268,13 +271,15 @@ class TimeSlotModal extends Component {
                 client = {
                     person: {
                         name: this.state.selectClientName,
-                        phone: this.state.selectClientPhone
+                        phone: this.state.selectClientPhone,
                     }
                 }
         }
 
         if (!client || !this.state.selectMaster || !this.state.date || !this.state.selectService)
             return false;
+
+        client.description = this.state.clientDescription;
 
         let startDate = new Date(this.state.date);
         startDate.setHours(this.state.startHour.value);
@@ -317,6 +322,7 @@ class TimeSlotModal extends Component {
             selectMasterName: undefined,
             selectClientName: '',
             selectClientPhone: '',
+            clientDescription: '',
             submit: false,
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
@@ -507,7 +513,8 @@ class TimeSlotModal extends Component {
     onChangeClientName = (event, { newValue }) => {
         this.setState({
             selectClientName: newValue,
-            selectClient: undefined
+            selectClient: undefined,
+            clientDescription: ''
         });
     };
 
@@ -521,7 +528,8 @@ class TimeSlotModal extends Component {
         else phone = newValue;
         this.setState({
             selectClientPhone: phone,
-            selectClient: undefined
+            selectClient: undefined,
+            clientDescription: ''
         });
     };
 
@@ -536,6 +544,7 @@ class TimeSlotModal extends Component {
         this.setState({
             selectClient: suggestion,
             selectClientName: suggestion.person.name,
+            clientDescription: suggestion.description,
             selectClientPhone: '+7 (' + suggestion.person.phone.substring(0,3) + ') '
                 + suggestion.person.phone.substring(3, 6) + ' '
                 + suggestion.person.phone.substring(6, 8) + ' '
@@ -814,6 +823,16 @@ class TimeSlotModal extends Component {
                                 <FormControl className={classes.formControl} error={this.validate('selectClientPhone')} aria-describedby="selectClientPhone-error-text">
                                     { this.validate('selectClientPhone') ? <FormHelperText id="selectClientPhone-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
+                                <hr/>
+                                <div className="row">
+                                    <div className="col-sm">
+                                        Комментарии к клиенту:
+                                    </div>
+                                </div>
+                                <div>
+                                    <TextField InputLabelProps={{ shrink: true }} value={this.state.clientDescription}
+                                               onChange={this.handleChange('clientDescription')} fullWidth/>
+                                </div>
                                 <hr/>
                                 <div className="row">
                                     <div className="col-sm">

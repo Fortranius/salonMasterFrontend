@@ -7,9 +7,9 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import ServiceList from './components/ServiceItem';
 import masterTypeOptions from "../data/masterTypeOptions";
 import Select from 'react-select';
+import {getServices} from "../service/serviceService";
 
 const styles = theme => ({
     container: {
@@ -94,17 +94,33 @@ class UpdateModal extends Component {
             selectType: undefined,
             services: [],
             submit: false,
-            submitService: false
+            submitService: false,
+            selectedServices: [],
+            optionServices: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangePerson = this.handleChangePerson.bind(this);
         this.handleChangeService = this.handleChangeService.bind(this);
+
+        getServices().then(data => {
+            let services = data.map(service => {
+                return { value: service.id, label: service.description, service: service };
+            });
+            this.setState({
+                optionServices: services
+            });
+        });
     }
 
     componentDidMount() {
         if (this.props.update) {
+            let selectedServices = [];
+            if (this.props.update.services)
+                selectedServices = this.props.update.services.map(service => {
+                    return { value: service.id, label: service.description, service: service };
+                });
             let selectType = undefined;
             if (this.props.update.type)
                 selectType = {
@@ -119,7 +135,8 @@ class UpdateModal extends Component {
                 },
                 type: this.props.update.type ? this.props.update.type : '',
                 selectType: selectType,
-                services: this.props.update.services
+                services: this.props.update.services,
+                selectedServices: selectedServices
             });
         }
     }
@@ -140,7 +157,8 @@ class UpdateModal extends Component {
             },
             selectType: undefined,
             submit: false,
-            submitService: false
+            submitService: false,
+            electedServices: []
         });
     }
 
@@ -240,6 +258,16 @@ class UpdateModal extends Component {
         });
     };
 
+    handleChangeServices = (selectedServices) => {
+        let services = selectedServices.map(option => {
+            return option.service;
+        });
+        this.setState({
+            selectedServices: selectedServices,
+            services: services
+        });
+    };
+
     render() {
         const { classes } = this.props;
         return (
@@ -285,30 +313,19 @@ class UpdateModal extends Component {
                     </FormControl> : null}
                     <hr/>
                     { this.props.entity === 'мастера' ? <div>
-                        <div className="row">
-                            <div className="col-sm">
-                                Услуги мастера:
-                            </div>
-                        </div>
-                        <ServiceList services={this.state.services} isRemove={!this.props.update} removeService={this.removeService}/>
-                        <div className={classes.container}>
-                            <FormControl className={classes.formControl} error={this.validateService('description')} aria-describedby="description-error-text">
-                                <InputLabel htmlFor="description">Описание</InputLabel>
-                                <Input id="description" value={this.state.service.description} onChange={this.handleChangeService('description')} />
-                                { this.validateService('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
-                            </FormControl>
-                            <FormControl className={classes.formControl} error={this.validateService('minPrice')} aria-describedby="minPrice-error-text">
-                                <InputLabel htmlFor="minPrice">Минимальная цена (руб.)</InputLabel>
-                                <Input id="minPrice" value={this.state.service.minPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('minPrice')} />
-                                { this.validateService('minPrice') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
-                            </FormControl>
-                            <FormControl className={classes.formControl} aria-describedby="maxPrice-error-text">
-                                <InputLabel htmlFor="maxPrice">Максимальная цена (руб.)</InputLabel>
-                                <Input id="maxPrice" value={this.state.service.maxPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('maxPrice')} />
-                            </FormControl>
-                            <button className="btn btn-default add-service-button" onClick={this.addService}>+</button>
-                        </div>
-                    </div>: null}
+                        <hr/>
+                        <FormControl className={classes.formControlServices} error={this.validate('service')} aria-describedby="service-error-text">
+                            <Select id="service"
+                                    isMulti
+                                    closeMenuOnSelect={false}
+                                    value={this.state.selectedServices}
+                                    onChange={this.handleChangeServices}
+                                    placeholder="Выберите услуги"
+                                    options={this.state.optionServices}
+                            />
+                            { this.validate('service') ? <FormHelperText id="service-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
+                        </FormControl>
+                    </div>: null }
                     <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
