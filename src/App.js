@@ -6,6 +6,7 @@ import Masters from './components/Masters';
 import Timetable from "./components/TimeTable";
 import Products from "./components/Products";
 import Expenses from "./components/Expenses";
+import Incoming from "./components/Incoming";
 import Dashboard from "./components/Dashboard";
 import LoginPage from "./components/LoginPage";
 import {PrivateRoute} from './route/PrivateRoute';
@@ -73,12 +74,20 @@ class App extends Component {
                                         Аксессуары
                                     </NavText>
                                 </NavItem>
+                                <NavItem eventKey="incoming">
+                                    <NavIcon>
+                                        <i className="fa fa-fw fa-plus-circle" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Приход
+                                    </NavText>
+                                </NavItem>
                                 <NavItem eventKey="expenses">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-minus-circle" style={{fontSize: '1.75em'}}/>
                                     </NavIcon>
                                     <NavText>
-                                        Расходы
+                                        Расход
                                     </NavText>
                                 </NavItem>
                                 <NavItem eventKey="services">
@@ -105,6 +114,7 @@ class App extends Component {
                             <PrivateRoute path="/masters" component={Masters}/>
                             <PrivateRoute path="/clients" component={Clients}/>
                             <PrivateRoute path="/products" component={Products}/>
+                            <PrivateRoute path="/incoming" component={Incoming}/>
                             <PrivateRoute path="/expenses" component={Expenses}/>
                             <PrivateRoute path="/services" component={Services}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
