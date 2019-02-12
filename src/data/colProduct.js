@@ -8,7 +8,11 @@ export default [
         text: 'Название аксессуара'
     },
     {
-        dataField: 'price',
-        text: 'Цена'
+        dataField: 'purchasePrice',
+        text: 'Закупочная цена'
+    },
+    {
+        dataField: 'sellingPrice',
+        text: 'Цена продажи'
     }
 ]

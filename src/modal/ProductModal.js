@@ -60,7 +60,8 @@ class ProductModal extends Component {
         this.state = {
             product: {
                 description: '',
-                price: ''
+                purchasePrice: '',
+                sellingPrice: ''
             },
             submit: false
         };
@@ -85,7 +86,8 @@ class ProductModal extends Component {
             submit: true
         });
         if (this.state.product.description
-            && this.state.product.price) {
+            && this.state.product.purchasePrice
+            && this.state.product.sellingPrice) {
             this.props.accept(this.state.product);
             this.clear();
         }
@@ -95,7 +97,8 @@ class ProductModal extends Component {
         this.setState({
             product: {
                 description: '',
-                price: ''
+                purchasePrice: '',
+                sellingPrice: ''
             },
             submit: false
         });
@@ -132,10 +135,15 @@ class ProductModal extends Component {
                                 <Input id="description" value={this.state.product.description} onChange={this.handleChange('description')} />
                                 { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
-                            <FormControl className={classes.formControl} error={this.validate('price')} aria-describedby="price-error-text">
-                                <InputLabel htmlFor="price">Минимальная цена (руб.)</InputLabel>
-                                <Input id="price" inputComponent={NumberFormatCustom} value={this.state.product.price} onChange={this.handleChange('price')} />
-                                { this.validate('price') ? <FormHelperText id="price-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            <FormControl className={classes.formControl} error={this.validate('purchasePrice')} aria-describedby="purchasePrice-error-text">
+                                <InputLabel htmlFor="purchasePrice">Закупочная цена (руб.)</InputLabel>
+                                <Input id="purchasePrice" inputComponent={NumberFormatCustom} value={this.state.product.purchasePrice} onChange={this.handleChange('purchasePrice')} />
+                                { this.validate('purchasePrice') ? <FormHelperText id="purchasePrice-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                            <FormControl className={classes.formControl} error={this.validate('sellingPrice')} aria-describedby="sellingPrice-error-text">
+                                <InputLabel htmlFor="sellingPrice">Цена продажи (руб.)</InputLabel>
+                                <Input id="sellingPrice" inputComponent={NumberFormatCustom} value={this.state.product.sellingPrice} onChange={this.handleChange('sellingPrice')} />
+                                { this.validate('sellingPrice') ? <FormHelperText id="sellingPrice-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                         </div>
                     </div>

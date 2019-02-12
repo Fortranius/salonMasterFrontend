@@ -158,7 +158,7 @@ class UpdateModal extends Component {
             selectType: undefined,
             submit: false,
             submitService: false,
-            electedServices: []
+            selectedServices: []
         });
     }
 
