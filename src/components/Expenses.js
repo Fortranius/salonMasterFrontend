@@ -23,6 +23,7 @@ class Expenses extends Component {
             sortOrder: '',
             masterOptions: {},
             productOptions: {},
+            filters: {},
             row: undefined
         };
         this.handleTableChange = this.handleTableChange.bind(this);
@@ -87,9 +88,10 @@ class Expenses extends Component {
         console.log(filters);
         this.setState({
             sortField: sortField,
-            sortOrder: sortOrder
+            sortOrder: sortOrder,
+            filters: filters
         });
-        this.props.expenseActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder));
+        this.props.expenseActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder, filters));
     };
 
     updateExpense(entity) {
@@ -98,7 +100,8 @@ class Expenses extends Component {
                 this.props.expenses.number,
                 this.props.expenses.size,
                 this.state.sortField,
-                this.state.sortOrder
+                this.state.sortOrder,
+                this.state.filters
             ));
             this.setState({
                 openUpdate: false,
@@ -113,7 +116,8 @@ class Expenses extends Component {
                 this.props.expenses.number,
                 this.props.expenses.size,
                 this.state.sortField,
-                this.state.sortOrder
+                this.state.sortOrder,
+                this.state.filters
             ));
             this.setState({
                 openCreate: false
@@ -173,17 +177,16 @@ class Expenses extends Component {
         ];
         return (
             <div className="main-div">
-                {this.props.expenses ? <TableRemote data={this.props.expenses.content}
-                                                   page={this.props.expenses.number + 1}
+                <TableRemote data={this.props.expenses ? this.props.expenses.content : []}
+                                                   page={this.props.expenses ? this.props.expenses.number + 1 : 1}
                                                    columns={colExpense}
                                                    entity="расход"
-                                                   sizePerPage={this.props.expenses.size}
+                                                   sizePerPage={this.props.expenses ? this.props.expenses.size : 0}
                                                    remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}
                                                    create={this.onOpenCreateModal}
-                                                   totalSize={this.props.expenses.totalElements}
+                                                   totalSize={this.props.expenses ? this.props.expenses.totalElements : 0}
                                                    onTableChange={this.handleTableChange}/>
-                    : null}
 
                 {this.state.row ? <ExpenseModal accept={this.updateExpense}
                              open={this.state.openUpdate}

@@ -54,7 +54,7 @@ class TableRemote extends Component {
                     </button>: null }
                 </div>
                 <hr/>
-                { this.props.data.length > 0 ? <BootstrapTable
+                <BootstrapTable
                     remote
                     keyField="id"
                     data={this.props.data}
@@ -67,7 +67,7 @@ class TableRemote extends Component {
                         totalSize: this.props.totalSize
                     })}
                     onTableChange={this.props.onTableChange}
-                /> : null }
+                />
             </div>
         );
     }
