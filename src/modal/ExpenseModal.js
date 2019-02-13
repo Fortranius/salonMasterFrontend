@@ -12,6 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
+import NumberFormat from 'react-number-format';
 
 const styles = theme => ({
     container: {
@@ -57,6 +58,24 @@ async function getOptionExpensesByDescription(search, loadedOptions) {
     };
 }
 
+function NumberFormatCustom(props) {
+    const { inputRef, onChange, ...other } = props;
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={inputRef}
+            onValueChange={values => {
+                onChange({
+                    target: {
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator={' '}
+        />
+    );
+}
+
 class ExpenseModal extends Component {
 
     constructor() {
@@ -87,6 +106,7 @@ class ExpenseModal extends Component {
                 countProduct: this.props.update.countProduct,
                 selectProduct: this.props.update.product,
                 selectMaster: this.props.update.master,
+                cost: this.props.update.cost,
                 selectMasterFio: {
                     value: this.props.update.master.id,
                     label: this.props.update.master.person.name,
@@ -110,6 +130,7 @@ class ExpenseModal extends Component {
             selectProductByDescription: undefined,
             selectMasterFio: undefined,
             countProduct: 1,
+            cost: '',
             submit: false
         });
     }
@@ -132,6 +153,7 @@ class ExpenseModal extends Component {
                 date: this.state.date,
                 product: this.state.selectProduct,
                 master: this.state.selectMaster,
+                cost: this.state.cost,
                 countProduct: this.state.countProduct
             };
             this.props.accept(expense);
@@ -167,6 +189,12 @@ class ExpenseModal extends Component {
                 countProduct: event.target.value
             });
         }
+    };
+
+    handleChange = name => event => {
+        this.setState({
+            [name]: event.target.value
+        });
     };
 
     handleChangeDate = (newValue) => {
@@ -211,10 +239,10 @@ class ExpenseModal extends Component {
                             </div>
                             <div className="col-sm-4">
                                 <TextField InputLabelProps={{ shrink: true }} value={this.state.countProduct}
-                                           onChange={this.handleChange} type="number"/>
+                                           onChange={this.handleChange('countProduct')} type="number"/>
 
-                                <FormControl className={classes.formControl} error={this.validate('selectProduct')} aria-describedby="selectProduct-error-text">
-                                    { this.validate('selectProduct') ? <FormHelperText id="selectProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                <FormControl className={classes.formControl} error={this.validate('countProduct')} aria-describedby="countProduct-error-text">
+                                    { this.validate('countProduct') ? <FormHelperText id="countProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
                             </div>
                         </div>
@@ -236,9 +264,20 @@ class ExpenseModal extends Component {
                         </div>
                         <div className="row">
                             <div className="col-sm-2">
+                                Стоимость (руб.):
+                            </div>
+                            <div className="col-sm-4">
+                                <TextField InputProps={{inputComponent: NumberFormatCustom}} value={this.state.cost}
+                                           onChange={this.handleChange('cost')}/>
+
+                                <FormControl className={classes.cost} error={this.validate('cost')} aria-describedby="cost-error-text">
+                                    { this.validate('cost') ? <FormHelperText id="cost-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                </FormControl>
+                            </div>
+                            <div className="col-sm-2">
                                 Дата:
                             </div>
-                            <div className="col-sm">
+                            <div className="col-sm-4">
                                 <DayPickerInput
                                     placeholder={`Дата расхода`}
                                     parseDate={parseDate}

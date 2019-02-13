@@ -1,5 +1,7 @@
 export function getExpenses(params) {
-    return fetch("http://localhost:8080/api/expenses?page=" + params.page + "&size=" + params.size)
+    let sort = params.sortField ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
+    return fetch("http://localhost:8080/api/expenses?page=" + params.page
+        + "&size=" + params.size + sort)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
