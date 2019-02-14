@@ -10,6 +10,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import masterTypeOptions from "../data/masterTypeOptions";
 import Select from 'react-select';
 import {getServices} from "../service/serviceService";
+import typeFormatter from "../data/typeMaster";
 
 const styles = theme => ({
     container: {
@@ -125,7 +126,7 @@ class UpdateModal extends Component {
             if (this.props.update.type)
                 selectType = {
                     value: this.props.update.type,
-                    label: this.props.update.type
+                    label: typeFormatter(this.props.update.type)
                 };
             this.setState({
                 person: {
@@ -133,7 +134,7 @@ class UpdateModal extends Component {
                     name: this.props.update.person.name ? this.props.update.person.name : '',
                     mail: this.props.update.person.mail ? this.props.update.person.mail : '',
                 },
-                type: this.props.update.type ? this.props.update.type : '',
+                type: this.props.update.type ? typeFormatter(this.props.update.type) : '',
                 selectType: selectType,
                 services: this.props.update.services,
                 selectedServices: selectedServices
@@ -219,36 +220,10 @@ class UpdateModal extends Component {
         return (!this.state || !this.state[field]);
     };
 
-    validateService(field) {
-        if (!this.state.submitService)
-            return false;
-        return (!this.state.service || !this.state.service[field]);
-    };
-
     removeService = (serviceIndex)  => {
         let array = [...this.state.services];
         array.splice(serviceIndex, 1);
         this.setState({services: array});
-    };
-
-    addService = ()  => {
-        this.setState({
-            submitService: true
-        });
-        if (this.state.service.description
-            && this.state.service.minPrice) {
-            let services = this.state.services;
-            services.push(this.state.service);
-            this.setState({
-                services: services,
-                service: {
-                    description: '',
-                    minPrice: 0,
-                    maxPrice: 0
-                },
-                submitService:false
-            });
-        }
     };
 
     handleChangeTypeMaster = (newValue) => {

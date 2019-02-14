@@ -17,6 +17,7 @@ import {Title} from "./model/containers";
 import 'font-awesome/css/font-awesome.min.css';
 import logo from './logo_Lady_Land.png';
 import Services from "./components/Services";
+import Directory from "./components/Directory";
 
 class App extends Component {
 
@@ -106,6 +107,14 @@ class App extends Component {
                                         Статистика
                                     </NavText>
                                 </NavItem>
+                                <NavItem eventKey="directory">
+                                    <NavIcon>
+                                        <i className="fa fa-book fa-fw" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Справочники
+                                    </NavText>
+                                </NavItem>
                             </SideNav.Nav>
                         </SideNav>
                         <main>
@@ -118,6 +127,7 @@ class App extends Component {
                             <PrivateRoute path="/expenses" component={Expenses}/>
                             <PrivateRoute path="/services" component={Services}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
+                            <PrivateRoute path="/directory" component={Directory}/>
                         </main>
                     </React.Fragment>
                 )}

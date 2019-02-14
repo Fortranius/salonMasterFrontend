@@ -1,4 +1,5 @@
 import React from 'react';
+import typeFormatter from "../data/typeMaster";
 
 function phoneFormatter(cell, row) {
     if (row.person.phone) {
@@ -15,6 +16,12 @@ function phoneFormatter(cell, row) {
 
     return (
         <span>$ { cell } NTD</span>
+    );
+}
+
+function type(cell) {
+    return (
+        <span>{typeFormatter(cell)}</span>
     );
 }
 
@@ -38,6 +45,7 @@ export default [
     },
     {
         dataField: 'type',
-        text: 'Категория'
+        text: 'Категория',
+        formatter: type
     }
 ]
