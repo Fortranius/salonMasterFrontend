@@ -1,33 +1,72 @@
 import React, {Component} from 'react';
 import '../App.css';
-import {connect} from 'react-redux';
-import {getExpensesAction} from "../actions/expenseActions"
-import {bindActionCreators} from 'redux'
+import colProductBalance from "../data/colProductBalance";
+import BootstrapTable from 'react-bootstrap-table-next';
+import {getAllProductsBalance} from "../service/productBlanceService";
+import {createIncoming} from "../service/incomingService";
+import IncomingModal from "../modal/IncomingModal";
 
 class Incoming extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            data: [],
+            openCreate: false
+        };
+        this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
+        this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
+        this.createIncoming = this.createIncoming.bind(this);
 
+        getAllProductsBalance().then(data => {
+            this.setState({
+                data: data
+            });
+        });
     }
+
+    createIncoming(entity) {
+        createIncoming(entity).then(() => {
+            getAllProductsBalance().then(data => {
+                this.setState({
+                    data: data,
+                    openCreate: false
+                });
+            });
+        });
+    };
+
+    onOpenCreateModal () {
+        this.setState({
+            openCreate: true
+        });
+    };
+
+    onCloseCreateModal = () => {
+        this.setState({
+            openCreate: false
+        });
+    };
 
     render() {
         return (
             <div className="main-div">
-                Incoming
+                <div className="button-group">
+                    <button onClick = { this.onOpenCreateModal } className="btn btn-primary">
+                        Добавить приход продукта
+                    </button>
+                </div>
+                <BootstrapTable
+                    keyField="product.description"
+                    data={this.state.data}
+                    columns={colProductBalance}
+                />
+                <IncomingModal accept={this.createIncoming}
+                              open={this.state.openCreate}
+                              close={this.onCloseCreateModal} />
             </div>
         );
     }
 }
 
-const mapStateToProps = state => ({
-    Incoming: state.expenseReducer.Incoming
-});
-
-function mapDispatchToProps(dispatch) {
-    return {
-        IncomingActions: bindActionCreators(getExpensesAction, dispatch)
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Incoming);
+export default Incoming;

@@ -16,20 +16,20 @@ export function getServicesByDescription(description) {
         });
 }
 
-export function createService(service) {
-    return sendRequest(service, "POST");
+export function createService(entity) {
+    return sendRequest(entity, "POST");
 }
 
-export function updateService(service) {
-    return sendRequest(service, "PUT");
+export function updateService(entity) {
+    return sendRequest(entity, "PUT");
 }
 
-function sendRequest(master, method) {
+function sendRequest(entity, method) {
 
     const options = {
         method: method,
         headers: new Headers({'content-type': 'application/json'}),
-        body: JSON.stringify(master)
+        body: JSON.stringify(entity)
     };
 
     return fetch("http://localhost:8080/api/service", options)

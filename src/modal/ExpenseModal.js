@@ -95,6 +95,7 @@ class ExpenseModal extends Component {
         this.handleInputProductChange = this.handleInputProductChange.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeCountProduct = this.handleChangeCountProduct.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
     }
 
@@ -146,6 +147,7 @@ class ExpenseModal extends Component {
             submit: true
         });
         if (this.state.selectProduct
+            && this.state.countProduct>0
             && this.state.selectMaster
             && this.state.date) {
             let expense = {
@@ -183,7 +185,7 @@ class ExpenseModal extends Component {
         });
     };
 
-    handleChange = event => {
+    handleChangeCountProduct = event => {
         if (event.target.value > 0) {
             this.setState({
                 countProduct: event.target.value
@@ -239,7 +241,7 @@ class ExpenseModal extends Component {
                             </div>
                             <div className="col-sm-4">
                                 <TextField InputLabelProps={{ shrink: true }} value={this.state.countProduct}
-                                           onChange={this.handleChange('countProduct')} type="number"/>
+                                           onChange={this.handleChangeCountProduct} type="number"/>
 
                                 <FormControl className={classes.formControl} error={this.validate('countProduct')} aria-describedby="countProduct-error-text">
                                     { this.validate('countProduct') ? <FormHelperText id="countProduct-error-text">Поле не может быть пустым</FormHelperText>: null }

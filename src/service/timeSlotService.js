@@ -17,16 +17,16 @@ export function getTimeSlotsByClientId(clientId) {
         });
 }
 
-export function createTimeSlot(timeSlot) {
-    return sendRequest(timeSlot, "POST");
+export function createTimeSlot(entity) {
+    return sendRequest(entity, "POST");
 }
 
-function sendRequest(timeSlot, method) {
+function sendRequest(entity, method) {
 
     const options = {
         method: method,
         headers: new Headers({'content-type': 'application/json'}),
-        body: JSON.stringify(timeSlot)
+        body: JSON.stringify(entity)
     };
 
     return fetch("http://localhost:8080/api/timeSlot", options)

@@ -31,20 +31,20 @@ export function removeClient(clientId) {
         .then(function(res){ return res })
 }
 
-export function updateClient(master) {
-    return sendRequest(master, "PUT");
+export function updateClient(entity) {
+    return sendRequest(entity, "PUT");
 }
 
-export function createClient(master) {
-    return sendRequest(master, "POST");
+export function createClient(entity) {
+    return sendRequest(entity, "POST");
 }
 
-function sendRequest(master, method) {
+function sendRequest(entity, method) {
 
     const options = {
         method: method,
         headers: new Headers({'content-type': 'application/json'}),
-        body: JSON.stringify(master)
+        body: JSON.stringify(entity)
     };
 
     return fetch("http://localhost:8080/api/client", options)

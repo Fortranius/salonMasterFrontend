@@ -11,20 +11,20 @@ export function getExpenses(params) {
         });
 }
 
-export function updateExpense(expense) {
-    return sendRequest(expense, "PUT");
+export function updateExpense(entity) {
+    return sendRequest(entity, "PUT");
 }
 
-export function createExpense(expense) {
-    return sendRequest(expense, "POST");
+export function createExpense(entity) {
+    return sendRequest(entity, "POST");
 }
 
-function sendRequest(expense, method) {
+function sendRequest(entity, method) {
 
     const options = {
         method: method,
         headers: new Headers({'content-type': 'application/json'}),
-        body: JSON.stringify(expense)
+        body: JSON.stringify(entity)
     };
 
     return fetch("http://localhost:8080/api/expense", options)
