@@ -40,7 +40,7 @@ class Expenses extends Component {
 
         getAllMasters().then(masters => {
             let masterOptions = {};
-            masters.map(master => {
+            masters.forEach(master => {
                 masterOptions[master.id] = master.person.name;
             });
             this.setState({
@@ -49,7 +49,7 @@ class Expenses extends Component {
         });
         getProducts().then(products => {
             let productOptions = {};
-            products.map(product => {
+            products.forEach(product => {
                 productOptions[product.id] = product.description;
             });
             this.setState({

@@ -22,7 +22,7 @@ import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
 import {getProducts, getProductsByDescription} from "../service/productService";
 import ExpenseList from "./components/ExpenseItem";
-import {getAllHairs} from "../service/hairService";
+import {getAllHairCategories, getAllHairs} from "../service/hairService";
 
 const styles = theme => ({
     container: {
@@ -158,7 +158,9 @@ class TimeSlotModal extends Component {
             expenses: [],
             optionHairs: [],
             selectedHair: undefined,
-            hairWeight: 0
+            hairWeight: 0,
+            hairCount: 0,
+            hairsCategory: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -181,6 +183,12 @@ class TimeSlotModal extends Component {
                 optionHairs: hairs
             });
         })
+
+        getAllHairCategories().then(data => {
+            this.setState({
+                hairsCategory: data
+            })
+        });
     }
 
     componentDidMount() {
@@ -279,6 +287,7 @@ class TimeSlotModal extends Component {
             menu:'MAIN',
             expenses: this.props.event.timeSlot ? this.props.event.timeSlot.expenses : [],
             hairWeight: this.props.event.timeSlot ? this.props.event.timeSlot.hairWeight : 0,
+            hairCount: this.props.event.timeSlot ? this.props.event.timeSlot.hairCount : 0,
             selectedHair: selectedHair
         });
     }
@@ -339,9 +348,9 @@ class TimeSlotModal extends Component {
             status: this.state.status,
             expenses: expenses,
             hair: this.state.selectedHair.hair,
-            hairWeight: this.state.hairWeight
+            hairWeight: this.state.hairWeight,
+            hairCount: this.state.hairCount
         };
-        console.log(timeSlot);
         this.props.accept(timeSlot);
         this.clear();
     };
@@ -376,7 +385,8 @@ class TimeSlotModal extends Component {
             expenses: [],
             optionHairs: [],
             selectedHair: undefined,
-            hairWeight: 0
+            hairWeight: 0,
+            hairCount: 0
         });
     }
 
@@ -390,6 +400,12 @@ class TimeSlotModal extends Component {
                 ]
             }
         });
+
+        let sum = 0;
+        this.state.hairsCategory.filter(hairCategory => hairCategory.type === this.state.selectMaster.type)
+            .forEach(hairCategory => {
+                sum = sum + hairCategory.price*this.state.hairCount + this.state.selectedHair.hair.price*this.state.hairWeight;
+            });
         this.setState({
             selectMaster: newValue.master,
             services: options,
@@ -399,7 +415,8 @@ class TimeSlotModal extends Component {
                 value: newValue.value,
                 label: newValue.master.person.name,
                 master: newValue.master
-            }
+            },
+            price: sum
         });
     };
 
@@ -433,6 +450,24 @@ class TimeSlotModal extends Component {
     handleChange = name => event => {
         this.setState({
             [name]: event.target.value
+        });
+    };
+
+    handleChangeAndRecountSum = name => event => {
+        let sum = 0;
+        let hairCount = this.state.hairCount;
+        let hairWeight = this.state.hairWeight;
+
+        if (name==='hairCount') hairCount=event.target.value;
+        if (name==='hairWeight') hairWeight=event.target.value;
+
+        this.state.hairsCategory.filter(hairCategory => hairCategory.type === this.state.selectMaster.type)
+            .forEach(hairCategory => {
+                sum = sum + hairCategory.price*hairCount + this.state.selectedHair.hair.price*hairWeight;
+            });
+        this.setState({
+            [name]: event.target.value,
+            price: sum
         });
     };
 
@@ -615,8 +650,14 @@ class TimeSlotModal extends Component {
     };
 
     handleChangeHair = (newValue) => {
+        let sum = 0;
+        this.state.hairsCategory.filter(hairCategory => hairCategory.type === this.state.selectMaster.type)
+            .forEach(hairCategory => {
+                sum = sum + hairCategory.price*this.state.hairCount + newValue.hair.price*this.state.hairWeight;
+            });
         this.setState({
-            selectedHair: newValue
+            selectedHair: newValue,
+            price: sum
         });
     };
 
@@ -891,7 +932,6 @@ class TimeSlotModal extends Component {
                                     { this.validate('selectMaster') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
                                 <hr/>
-
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-sm-2 title-margin">
@@ -907,21 +947,35 @@ class TimeSlotModal extends Component {
                                                 { this.validate('selectedHair') ? <FormHelperText id="selectedHair-error-text">Поле не может быть пустым</FormHelperText>: null }
                                             </FormControl>
                                         </div>
+                                    </div>
+                                    <div className="row">
                                         <div className="col-sm-3 title-margin-date">
-                                            Количество (гр.):
+                                            Количество (шт.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.hairCount}
+                                                onChange={this.handleChangeAndRecountSum('hairCount')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-sm-3 title-margin-date">
+                                            Вес (гр.):
                                         </div>
                                         <div className="col-sm">
                                             <TextField
                                                 className={classes.formControl}
                                                 value={this.state.hairWeight}
-                                                onChange={this.handleChange('hairWeight')}
+                                                onChange={this.handleChangeAndRecountSum('hairWeight')}
                                                 InputProps={{
                                                     inputComponent: NumberFormatCustom,
                                                 }}
                                             />
                                         </div>
                                     </div>
-                                    <hr/>
                                 </div>
                                 <hr/>
                                 <div className="container">
