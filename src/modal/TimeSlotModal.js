@@ -22,6 +22,7 @@ import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
 import {getProducts, getProductsByDescription} from "../service/productService";
 import ExpenseList from "./components/ExpenseItem";
+import {getAllHairs} from "../service/hairService";
 
 const styles = theme => ({
     container: {
@@ -37,6 +38,12 @@ const styles = theme => ({
     formControl: {
         display: 'flex'
     },
+    formControlHairs: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        marginTop:16,
+        width: 250
+    }
 });
 
 async function getOptionMastersByFIO(search, loadedOptions) {
@@ -148,7 +155,10 @@ class TimeSlotModal extends Component {
             },
             selectProductByDescription: undefined,
             submitExpense: false,
-            expenses: []
+            expenses: [],
+            optionHairs: [],
+            selectedHair: undefined,
+            hairWeight: 0
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -160,7 +170,17 @@ class TimeSlotModal extends Component {
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeExpense = this.handleChangeExpense.bind(this);
+        this.handleChangeHair = this.handleChangeHair.bind(this);
         this.setStatus = this.setStatus.bind(this);
+
+        getAllHairs().then(data => {
+            let hairs = data.map(hair => {
+                return { value: hair.id, label: "Волосы " + hair.minLength + " - " + (hair.maxLength !== 0 ? hair.maxLength : "более"), hair: hair };
+            });
+            this.setState({
+                optionHairs: hairs
+            });
+        })
     }
 
     componentDidMount() {
@@ -173,13 +193,21 @@ class TimeSlotModal extends Component {
             services,
             selectService,
             selectServiceByDescription = '',
-            status;
+            status,
+            selectedHair;
         if (this.props.event.timeSlot) {
             selectMasterName = {
                 value: this.props.event.timeSlot.master.id,
                 label: this.props.event.timeSlot.master.person.name,
                 master: this.props.event.timeSlot.master
             };
+            if (this.props.event.timeSlot.hair)
+                selectedHair = {
+                    value: this.props.event.timeSlot.hair.id,
+                    label: "Волосы " + this.props.event.timeSlot.hair.minLength + " - " +
+                        (this.props.event.timeSlot.hair.maxLength !== 0 ? this.props.event.timeSlot.hair.maxLength : "более"),
+                    hair: this.props.event.timeSlot.hair
+                };
             selectMaster = this.props.event.timeSlot.master ? this.props.event.timeSlot.master : undefined;
             status = this.props.event.timeSlot.status ? this.props.event.timeSlot.status : 'NEW';
             selectClient = this.props.event.timeSlot.client;
@@ -249,7 +277,9 @@ class TimeSlotModal extends Component {
             selectService: selectService,
             selectServiceByDescription: selectServiceByDescription,
             menu:'MAIN',
-            expenses: this.props.event.timeSlot ? this.props.event.timeSlot.expenses : []
+            expenses: this.props.event.timeSlot ? this.props.event.timeSlot.expenses : [],
+            hairWeight: this.props.event.timeSlot ? this.props.event.timeSlot.hairWeight : 0,
+            selectedHair: selectedHair
         });
     }
 
@@ -307,8 +337,11 @@ class TimeSlotModal extends Component {
             price: this.state.price,
             service: this.state.selectService,
             status: this.state.status,
-            expenses: expenses
+            expenses: expenses,
+            hair: this.state.selectedHair.hair,
+            hairWeight: this.state.hairWeight
         };
+        console.log(timeSlot);
         this.props.accept(timeSlot);
         this.clear();
     };
@@ -340,7 +373,10 @@ class TimeSlotModal extends Component {
             },
             selectProductByDescription: undefined,
             submitExpense: false,
-            expenses: []
+            expenses: [],
+            optionHairs: [],
+            selectedHair: undefined,
+            hairWeight: 0
         });
     }
 
@@ -575,6 +611,12 @@ class TimeSlotModal extends Component {
                 label: newValue.product.description,
                 product: newValue.product
             }
+        });
+    };
+
+    handleChangeHair = (newValue) => {
+        this.setState({
+            selectedHair: newValue
         });
     };
 
@@ -848,6 +890,39 @@ class TimeSlotModal extends Component {
                                 <FormControl className={classes.formControl} error={this.validate('selectMaster')} aria-describedby="selectMaster-error-text">
                                     { this.validate('selectMaster') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
+                                <hr/>
+
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-2 title-margin">
+                                            Расход волос:
+                                        </div>
+                                        <div className="col-sm">
+                                            <Select value={this.state.selectedHair}
+                                                    onChange={this.handleChangeHair}
+                                                    placeholder="Выберите категорию волос"
+                                                    options={this.state.optionHairs}
+                                            />
+                                            <FormControl className={classes.formControlHairs} error={this.validate('selectedHair')} aria-describedby="selectedHair-error-text">
+                                                { this.validate('selectedHair') ? <FormHelperText id="selectedHair-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            </FormControl>
+                                        </div>
+                                        <div className="col-sm-3 title-margin-date">
+                                            Количество (гр.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.hairWeight}
+                                                onChange={this.handleChange('hairWeight')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                </div>
                                 <hr/>
                                 <div className="container">
                                     <div className="row">
