@@ -94,11 +94,13 @@
 }
 
 .login-form {
-  margin-left: 40%;
-  margin-right: 40%;
+  margin-left: 35%;
+  margin-right: 35%;
 }
 .login-div {
   width: 100%;
+  padding-top: 40px;
+  padding-right: 190px;
 }
 
 .react-calendar__navigation button {

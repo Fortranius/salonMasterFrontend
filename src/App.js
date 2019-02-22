@@ -33,8 +33,12 @@ class App extends Component {
             <Router>
                 <Route render={({location, history}) => (
                     <React.Fragment>
-                        <SideNav defaultExpanded={true}
+                        {localStorage.getItem('user') ? <SideNav defaultExpanded={true}
                             onSelect={(selected) => {
+                                if (selected === 'logout') {
+                                    localStorage.clear();
+                                    window.location.reload();
+                                }
                                 const to = '/' + selected;
                                 if (location.pathname !== to) {
                                     history.push(to);
@@ -115,8 +119,16 @@ class App extends Component {
                                         Справочники
                                     </NavText>
                                 </NavItem>
+                                <NavItem eventKey="logout">
+                                    <NavIcon>
+                                        <i className="fa fa-book fa-fw" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Выход
+                                    </NavText>
+                                </NavItem>
                             </SideNav.Nav>
-                        </SideNav>
+                        </SideNav> : null}
                         <main>
                             <Route path="/login" component={LoginPage}/>
                             <PrivateRoute exact path='/' component={Timetable}/>
