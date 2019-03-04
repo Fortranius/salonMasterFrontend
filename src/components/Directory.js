@@ -32,7 +32,7 @@ class Directory extends Component {
                     Прайс стоимсоти услуг мастеров:
                 </h4>
                 <BootstrapTable
-                    keyField="price"
+                    keyField="id"
                     data={this.state.hairsCategory}
                     columns={colHairCategory}
                 />
@@ -41,7 +41,7 @@ class Directory extends Component {
                     Прайс стоимости волос:
                 </h4>
                 <BootstrapTable
-                    keyField="minLength"
+                    keyField="id"
                     data={this.state.hairs}
                     columns={colHair}
                 />

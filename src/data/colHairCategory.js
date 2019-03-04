@@ -1,9 +1,17 @@
-import typeFormatter from "./typeMaster";
+import typeMasterFormatter from "./typeMaster";
+import typeHairFormatter from "./typeHair";
+
 import React from "react";
 
-function type(cell) {
+function typeMaster(cell) {
     return (
-        <span>{typeFormatter(cell)}</span>
+        <span>{typeMasterFormatter(cell)}</span>
+    );
+}
+
+function typeHair(cell) {
+    return (
+        <span>{typeHairFormatter(cell)}</span>
     );
 }
 
@@ -13,8 +21,13 @@ export default [
         text: 'Стоимсоть за прядь'
     },
     {
-        dataField: 'type',
+        dataField: 'masterType',
         text: 'Категория мастера',
-        formatter: type
+        formatter: typeMaster
+    },
+    {
+        dataField: 'hairType',
+        text: 'Тип работ',
+        formatter: typeHair
     }
 ]

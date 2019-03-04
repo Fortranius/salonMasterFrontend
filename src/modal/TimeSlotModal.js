@@ -935,6 +935,47 @@ class TimeSlotModal extends Component {
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-sm-2 title-margin">
+                                            Услуга:
+                                        </div>
+                                        <div className="col-sm">
+                                            {this.state.selectMaster ? <Autosuggest
+                                                suggestions={this.state.services}
+                                                multiSection={true}
+                                                onSuggestionsFetchRequested={this.onServicesByDescription}
+                                                onSuggestionsClearRequested={this.onServicesClearRequested}
+                                                getSuggestionValue={getServiceDescription}
+                                                renderSuggestion={renderService}
+                                                renderSectionTitle={renderSectionTitle}
+                                                getSectionSuggestions={getSectionServices}
+                                                inputProps={inputServiceProps}
+                                                onSuggestionSelected={this.onServiceSelected}
+                                                focusInputOnSuggestionClick={true}
+                                                shouldRenderSuggestions={this.shouldRenderSuggestions}
+                                            />: null }
+                                            <FormControl className={classes.formControl} error={this.validate('selectService')} aria-describedby="selectService-error-text">
+                                                { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            </FormControl>
+                                        </div>
+                                        <div className="col-sm-2 title-margin-date">
+                                            Цена (руб.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.price}
+                                                onChange={this.handleChange('price')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                </div>
+                                <hr/>
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-2 title-margin">
                                             Расход волос:
                                         </div>
                                         <div className="col-sm">
@@ -976,47 +1017,6 @@ class TimeSlotModal extends Component {
                                             />
                                         </div>
                                     </div>
-                                </div>
-                                <hr/>
-                                <div className="container">
-                                    <div className="row">
-                                        <div className="col-sm-2 title-margin">
-                                            Услуга:
-                                        </div>
-                                        <div className="col-sm">
-                                            {this.state.selectMaster ? <Autosuggest
-                                                suggestions={this.state.services}
-                                                multiSection={true}
-                                                onSuggestionsFetchRequested={this.onServicesByDescription}
-                                                onSuggestionsClearRequested={this.onServicesClearRequested}
-                                                getSuggestionValue={getServiceDescription}
-                                                renderSuggestion={renderService}
-                                                renderSectionTitle={renderSectionTitle}
-                                                getSectionSuggestions={getSectionServices}
-                                                inputProps={inputServiceProps}
-                                                onSuggestionSelected={this.onServiceSelected}
-                                                focusInputOnSuggestionClick={true}
-                                                shouldRenderSuggestions={this.shouldRenderSuggestions}
-                                            />: null }
-                                            <FormControl className={classes.formControl} error={this.validate('selectService')} aria-describedby="selectService-error-text">
-                                                { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                            </FormControl>
-                                        </div>
-                                        <div className="col-sm-2 title-margin-date">
-                                            Цена (руб.):
-                                        </div>
-                                        <div className="col-sm">
-                                            <TextField
-                                                className={classes.formControl}
-                                                value={this.state.price}
-                                                onChange={this.handleChange('price')}
-                                                InputProps={{
-                                                    inputComponent: NumberFormatCustom,
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr/>
                                 </div>
                             </div> : null}
                         </div>
