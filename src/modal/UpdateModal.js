@@ -9,8 +9,8 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import masterTypeOptions from "../data/masterTypeOptions";
 import Select from 'react-select';
-import {getServices} from "../service/serviceService";
-import typeFormatter from "../data/typeMaster";
+import {getProcedures} from "../service/procedureService";
+import typeFormatter from "../data/categoryMasterFormatter";
 
 const styles = theme => ({
     container: {
@@ -60,49 +60,48 @@ function NumberFormatCustomPhone(props) {
 
 class UpdateModal extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             person: {
                 phone: '',
                 name:'',
                 mail:''
             },
-            service: {
+            procedure: {
                 description: '',
                 minPrice: 0,
                 maxPrice: 0
             },
             type: '',
             selectType: undefined,
-            services: [],
+            procedures: [],
             submit: false,
-            submitService: false,
-            selectedServices: [],
-            optionServices: []
+            submitProcedure: false,
+            selectedProcedures: [],
+            optionProcedures: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangePerson = this.handleChangePerson.bind(this);
-        this.handleChangeService = this.handleChangeService.bind(this);
 
-        getServices().then(data => {
-            let services = data.map(service => {
-                return { value: service.id, label: service.description, service: service };
+        getProcedures().then(data => {
+            let procedures = data.map(procedure => {
+                return { value: procedure.id, label: procedure.description, procedure: procedure };
             });
             this.setState({
-                optionServices: services
+                optionProcedures: procedures
             });
         });
     }
 
     componentDidMount() {
         if (this.props.update) {
-            let selectedServices = [];
-            if (this.props.update.services)
-                selectedServices = this.props.update.services.map(service => {
-                    return { value: service.id, label: service.description, service: service };
+            let selectedProcedures = [];
+            if (this.props.update.procedures)
+                selectedProcedures = this.props.update.procedures.map(procedure => {
+                    return { value: procedure.id, label: procedure.description, procedure: procedure };
                 });
             let selectType = undefined;
             if (this.props.update.type)
@@ -116,10 +115,10 @@ class UpdateModal extends Component {
                     name: this.props.update.person.name ? this.props.update.person.name : '',
                     mail: this.props.update.person.mail ? this.props.update.person.mail : '',
                 },
-                type: this.props.update.type ? typeFormatter(this.props.update.type) : '',
+                type: this.props.update.type ? this.props.update.type : '',
                 selectType: selectType,
-                services: this.props.update.services,
-                selectedServices: selectedServices
+                procedures: this.props.update.procedures,
+                selectedProcedures: selectedProcedures
             });
         }
     }
@@ -132,16 +131,16 @@ class UpdateModal extends Component {
                 mail:''
             },
             type: '',
-            services:[],
-            service: {
+            procedures:[],
+            procedure: {
                 description: '',
                 minPrice: 0,
                 maxPrice: 0
             },
             selectType: undefined,
             submit: false,
-            submitService: false,
-            selectedServices: []
+            submitProcedure: false,
+            selectedProcedures: []
         });
     }
 
@@ -157,7 +156,7 @@ class UpdateModal extends Component {
         });
         if (this.state.person.name
             && this.state.person.phone.length === 10
-            && ((this.state.services && this.state.services.length>0)
+            && ((this.state.procedures && this.state.procedures.length>0)
                 || this.props.entity !== 'мастера')) {
             this.props.accept(this.state);
             this.clear();
@@ -179,15 +178,6 @@ class UpdateModal extends Component {
         });
     };
 
-    handleChangeService = name => event => {
-        this.setState({
-            service: {
-                ...this.state.service,
-                [name]: event.target.value
-            }
-        });
-    };
-
     validate(field) {
         if (!this.state.submit)
             return false;
@@ -202,12 +192,6 @@ class UpdateModal extends Component {
         return (!this.state || !this.state[field]);
     };
 
-    removeService = (serviceIndex)  => {
-        let array = [...this.state.services];
-        array.splice(serviceIndex, 1);
-        this.setState({services: array});
-    };
-
     handleChangeTypeMaster = (newValue) => {
         this.setState({
             type: newValue.value,
@@ -215,13 +199,13 @@ class UpdateModal extends Component {
         });
     };
 
-    handleChangeServices = (selectedServices) => {
-        let services = selectedServices.map(option => {
-            return option.service;
+    handleChangeProcedures = (selectedProcedures) => {
+        let procedures = selectedProcedures.map(option => {
+            return option.procedure;
         });
         this.setState({
-            selectedServices: selectedServices,
-            services: services
+            selectedProcedures: selectedProcedures,
+            procedures: procedures
         });
     };
 
@@ -271,16 +255,16 @@ class UpdateModal extends Component {
                     <hr/>
                     { this.props.entity === 'мастера' ? <div>
                         <hr/>
-                        <FormControl className={classes.formControlServices} error={this.validate('service')} aria-describedby="service-error-text">
-                            <Select id="service"
+                        <FormControl className={classes.formControlServices} error={this.validate('procedure')} aria-describedby="procedure-error-text">
+                            <Select id="procedure"
                                     isMulti
                                     closeMenuOnSelect={false}
-                                    value={this.state.selectedServices}
-                                    onChange={this.handleChangeServices}
+                                    value={this.state.selectedProcedures}
+                                    onChange={this.handleChangeProcedures}
                                     placeholder="Выберите услуги"
-                                    options={this.state.optionServices}
+                                    options={this.state.optionProcedures}
                             />
-                            { this.validate('service') ? <FormHelperText id="service-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
+                            { this.validate('procedure') ? <FormHelperText id="procedure-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
                         </FormControl>
                     </div>: null }
                     <hr/>

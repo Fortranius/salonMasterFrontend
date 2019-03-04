@@ -1,5 +1,5 @@
 import React from 'react';
-import typeFormatter from "../data/typeMaster";
+import typeFormatter from "./categoryMasterFormatter";
 
 function phoneFormatter(cell, row) {
     if (row.person.phone) {

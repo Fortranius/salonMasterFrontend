@@ -7,7 +7,7 @@ export default function typeFormatter(cell) {
         case 'MIDDLE_PLUS':
             return "Стандарт плюс мастер";
         case 'MIDDLE':
-            return "Стандартный масте";
+            return "Стандартный мастер";
         case 'START':
             return "Начинающий мастер";
         case 'SUPPORT':

@@ -33,7 +33,7 @@ const styles = theme => ({
     }
 });
 
-class ServiceModal extends Component {
+class ProcedureModal extends Component {
 
     constructor(props) {
         super(props);
@@ -125,4 +125,4 @@ class ServiceModal extends Component {
     }
 }
 
-export default withStyles(styles)(ServiceModal);
+export default withStyles(styles)(ProcedureModal);

@@ -1,5 +1,5 @@
-export function getServices() {
-    return fetch("http://localhost:8080/api/services")
+export function getProcedures() {
+    return fetch("http://localhost:8080/api/procedures")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -7,20 +7,11 @@ export function getServices() {
         });
 }
 
-export function getServicesByDescription(description) {
-    return fetch("http://localhost:8080/api/services/description/" + description)
-        .then(handleErrors)
-        .then(res => res.json())
-        .then(val => {
-            return val;
-        });
-}
-
-export function createService(entity) {
+export function createProcedure(entity) {
     return sendRequest(entity, "POST");
 }
 
-export function updateService(entity) {
+export function updateProcedure(entity) {
     return sendRequest(entity, "PUT");
 }
 
@@ -32,7 +23,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/service", options)
+    return fetch("http://localhost:8080/api/procedure", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }
