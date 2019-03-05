@@ -18,6 +18,7 @@ import 'font-awesome/css/font-awesome.min.css';
 import logo from './logo_Lady_Land.png';
 import Procedures from "./components/Procedures";
 import Directory from "./components/Directory";
+import Sales from "./components/Sales";
 
 class App extends Component {
 
@@ -145,7 +146,7 @@ class App extends Component {
                             <PrivateRoute path="/products" component={Products}/>
                             <PrivateRoute path="/incoming" component={Incoming}/>
                             <PrivateRoute path="/expenses" component={Expenses}/>
-                            <PrivateRoute path="/sales" component={Expenses}/>
+                            <PrivateRoute path="/sales" component={Sales}/>
                             <PrivateRoute path="/procedures" component={Procedures}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
                             <PrivateRoute path="/directory" component={Directory}/>

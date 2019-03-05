@@ -76,7 +76,7 @@ function NumberFormatCustom(props) {
     );
 }
 
-class ExpenseModal extends Component {
+class SaleModal extends Component {
 
     constructor() {
         super();
@@ -84,16 +84,13 @@ class ExpenseModal extends Component {
             id: undefined,
             date: new Date(),
             selectProduct: undefined,
-            selectMaster: undefined,
             selectProductByDescription: undefined,
-            selectMasterFio: undefined,
             countProduct: 1,
             submit: false
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleInputProductChange = this.handleInputProductChange.bind(this);
-        this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeCountProduct = this.handleChangeCountProduct.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
@@ -106,12 +103,7 @@ class ExpenseModal extends Component {
                 date: this.props.update.date ? moment.unix(this.props.update.date).toDate() : new Date(),
                 countProduct: this.props.update.countProduct,
                 selectProduct: this.props.update.product,
-                selectMaster: this.props.update.master,
-                selectMasterFio: {
-                    value: this.props.update.master.id,
-                    label: this.props.update.master.person.name,
-                    master: this.props.update.master
-                },
+                cost: this.props.update.cost,
                 selectProductByDescription: {
                     value: this.props.update.product.id,
                     label: this.props.update.product.description,
@@ -126,9 +118,7 @@ class ExpenseModal extends Component {
             id: undefined,
             date: new Date(),
             selectProduct: undefined,
-            selectMaster: undefined,
             selectProductByDescription: undefined,
-            selectMasterFio: undefined,
             countProduct: 1,
             submit: false
         });
@@ -146,13 +136,12 @@ class ExpenseModal extends Component {
         });
         if (this.state.selectProduct
             && this.state.countProduct>0
-            && this.state.selectMaster
             && this.state.date) {
             let expense = {
                 id: this.state.id,
                 date: this.state.date,
                 product: this.state.selectProduct,
-                master: this.state.selectMaster,
+                cost: this.state.cost,
                 countProduct: this.state.countProduct
             };
             this.props.accept(expense);
@@ -167,17 +156,6 @@ class ExpenseModal extends Component {
                 value: newValue.value,
                 label: newValue.product.description,
                 product: newValue.product
-            }
-        });
-    };
-
-    handleInputMasterChange = (newValue) => {
-        this.setState({
-            selectMaster: newValue.master,
-            selectMasterFio: {
-                value: newValue.value,
-                label: newValue.master.person.name,
-                master: newValue.master
             }
         });
     };
@@ -247,22 +225,6 @@ class ExpenseModal extends Component {
                         </div>
                         <div className="row">
                             <div className="col-sm-2">
-                                Мастер:
-                            </div>
-                            <div className="col-sm">
-                                <AsyncPaginate
-                                    value={this.state.selectMasterFio}
-                                    loadOptions={getOptionMastersByFIO}
-                                    onChange={this.handleInputMasterChange}
-                                    placeholder={'Выберите мастера'}
-                                />
-                                <FormControl className={classes.formControl} error={this.validate('selectMaster')} aria-describedby="selectMaster-error-text">
-                                    { this.validate('selectMaster') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                </FormControl>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-sm-2">
                                 Дата:
                             </div>
                             <div className="col-sm-4">
@@ -277,7 +239,7 @@ class ExpenseModal extends Component {
                                         localeUtils: MomentLocaleUtils,
                                     }}/>
                                 <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
-                                    { this.validate('date') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                    { this.validate('date') ? <FormHelperText id="date-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
                             </div>
                         </div>
@@ -296,4 +258,4 @@ class ExpenseModal extends Component {
     }
 }
 
-export default withStyles(styles)(ExpenseModal);
+export default withStyles(styles)(SaleModal);

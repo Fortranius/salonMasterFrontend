@@ -85,7 +85,6 @@ class Expenses extends Component {
     };
 
     handleTableChange = (type, {sortField, sortOrder, filters, page, sizePerPage}) => {
-        console.log(filters);
         this.setState({
             sortField: sortField,
             sortOrder: sortOrder,
@@ -169,10 +168,6 @@ class Expenses extends Component {
             {
                 dataField: 'countProduct',
                 text: 'Количество товара'
-            },
-            {
-                dataField: 'cost',
-                text: 'Стоимость'
             }
         ];
         return (
@@ -184,7 +179,6 @@ class Expenses extends Component {
                                                    buttonCreateTitle='Создание нового расхода'
                                                    buttonEditTitle='Изменение расхода'
                                                    sizePerPage={this.props.expenses ? this.props.expenses.size : 0}
-                                                   remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}
                                                    create={this.onOpenCreateModal}
                                                    totalSize={this.props.expenses ? this.props.expenses.totalElements : 0}
