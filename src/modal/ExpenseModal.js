@@ -266,17 +266,6 @@ class ExpenseModal extends Component {
                         </div>
                         <div className="row">
                             <div className="col-sm-2">
-                                Стоимость (руб.):
-                            </div>
-                            <div className="col-sm-4">
-                                <TextField InputProps={{inputComponent: NumberFormatCustom}} value={this.state.cost}
-                                           onChange={this.handleChange('cost')}/>
-
-                                <FormControl className={classes.cost} error={this.validate('cost')} aria-describedby="cost-error-text">
-                                    { this.validate('cost') ? <FormHelperText id="cost-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                </FormControl>
-                            </div>
-                            <div className="col-sm-2">
                                 Дата:
                             </div>
                             <div className="col-sm-4">

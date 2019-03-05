@@ -20,8 +20,6 @@ import MomentLocaleUtils, {parseDate} from 'react-day-picker/moment';
 import 'moment/locale/ru';
 import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
-import {getProducts, getProductsByDescription} from "../service/productService";
-import ExpenseList from "./components/ExpenseItem";
 import {getAllHairCategories, getAllHairs} from "../service/hairService";
 
 const styles = theme => ({
@@ -81,7 +79,6 @@ function NumberFormatCustom(props) {
 
 const getClientName = client => client.person.name;
 const getClientPhone = client => client.person.phone;
-const getServiceDescription = service => service.description;
 
 const renderClient = client => {
     return (
@@ -89,15 +86,9 @@ const renderClient = client => {
     );
 };
 
-const renderService = service => {
+const renderSectionTitle = () => {
     return (
-        <span>{service.description}</span>
-    );
-};
-
-const renderSectionTitle = section => {
-    return (
-        <strong>{section.title}</strong>
+        <strong/>
     );
 };
 
@@ -105,32 +96,11 @@ const getSectionClients = section => {
     return section.clients;
 };
 
-const getSectionServices = section => {
-    return section.services;
-};
-
-async function getOptionExpensesByDescription(search, loadedOptions) {
-    let response;
-    if (!search) response = await getProducts();
-    else response = await getProductsByDescription(search);
-    let cachedOptions = response.map((d) => ({
-        value: d.id,
-        label: d.description,
-        product: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true
-    };
-}
-
 class TimeSlotModal extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selectService: undefined,
-            selectServiceByDescription: '',
             selectMaster: undefined,
             selectMasterName: undefined,
             selectClient: undefined,
@@ -143,24 +113,23 @@ class TimeSlotModal extends Component {
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
             id: undefined,
-            price: 0,
+            allPrice: 0,
+            masterWorkPrice: 0,
             status: 'NEW',
             value: '',
-            services:[],
             clients: [],
             menu:'MAIN',
-            expense: {
-                product: undefined,
-                countProduct: 1
-            },
             selectProductByDescription: undefined,
-            submitExpense: false,
-            expenses: [],
             optionHairs: [],
             selectedHair: undefined,
             hairWeight: 0,
-            hairCount: 0,
-            hairsCategory: []
+            hairCountExtension: 0,
+            hairCountRemoval: 0,
+            hairsCategory: [],
+            procedures: [],
+            submitProcedure: false,
+            selectedProcedures: [],
+            optionProcedures: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -171,9 +140,9 @@ class TimeSlotModal extends Component {
         this.handleChangeEndMinutes = this.handleChangeEndMinutes.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleChangeExpense = this.handleChangeExpense.bind(this);
         this.handleChangeHair = this.handleChangeHair.bind(this);
         this.setStatus = this.setStatus.bind(this);
+        this.handleChangeProcedures = this.handleChangeProcedures.bind(this);
 
         getAllHairs().then(data => {
             let hairs = data.map(hair => {
@@ -182,7 +151,7 @@ class TimeSlotModal extends Component {
             this.setState({
                 optionHairs: hairs
             });
-        })
+        });
 
         getAllHairCategories().then(data => {
             this.setState({
@@ -198,12 +167,15 @@ class TimeSlotModal extends Component {
             selectClientName = '',
             selectClientPhone = '',
             clientDescription = '',
-            services,
-            selectService,
-            selectServiceByDescription = '',
             status,
-            selectedHair;
+            selectedHair,
+            procedures = [],
+            selectedProcedures = [];
         if (this.props.event.timeSlot) {
+            selectedProcedures = this.props.event.timeSlot.procedures.map(procedure => {
+                return { value: procedure.id, label: procedure.description, procedure: procedure };
+            });
+            procedures = this.props.event.timeSlot.procedures;
             selectMasterName = {
                 value: this.props.event.timeSlot.master.id,
                 label: this.props.event.timeSlot.master.person.name,
@@ -226,25 +198,7 @@ class TimeSlotModal extends Component {
                 + this.props.event.timeSlot.client.person.phone.substring(3, 6) + ' '
                 + this.props.event.timeSlot.client.person.phone.substring(6, 8) + ' '
                 + this.props.event.timeSlot.client.person.phone.substring(8, 10);
-            selectService = this.props.event.timeSlot.service;
-            selectServiceByDescription = this.props.event.timeSlot.service.description;
-            services = this.props.event.timeSlot.master.services.map(service => {
-                return {
-                    title: service.description,
-                    services: [
-                        service
-                    ]
-                }
-            });
         } else if (this.props.selectMaster) {
-            services = this.props.selectMaster.master.services.map(service => {
-                return {
-                    title: service.description,
-                    services: [
-                        service
-                    ]
-                }
-            });
             selectMasterName = {
                 value: this.props.selectMaster.master.id,
                 label: this.props.selectMaster.master.person.name,
@@ -252,10 +206,14 @@ class TimeSlotModal extends Component {
             };
             selectMaster = this.props.selectMaster.master;
         }
+        let optionProcedures = selectMaster.procedures.map(procedure => {
+            return { value: procedure.id, label: procedure.description, procedure: procedure };
+        });
         this.setState({
             date: this.props.event.start,
             id: this.props.event.id,
-            price: this.props.event.timeSlot ? this.props.event.timeSlot.price : 0,
+            allPrice: this.props.event.timeSlot ? this.props.event.timeSlot.allPrice : 0,
+            masterWorkPrice: this.props.event.timeSlot ? this.props.event.timeSlot.masterWorkPrice : 0,
             startHour: {
                 value: this.props.event.start.getHours(),
                 label: this.props.event.start.getHours()
@@ -281,14 +239,14 @@ class TimeSlotModal extends Component {
             selectClient: selectClient,
             selectClientName: selectClientName,
             selectClientPhone: selectClientPhone,
-            services: services,
-            selectService: selectService,
-            selectServiceByDescription: selectServiceByDescription,
             menu:'MAIN',
-            expenses: this.props.event.timeSlot ? this.props.event.timeSlot.expenses : [],
             hairWeight: this.props.event.timeSlot ? this.props.event.timeSlot.hairWeight : 0,
-            hairCount: this.props.event.timeSlot ? this.props.event.timeSlot.hairCount : 0,
-            selectedHair: selectedHair
+            hairCountExtension: this.props.event.timeSlot ? this.props.event.timeSlot.hairCountExtension : 0,
+            hairCountRemoval: this.props.event.timeSlot ? this.props.event.timeSlot.hairCountRemoval : 0,
+            selectedHair: selectedHair,
+            selectedProcedures: selectedProcedures,
+            optionProcedures: optionProcedures,
+            procedures: procedures
         });
     }
 
@@ -315,7 +273,7 @@ class TimeSlotModal extends Component {
                 }
         }
 
-        if (!client || !this.state.selectMaster || !this.state.date || !this.state.selectService)
+        if (!client || !this.state.selectMaster || !this.state.date)
             return false;
 
         client.description = this.state.clientDescription;
@@ -327,29 +285,20 @@ class TimeSlotModal extends Component {
         endDate.setHours(this.state.endHour.value);
         endDate.setMinutes(this.state.endMinutes.value);
 
-        let expenses = this.state.expenses.map(expense => {
-            return {
-                id: expense.id,
-                product: expense.product,
-                countProduct: expense.countProduct,
-                master: this.state.selectMaster,
-                date: new Date()
-            }
-        });
-
         let timeSlot = {
             id: this.state.id,
             client: client,
             master: this.state.selectMaster,
             startSlot: startDate,
             endSlot: endDate,
-            price: this.state.price,
-            service: this.state.selectService,
+            allPrice: this.state.allPrice,
+            masterWorkPrice: this.state.masterWorkPrice,
             status: this.state.status,
-            expenses: expenses,
             hair: this.state.selectedHair.hair,
             hairWeight: this.state.hairWeight,
-            hairCount: this.state.hairCount
+            hairCountExtension: this.state.hairCountExtension,
+            hairCountRemoval: this.state.hairCountRemoval,
+            procedures: this.state.procedures
         };
         this.props.accept(timeSlot);
         this.clear();
@@ -357,8 +306,6 @@ class TimeSlotModal extends Component {
 
     clear() {
         this.setState({
-            selectService: undefined,
-            selectServiceByDescription: '',
             selectClient: undefined,
             selectMaster: undefined,
             selectMasterName: undefined,
@@ -371,52 +318,51 @@ class TimeSlotModal extends Component {
             endHour: { value: 10, label: '10' },
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
-            price: 0,
+            allPrice: 0,
+            masterWorkPrice: 0,
             status: 'NEW',
-            services:[],
             clients:[],
             menu:'MAIN',
-            expense: {
-                product: undefined,
-                countProduct: 1
-            },
             selectProductByDescription: undefined,
-            submitExpense: false,
-            expenses: [],
             optionHairs: [],
             selectedHair: undefined,
             hairWeight: 0,
-            hairCount: 0
+            hairCountExtension: 0,
+            hairCountRemoval: 0,
+            procedures: [],
+            submitProcedure: false,
+            selectedProcedures: [],
+            optionProcedures: []
         });
     }
 
     handleInputMasterChange = (newValue) => {
-        let options = newValue.master.services.map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
-            return {
-                title: service.minPrice + ' руб.' + maxPrice,
-                services: [
-                    service
-                ]
-            }
-        });
-
-        let sum = 0;
-        this.state.hairsCategory.filter(hairCategory => hairCategory.type === this.state.selectMaster.type)
+        let allSum = 0, masterWorkSum = 0;
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
             .forEach(hairCategory => {
-                sum = sum + hairCategory.price*this.state.hairCount + this.state.selectedHair.hair.price*this.state.hairWeight;
+                allSum = allSum + hairCategory.price*this.state.hairCountExtension + this.state.selectedHair.hair.price*this.state.hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountExtension;
             });
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*this.state.hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountRemoval;
+            });
+
+        let procedures = newValue.master.procedures.map(procedure => {
+            return { value: procedure.id, label: procedure.description, procedure: procedure };
+        });
         this.setState({
             selectMaster: newValue.master,
-            services: options,
-            selectService: undefined,
-            selectServiceByDescription: '',
             selectMasterName: {
                 value: newValue.value,
                 label: newValue.master.person.name,
                 master: newValue.master
             },
-            price: sum
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum,
+            selectedProcedures: [],
+            optionProcedures: procedures
         });
     };
 
@@ -454,29 +400,29 @@ class TimeSlotModal extends Component {
     };
 
     handleChangeAndRecountSum = name => event => {
-        let sum = 0;
-        let hairCount = this.state.hairCount;
+        let allSum = 0, masterWorkSum = 0;
+        let hairCountExtension = this.state.hairCountExtension;
+        let hairCountRemoval = this.state.hairCountRemoval;
         let hairWeight = this.state.hairWeight;
 
-        if (name==='hairCount') hairCount=event.target.value;
+        if (name==='hairCountExtension') hairCountExtension=event.target.value;
         if (name==='hairWeight') hairWeight=event.target.value;
+        if (name==='hairCountRemoval') hairCountRemoval=event.target.value;
 
-        this.state.hairsCategory.filter(hairCategory => hairCategory.type === this.state.selectMaster.type)
+        if (this.state.selectedHair) this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
             .forEach(hairCategory => {
-                sum = sum + hairCategory.price*hairCount + this.state.selectedHair.hair.price*hairWeight;
+                allSum = allSum + hairCategory.price*hairCountExtension + this.state.selectedHair.hair.price*hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
+            });
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
             });
         this.setState({
             [name]: event.target.value,
-            price: sum
-        });
-    };
-
-    handleChangeExpense = name => event => {
-        this.setState({
-            expense: {
-                ...this.state.expense,
-                [name]: event.target.value
-            }
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum
         });
     };
 
@@ -541,43 +487,9 @@ class TimeSlotModal extends Component {
         });
     };
 
-    onServicesByDescription = ({ value }) => {
-        const inputValue = value.trim().toLowerCase();
-        const inputLength = inputValue.length;
-        let options = this.state.selectMaster.services.filter(service =>
-            service.description.toLowerCase().slice(0, inputLength) === inputValue
-        ).map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
-            return {
-                title: service.minPrice + ' руб.' + maxPrice,
-                services: [
-                    service
-                ]
-            }
-        });
-        this.setState({
-            services: options
-        });
-    };
-
     onClientsClearRequested = () => {
         this.setState({
             clients: []
-        });
-    };
-
-    onServicesClearRequested = () => {
-        let options = this.state.selectMaster.services.map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
-            return {
-                title: service.minPrice + ' руб.' + maxPrice,
-                services: [
-                    service
-                ]
-            }
-        });
-        this.setState({
-            services: options
         });
     };
 
@@ -604,13 +516,6 @@ class TimeSlotModal extends Component {
         });
     };
 
-    onChangeServiceDescription = (event, { newValue }) => {
-        this.setState({
-            selectService: undefined,
-            selectServiceByDescription: newValue
-        });
-    };
-
     onClientSelected = (event, { suggestion })  => {
         this.setState({
             selectClient: suggestion,
@@ -623,74 +528,34 @@ class TimeSlotModal extends Component {
         });
     };
 
-    onServiceSelected = (event, { suggestion })  => {
-        this.setState({
-            selectService: suggestion,
-            price: suggestion.minPrice,
-            selectServiceByDescription: suggestion.description
-        });
-    };
-
-    shouldRenderSuggestions = (value) => {
-        return value.trim().length > -1;
-    };
-
-    handleInputProductChange = (newValue) => {
-        this.setState({
-            expense: {
-                ...this.state.expense,
-                product: newValue.product
-            },
-            selectProductByDescription: {
-                value: newValue.value,
-                label: newValue.product.description,
-                product: newValue.product
-            }
-        });
-    };
-
     handleChangeHair = (newValue) => {
-        let sum = 0;
-        this.state.hairsCategory.filter(hairCategory => hairCategory.type === this.state.selectMaster.type)
+        let allSum = 0, masterWorkSum = 0;
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
             .forEach(hairCategory => {
-                sum = sum + hairCategory.price*this.state.hairCount + newValue.hair.price*this.state.hairWeight;
+                allSum = allSum + hairCategory.price*this.state.hairCountExtension + newValue.hair.price*this.state.hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountExtension;
             });
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*this.state.hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountRemoval;
+            });
+
         this.setState({
             selectedHair: newValue,
-            price: sum
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum
         });
     };
 
-    addExpense = ()  => {
+    handleChangeProcedures = (selectedProcedures) => {
+        let procedures = selectedProcedures.map(option => {
+            return option.procedure;
+        });
         this.setState({
-            submitExpense: true
+            selectedProcedures: selectedProcedures,
+            procedures: procedures
         });
-        if (this.state.expense.product
-            && this.state.expense.countProduct) {
-            let expenses = this.state.expenses;
-            expenses.push(this.state.expense);
-            this.setState({
-                selectProductByDescription: undefined,
-                expenses: expenses,
-                expense: {
-                    product: undefined,
-                    countProduct: 1
-                },
-                submitExpense:false
-            });
-        }
-    };
-
-    validateExpense(field) {
-        if (!this.state.submitExpense)
-            return false;
-        return (!this.state.expense || !this.state.expense[field]);
-    };
-
-    removeExpense = (serviceIndex)  => {
-        let array = [...this.state.expenses];
-        array.splice(serviceIndex, 1);
-        this.setState({expenses: array});
     };
 
     render() {
@@ -704,12 +569,6 @@ class TimeSlotModal extends Component {
             placeholder: 'Введите телефон клиента',
             value: this.state.selectClientPhone,
             onChange: this.onChangeClientPhone
-        };
-
-        const inputServiceProps = {
-            placeholder: '',
-            value: this.state.selectServiceByDescription,
-            onChange: this.onChangeServiceDescription
         };
         return (
             <div>
@@ -725,57 +584,17 @@ class TimeSlotModal extends Component {
                                     <li>
                                         <a href="#" onClick={() => this.setMenu('MAIN')}>Детали заказа</a>
                                     </li>
-                                    <li>
-                                        <a href="#" onClick={() => this.setMenu('EXPENSE')}>Расходы</a>
-                                    </li>
                                     {this.state.selectClient ? <li>
                                         <a href="#" onClick={() => this.setMenu('HISTORY')}>История посещений</a>
                                     </li> : null}
+                                    <li>
+                                        <a href="#" onClick={() => this.setMenu('HISTORY_CHANGE')}>История изменений</a>
+                                    </li>
                                 </ul>
                             </div>
                             {this.state.menu === 'HISTORY' ? <div className="col-sm">
                                 <div className="container selectDiv">
                                     <HistoryClients client={this.state.selectClient}/>
-                                </div>
-                            </div> : null}
-                            {this.state.menu === 'EXPENSE' ? <div className="col-sm">
-                                <div className="container selectDiv">
-                                    <div className="row">
-                                        <ExpenseList expenses={this.state.expenses} removeExpense={this.removeExpense}/>
-                                    </div>
-                                    <div className="row">
-                                        <hr/>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-sm-1 title-margin-date">
-                                            Товар:
-                                        </div>
-                                        <div className="col-sm-4">
-                                            <AsyncPaginate
-                                                value={this.state.selectProductByDescription}
-                                                loadOptions={getOptionExpensesByDescription}
-                                                onChange={this.handleInputProductChange}
-                                                placeholder={'Выберите товар'}
-                                            />
-                                            <FormControl className={classes.formControl} error={this.validateExpense('product')} aria-describedby="product-error-text">
-                                                { this.validateExpense('product') ? <FormHelperText id="product-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                            </FormControl>
-                                        </div>
-                                        <div className="col-sm-2 title-margin-date">
-                                            Количество:
-                                        </div>
-                                        <div className="col-sm-4">
-                                            <TextField InputLabelProps={{ shrink: true }} value={this.state.expense.countProduct}
-                                                       onChange={this.handleChangeExpense('countProduct')} type="number"/>
-
-                                            <FormControl className={classes.formControl} error={this.validateExpense('countProduct')} aria-describedby="countProduct-error-text">
-                                                { this.validateExpense('countProduct') ? <FormHelperText id="countProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                            </FormControl>
-                                        </div>
-                                        <div className="col-sm-1">
-                                            <button className="btn btn-default add-expense-button" onClick={this.addExpense}>+</button>
-                                        </div>
-                                    </div>
                                 </div>
                             </div> : null}
                             {this.state.menu === 'MAIN' ? <div className="col-sm">
@@ -938,42 +757,22 @@ class TimeSlotModal extends Component {
                                             Услуга:
                                         </div>
                                         <div className="col-sm">
-                                            {this.state.selectMaster ? <Autosuggest
-                                                suggestions={this.state.services}
-                                                multiSection={true}
-                                                onSuggestionsFetchRequested={this.onServicesByDescription}
-                                                onSuggestionsClearRequested={this.onServicesClearRequested}
-                                                getSuggestionValue={getServiceDescription}
-                                                renderSuggestion={renderService}
-                                                renderSectionTitle={renderSectionTitle}
-                                                getSectionSuggestions={getSectionServices}
-                                                inputProps={inputServiceProps}
-                                                onSuggestionSelected={this.onServiceSelected}
-                                                focusInputOnSuggestionClick={true}
-                                                shouldRenderSuggestions={this.shouldRenderSuggestions}
-                                            />: null }
-                                            <FormControl className={classes.formControl} error={this.validate('selectService')} aria-describedby="selectService-error-text">
-                                                { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            <FormControl className={classes.formControl} error={this.validate('procedure')} aria-describedby="procedure-error-text">
+                                                <Select id="procedure"
+                                                        isMulti
+                                                        closeMenuOnSelect={false}
+                                                        value={this.state.selectedProcedures}
+                                                        onChange={this.handleChangeProcedures}
+                                                        placeholder="Выберите услуги"
+                                                        options={this.state.optionProcedures}
+                                                />
+                                                { this.validate('procedure') ? <FormHelperText id="procedure-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
                                             </FormControl>
                                         </div>
-                                        <div className="col-sm-2 title-margin-date">
-                                            Цена (руб.):
-                                        </div>
-                                        <div className="col-sm">
-                                            <TextField
-                                                className={classes.formControl}
-                                                value={this.state.price}
-                                                onChange={this.handleChange('price')}
-                                                InputProps={{
-                                                    inputComponent: NumberFormatCustom,
-                                                }}
-                                            />
-                                        </div>
                                     </div>
-                                    <hr/>
                                 </div>
                                 <hr/>
-                                <div className="container">
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? <div className="container">
                                     <div className="row">
                                         <div className="col-sm-2 title-margin">
                                             Расход волос:
@@ -989,15 +788,15 @@ class TimeSlotModal extends Component {
                                             </FormControl>
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    {this.state.selectedHair ? <div className="row">
                                         <div className="col-sm-3 title-margin-date">
                                             Количество (шт.):
                                         </div>
                                         <div className="col-sm">
                                             <TextField
                                                 className={classes.formControl}
-                                                value={this.state.hairCount}
-                                                onChange={this.handleChangeAndRecountSum('hairCount')}
+                                                value={this.state.hairCountExtension}
+                                                onChange={this.handleChangeAndRecountSum('hairCountExtension')}
                                                 InputProps={{
                                                     inputComponent: NumberFormatCustom,
                                                 }}
@@ -1016,7 +815,57 @@ class TimeSlotModal extends Component {
                                                 }}
                                             />
                                         </div>
+                                    </div> : null}
+                                    <hr/>
+                                </div> : null}
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-4 title-margin-date">
+                                            Снятие волос (количество прядей):
+                                        </div>
+                                        <div className="col-sm-3">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.hairCountRemoval}
+                                                onChange={this.handleChangeAndRecountSum('hairCountRemoval')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
                                     </div>
+                                    <hr/>
+                                </div> : null}
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-3 title-margin-date">
+                                            Услуги мастера (руб.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.masterWorkPrice}
+                                                onChange={this.handleChange('masterWorkPrice')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-sm-3 title-margin-date">
+                                            Общая стоимость (руб.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.allPrice}
+                                                onChange={this.handleChange('allPrice')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <hr/>
                                 </div>
                             </div> : null}
                         </div>
