@@ -181,6 +181,8 @@ class Expenses extends Component {
                                                    page={this.props.expenses ? this.props.expenses.number + 1 : 1}
                                                    columns={colExpense}
                                                    entity="расход"
+                                                   buttonCreateTitle='Создание нового расхода'
+                                                   buttonEditTitle='Изменение расхода'
                                                    sizePerPage={this.props.expenses ? this.props.expenses.size : 0}
                                                    remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}

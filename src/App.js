@@ -95,6 +95,14 @@ class App extends Component {
                                         Расход
                                     </NavText>
                                 </NavItem>
+                                <NavItem eventKey="sales">
+                                    <NavIcon>
+                                        <i className="fa fa-fw fa-shopping-cart" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Продажи
+                                    </NavText>
+                                </NavItem>
                                 <NavItem eventKey="procedures">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-cut" style={{fontSize: '1.75em'}}/>
@@ -121,7 +129,7 @@ class App extends Component {
                                 </NavItem>
                                 <NavItem eventKey="logout">
                                     <NavIcon>
-                                        <i className="fa fa-book fa-fw" style={{fontSize: '1.75em'}}/>
+                                        <i className="fa fa-sign-out" style={{fontSize: '1.75em'}}/>
                                     </NavIcon>
                                     <NavText>
                                         Выход
@@ -137,6 +145,7 @@ class App extends Component {
                             <PrivateRoute path="/products" component={Products}/>
                             <PrivateRoute path="/incoming" component={Incoming}/>
                             <PrivateRoute path="/expenses" component={Expenses}/>
+                            <PrivateRoute path="/sales" component={Expenses}/>
                             <PrivateRoute path="/procedures" component={Procedures}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
                             <PrivateRoute path="/directory" component={Directory}/>

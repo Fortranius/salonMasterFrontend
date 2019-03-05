@@ -121,6 +121,8 @@ class Masters extends Component {
                                                    page={this.props.masters.number + 1}
                                                    columns={colMaster}
                                                    entity="мастера"
+                                                   buttonCreateTitle='Создание нового мастера'
+                                                   buttonEditTitle='Изменение мастера'
                                                    sizePerPage={this.props.masters.size}
                                                    remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}
