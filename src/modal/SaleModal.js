@@ -6,13 +6,10 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import AsyncPaginate from 'react-select-async-paginate';
 import {getProducts, getProductsByDescription} from "../service/productService";
-import {getMasters, getMastersByFiO} from "../service/masterService";
-import PageParams from "../model/PageParams";
 import TextField from '@material-ui/core/TextField';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
-import NumberFormat from 'react-number-format';
 
 const styles = theme => ({
     container: {
@@ -27,22 +24,6 @@ const styles = theme => ({
     }
 });
 
-async function getOptionMastersByFIO(search, loadedOptions) {
-    let response;
-    if (!search) response = await getMasters(new PageParams(0, 100));
-    else response = await getMastersByFiO(search);
-    let cachedOptions = response.content.map((d) => ({
-        value: d.id,
-        label: d.person.name,
-        master: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true
-    };
-}
-
-
 async function getOptionExpensesByDescription(search, loadedOptions) {
     let response;
     if (!search) response = await getProducts();
@@ -56,24 +37,6 @@ async function getOptionExpensesByDescription(search, loadedOptions) {
         options: cachedOptions,
         hasMore: true
     };
-}
-
-function NumberFormatCustom(props) {
-    const { inputRef, onChange, ...other } = props;
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={inputRef}
-            onValueChange={values => {
-                onChange({
-                    target: {
-                        value: values.value,
-                    },
-                });
-            }}
-            thousandSeparator={' '}
-        />
-    );
 }
 
 class SaleModal extends Component {

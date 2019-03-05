@@ -127,10 +127,6 @@ class Expenses extends Component {
     render() {
         const colExpense = [
             {
-                dataField: 'id',
-                text: 'ID'
-            },
-            {
                 dataField: 'date',
                 text: 'Дата расхода',
                 sort: true,

@@ -101,10 +101,6 @@ class Sales extends Component {
     render() {
         const colSale = [
             {
-                dataField: 'id',
-                text: 'ID'
-            },
-            {
                 dataField: 'date',
                 text: 'Дата продажи',
                 formatter: (cellContent) => {
@@ -117,7 +113,7 @@ class Sales extends Component {
             },
             {
                 dataField: 'product.description',
-                text: ''
+                text: 'Товар'
             },
             {
                 dataField: 'countProduct',

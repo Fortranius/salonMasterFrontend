@@ -27,10 +27,6 @@ function type(cell) {
 
 export default [
     {
-        dataField: 'id',
-        text: 'ID'
-    },
-    {
         dataField: 'person.name',
         text: 'Имя'
     },
