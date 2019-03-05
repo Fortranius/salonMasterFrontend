@@ -186,6 +186,12 @@ class UpdateModal extends Component {
         return (!this.state.person || !this.state.person[field]);
     };
 
+    validateProcedures() {
+        if (!this.state.submit)
+            return false;
+        return (!this.state || !this.state.procedures || this.state.procedures.length === 0);
+    }
+
     validateState(field) {
         if (!this.state.submit)
             return false;
@@ -255,8 +261,8 @@ class UpdateModal extends Component {
                     <hr/>
                     { this.props.entity === 'мастера' ? <div>
                         <hr/>
-                        <FormControl className={classes.formControlServices} error={this.validate('procedure')} aria-describedby="procedure-error-text">
-                            <Select id="procedure"
+                        <FormControl className={classes.formControlServices} error={this.validateProcedures()} aria-describedby="procedures-error-text">
+                            <Select id="procedures"
                                     isMulti
                                     closeMenuOnSelect={false}
                                     value={this.state.selectedProcedures}
@@ -264,7 +270,7 @@ class UpdateModal extends Component {
                                     placeholder="Выберите услуги"
                                     options={this.state.optionProcedures}
                             />
-                            { this.validate('procedure') ? <FormHelperText id="procedure-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
+                            { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
                         </FormControl>
                     </div>: null }
                     <hr/>

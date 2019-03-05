@@ -86,9 +86,9 @@ const renderClient = client => {
     );
 };
 
-const renderSectionTitle = () => {
+const renderSectionTitle = section => {
     return (
-        <strong/>
+        <strong>{section.title}</strong>
     );
 };
 
@@ -268,12 +268,15 @@ class TimeSlotModal extends Component {
                 client = {
                     person: {
                         name: this.state.selectClientName,
-                        phone: this.state.selectClientPhone,
+                        phone: this.state.selectClientPhone.substring(2).replace(/[.*+ ?^${}()|[\]\\]/g, ""),
                     }
                 }
         }
 
-        if (!client || !this.state.selectMaster || !this.state.date)
+        if (!client || !this.state.selectMaster || !this.state.date || !this.state.procedures || this.state.procedures.length === 0)
+            return false;
+
+        if (this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') && !this.state.selectedHair)
             return false;
 
         client.description = this.state.clientDescription;
@@ -294,11 +297,11 @@ class TimeSlotModal extends Component {
             allPrice: this.state.allPrice,
             masterWorkPrice: this.state.masterWorkPrice,
             status: this.state.status,
-            hair: this.state.selectedHair.hair,
             hairWeight: this.state.hairWeight,
             hairCountExtension: this.state.hairCountExtension,
             hairCountRemoval: this.state.hairCountRemoval,
-            procedures: this.state.procedures
+            procedures: this.state.procedures,
+            hair: this.state.selectedHair ? this.state.selectedHair.hair : undefined
         };
         this.props.accept(timeSlot);
         this.clear();
@@ -337,18 +340,6 @@ class TimeSlotModal extends Component {
     }
 
     handleInputMasterChange = (newValue) => {
-        let allSum = 0, masterWorkSum = 0;
-        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
-            .forEach(hairCategory => {
-                allSum = allSum + hairCategory.price*this.state.hairCountExtension + this.state.selectedHair.hair.price*this.state.hairWeight;
-                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountExtension;
-            });
-        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
-            .forEach(hairCategory => {
-                allSum = allSum + hairCategory.price*this.state.hairCountRemoval;
-                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountRemoval;
-            });
-
         let procedures = newValue.master.procedures.map(procedure => {
             return { value: procedure.id, label: procedure.description, procedure: procedure };
         });
@@ -359,9 +350,14 @@ class TimeSlotModal extends Component {
                 label: newValue.master.person.name,
                 master: newValue.master
             },
-            allPrice: allSum,
-            masterWorkPrice: masterWorkSum,
+            allPrice: 0,
+            masterWorkPrice: 0,
             selectedProcedures: [],
+            procedures: [],
+            selectedHair: undefined,
+            hairWeight: 0,
+            hairCountExtension: 0,
+            hairCountRemoval: 0,
             optionProcedures: procedures
         });
     };
@@ -444,6 +440,12 @@ class TimeSlotModal extends Component {
         return (!this.state || !this.state[field]);
     }
 
+    validateProcedures() {
+        if (!this.state.submit)
+            return false;
+        return (!this.state || !this.state.procedures || this.state.procedures.length === 0);
+    }
+
     onClientsFetchRequestedByName = ({ value }) => {
         getClientsByFiO(value).then(clients => {
             let options = clients.map(client => {
@@ -520,7 +522,7 @@ class TimeSlotModal extends Component {
         this.setState({
             selectClient: suggestion,
             selectClientName: suggestion.person.name,
-            clientDescription: suggestion.description,
+            clientDescription: suggestion.description ? suggestion.description : "",
             selectClientPhone: '+7 (' + suggestion.person.phone.substring(0,3) + ') '
                 + suggestion.person.phone.substring(3, 6) + ' '
                 + suggestion.person.phone.substring(6, 8) + ' '
@@ -757,8 +759,8 @@ class TimeSlotModal extends Component {
                                             Услуга:
                                         </div>
                                         <div className="col-sm">
-                                            <FormControl className={classes.formControl} error={this.validate('procedure')} aria-describedby="procedure-error-text">
-                                                <Select id="procedure"
+                                            <FormControl className={classes.formControl} error={this.validateProcedures()} aria-describedby="procedures-error-text">
+                                                <Select id="procedures"
                                                         isMulti
                                                         closeMenuOnSelect={false}
                                                         value={this.state.selectedProcedures}
@@ -766,7 +768,7 @@ class TimeSlotModal extends Component {
                                                         placeholder="Выберите услуги"
                                                         options={this.state.optionProcedures}
                                                 />
-                                                { this.validate('procedure') ? <FormHelperText id="procedure-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
+                                                { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
                                             </FormControl>
                                         </div>
                                     </div>

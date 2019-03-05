@@ -68,8 +68,7 @@ class TimeTable extends Component {
                     resourceId: timeSlot.master.id,
                     title: "\nМастер: "+ timeSlot.master.person.name
                     + " \nКлиент: " + timeSlot.client.person.name
-                    + " \nУслуга: " + timeSlot.service.description
-                    + " Цена: " + timeSlot.price,
+                    + " Цена: " + timeSlot.allPrice,
                     timeSlot: timeSlot,
                     start: moment.unix(timeSlot.startSlot).toDate(),
                     end: moment.unix(timeSlot.endSlot).toDate()

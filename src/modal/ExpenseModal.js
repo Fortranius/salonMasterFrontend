@@ -12,7 +12,6 @@ import TextField from '@material-ui/core/TextField';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
-import NumberFormat from 'react-number-format';
 
 const styles = theme => ({
     container: {
@@ -56,24 +55,6 @@ async function getOptionExpensesByDescription(search, loadedOptions) {
         options: cachedOptions,
         hasMore: true
     };
-}
-
-function NumberFormatCustom(props) {
-    const { inputRef, onChange, ...other } = props;
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={inputRef}
-            onValueChange={values => {
-                onChange({
-                    target: {
-                        value: values.value,
-                    },
-                });
-            }}
-            thousandSeparator={' '}
-        />
-    );
 }
 
 class ExpenseModal extends Component {

@@ -21,7 +21,7 @@ class HistoryClients extends Component {
                     return {
                         id: slot.id,
                         master: slot.master.person.name,
-                        price: slot.price.toLocaleString() + " руб.",
+                        price: slot.allPrice.toLocaleString() + " руб.",
                         status: this.getStatus(slot.status),
                         date: moment.unix(slot.startSlot).toDate().toLocaleDateString()
                     }
