@@ -8,7 +8,6 @@ import PageParams from '../model/PageParams'
 import {getProducts} from "../service/productService";
 import moment from 'moment'
 import SaleModal from "../modal/SaleModal";
-import {createSale, updateSale} from "../service/saleService";
 
 class Sales extends Component {
 
@@ -18,17 +17,17 @@ class Sales extends Component {
             openUpdate: false,
             openCreate: false,
             productOptions: {},
-            row: undefined
+            row: undefined,
         };
         this.handleTableChange = this.handleTableChange.bind(this);
 
-        this.updateSale = this.updateSale.bind(this);
         this.onOpenUpdateModal = this.onOpenUpdateModal.bind(this);
         this.onCloseUpdateModal = this.onCloseUpdateModal.bind(this);
 
-        this.createSale = this.createSale.bind(this);
         this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
         this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
+
+        this.accept = this.accept.bind(this);
 
         this.props.saleActions(new PageParams(0, 10));
 
@@ -59,13 +58,13 @@ class Sales extends Component {
     onCloseUpdateModal = () => {
         this.setState({
             openUpdate: false,
-            row: undefined
+            row: undefined,
         });
     };
 
     onCloseCreateModal = () => {
         this.setState({
-            openCreate: false
+            openCreate: false,
         });
     };
 
@@ -73,28 +72,15 @@ class Sales extends Component {
         this.props.saleActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder, filters));
     };
 
-    updateSale(entity) {
-        updateSale(entity).then(() => {
-            this.props.saleActions(new PageParams(
-                this.props.sales.number,
-                this.props.sales.size
-            ));
-            this.setState({
-                openUpdate: false,
-                row: undefined
-            });
-        });
-    };
-
-    createSale(entity) {
-        createSale(entity).then(() => {
-            this.props.saleActions(new PageParams(
-                this.props.sales.number,
-                this.props.sales.size
-            ));
-            this.setState({
-                openCreate: false
-            });
+    accept() {
+        this.props.saleActions(new PageParams(
+            this.props.sales.number,
+            this.props.sales.size
+        ));
+        this.setState({
+            openUpdate: false,
+            openCreate: false,
+            row: undefined
         });
     };
 
@@ -134,13 +120,15 @@ class Sales extends Component {
                                                    totalSize={this.props.sales ? this.props.sales.totalElements : 0}
                                                    onTableChange={this.handleTableChange}/>
 
-                {this.state.row ? <SaleModal accept={this.updateSale}
+                {this.state.row ? <SaleModal accept={this.accept}
                              open={this.state.openUpdate}
                              update={this.state.row}
+                             isCreate={false}
                              close={this.onCloseUpdateModal} />: null}
 
-                <SaleModal accept={this.createSale}
+                <SaleModal accept={this.accept}
                              open={this.state.openCreate}
+                             isCreate={true}
                              close={this.onCloseCreateModal} />
             </div>
         );

@@ -370,3 +370,11 @@ h2 {
 .react-autosuggest__suggestions-list {
   width: 100%;
 }
+
+.error_label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+  font-size: 22px;
+}

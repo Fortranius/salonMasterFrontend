@@ -28,7 +28,6 @@ function sendRequest(entity, method) {
     };
 
     return fetch("http://localhost:8080/api/expense", options)
-        .then(handleErrors)
         .then(function(res){ return res })
 }
 

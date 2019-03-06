@@ -6,8 +6,8 @@ import filterFactory from 'react-bootstrap-table2-filter';
 
 class TableRemote extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             select: undefined
         };
@@ -25,10 +25,16 @@ class TableRemote extends Component {
 
     removeEntity() {
         this.props.remove(this.state.select.id);
+        this.setState({
+            select: undefined
+        })
     };
 
     updateEntity() {
         this.props.update(this.state.select);
+        this.setState({
+            select: undefined
+        })
     };
 
     createEntity() {

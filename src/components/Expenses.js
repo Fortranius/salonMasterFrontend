@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import {getExpensesAction} from "../actions/expenseActions"
 import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
-import {createExpense, updateExpense} from "../service/expenseService";
 import ExpenseModal from "../modal/ExpenseModal";
 import {getAllMasters} from "../service/masterService";
 import {selectFilter} from "react-bootstrap-table2-filter";
@@ -24,17 +23,18 @@ class Expenses extends Component {
             masterOptions: {},
             productOptions: {},
             filters: {},
-            row: undefined
+            row: undefined,
+            error: undefined
         };
         this.handleTableChange = this.handleTableChange.bind(this);
 
-        this.updateExpense = this.updateExpense.bind(this);
         this.onOpenUpdateModal = this.onOpenUpdateModal.bind(this);
         this.onCloseUpdateModal = this.onCloseUpdateModal.bind(this);
 
-        this.createExpense = this.createExpense.bind(this);
         this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
         this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
+
+        this.accept = this.accept.bind(this);
 
         this.props.expenseActions(new PageParams(0, 10));
 
@@ -61,26 +61,30 @@ class Expenses extends Component {
     onOpenUpdateModal (row) {
         this.setState({
             openUpdate: true,
-            row: row
+            row: row,
+            error: undefined
         });
     };
 
     onOpenCreateModal () {
         this.setState({
             openCreate: true,
+            error: undefined
         });
     };
 
     onCloseUpdateModal = () => {
         this.setState({
             openUpdate: false,
-            row: undefined
+            row: undefined,
+            error: undefined
         });
     };
 
     onCloseCreateModal = () => {
         this.setState({
-            openCreate: false
+            openCreate: false,
+            error: undefined
         });
     };
 
@@ -93,34 +97,19 @@ class Expenses extends Component {
         this.props.expenseActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder, filters));
     };
 
-    updateExpense(entity) {
-        updateExpense(entity).then(() => {
-            this.props.expenseActions(new PageParams(
-                this.props.expenses.number,
-                this.props.expenses.size,
-                this.state.sortField,
-                this.state.sortOrder,
-                this.state.filters
-            ));
-            this.setState({
-                openUpdate: false,
-                row: undefined
-            });
-        });
-    };
-
-    createExpense(entity) {
-        createExpense(entity).then(() => {
-            this.props.expenseActions(new PageParams(
-                this.props.expenses.number,
-                this.props.expenses.size,
-                this.state.sortField,
-                this.state.sortOrder,
-                this.state.filters
-            ));
-            this.setState({
-                openCreate: false
-            });
+    accept() {
+        this.props.expenseActions(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters
+        ));
+        this.setState({
+            openUpdate: false,
+            openCreate: false,
+            row: undefined,
+            error: undefined
         });
     };
 
@@ -180,13 +169,14 @@ class Expenses extends Component {
                                                    totalSize={this.props.expenses ? this.props.expenses.totalElements : 0}
                                                    onTableChange={this.handleTableChange}/>
 
-                {this.state.row ? <ExpenseModal accept={this.updateExpense}
+                {this.state.row ? <ExpenseModal accept={this.accept}
                              open={this.state.openUpdate}
+                             isCreate={false}
                              update={this.state.row}
                              close={this.onCloseUpdateModal} />: null}
 
-                <ExpenseModal accept={this.createExpense}
-                             open={this.state.openCreate}
+                <ExpenseModal accept={this.accept}
+                             open={this.state.openCreate} isCreate={true}
                              close={this.onCloseCreateModal} />
             </div>
         );

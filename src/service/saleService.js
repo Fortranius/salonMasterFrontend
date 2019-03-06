@@ -25,7 +25,6 @@ function sendRequest(entity, method) {
     };
 
     return fetch("http://localhost:8080/api/sale", options)
-        .then(handleErrors)
         .then(function(res){ return res })
 }
 
