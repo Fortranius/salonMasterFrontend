@@ -1,9 +1,9 @@
-export function getExpenses(params) {
+export function getExpenses(params, start, end) {
     let sort = params.sortField ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
     let filterMaster= params.filters && params.filters['master.person.name'] ? "&masterId=" + params.filters['master.person.name'].filterVal : '';
     let filterProduct= params.filters && params.filters['product.description'] ? "&productId=" + params.filters['product.description'].filterVal : '';
     return fetch("http://localhost:8080/api/expenses?page=" + params.page
-        + "&size=" + params.size + sort + filterMaster + filterProduct)
+        + "&size=" + params.size + sort + filterMaster + filterProduct + "&start=" + start + "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {

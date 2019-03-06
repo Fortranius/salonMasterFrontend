@@ -10,6 +10,8 @@ import {getAllMasters} from "../service/masterService";
 import {selectFilter} from "react-bootstrap-table2-filter";
 import {getProducts} from "../service/productService";
 import moment from 'moment'
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 
 class Expenses extends Component {
 
@@ -24,7 +26,9 @@ class Expenses extends Component {
             productOptions: {},
             filters: {},
             row: undefined,
-            error: undefined
+            error: undefined,
+            start: moment().startOf('month').toDate(),
+            end: moment().endOf('month').toDate()
         };
         this.handleTableChange = this.handleTableChange.bind(this);
 
@@ -36,7 +40,9 @@ class Expenses extends Component {
 
         this.accept = this.accept.bind(this);
 
-        this.props.expenseActions(new PageParams(0, 10));
+        this.props.expenseActions(new PageParams(0, 10, "date", "asc"),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
 
         getAllMasters().then(masters => {
             let masterOptions = {};
@@ -94,7 +100,9 @@ class Expenses extends Component {
             sortOrder: sortOrder,
             filters: filters
         });
-        this.props.expenseActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder, filters));
+        this.props.expenseActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder, filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
     };
 
     accept() {
@@ -103,13 +111,42 @@ class Expenses extends Component {
             this.props.expenses.size,
             this.state.sortField,
             this.state.sortOrder,
-            this.state.filters
-        ));
+            this.state.filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
         this.setState({
             openUpdate: false,
             openCreate: false,
             row: undefined,
             error: undefined
+        });
+    };
+
+    handleChangeStartDate = (newValue) => {
+        this.props.expenseActions(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+        this.setState({
+            start: newValue
+        });
+    };
+
+    handleChangeEndDate = (newValue) => {
+        this.props.expenseActions(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'));
+        this.setState({
+            end: newValue
         });
     };
 
@@ -157,6 +194,42 @@ class Expenses extends Component {
         ];
         return (
             <div className="main-div">
+                <div className="container" >
+                    <div className="row">
+                        <div className="col-sm-2 title-margin-date">
+                            c
+                        </div>
+                        <div className="col-sm">
+                            <DayPickerInput
+                                placeholder={``}
+                                parseDate={parseDate}
+                                formatDate={formatDate}
+                                value={this.state.start}
+                                onDayChange={this.handleChangeStartDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils
+                                }}
+                            />
+                        </div>
+                        <div className="col-sm-2 title-margin-date">
+                            по
+                        </div>
+                        <div className="col-sm">
+                            <DayPickerInput
+                                placeholder={``}
+                                parseDate={parseDate}
+                                formatDate={formatDate}
+                                value={this.state.end}
+                                onDayChange={this.handleChangeEndDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
                 <TableRemote data={this.props.expenses ? this.props.expenses.content : []}
                                                    page={this.props.expenses ? this.props.expenses.number + 1 : 1}
                                                    columns={colExpense}
