@@ -378,3 +378,7 @@ h2 {
   color: red;
   font-size: 22px;
 }
+
+.dashboard {
+  height: 300px;
+}

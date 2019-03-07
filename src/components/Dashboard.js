@@ -6,6 +6,7 @@ import {getDashboardAll, getDashboardMasters} from "../service/dashboardService"
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
+import {getMastersReport} from "../service/reportService";
 
 class Dashboard extends Component {
 
@@ -14,17 +15,17 @@ class Dashboard extends Component {
         this.state = {
             masters: undefined,
             all: undefined,
-            start: moment().startOf('week').isoWeekday(1).toDate(),
-            end: moment().startOf('week').isoWeekday(7).toDate()
+            start: moment().startOf('month').toDate(),
+            end: moment().endOf('month').toDate()
         };
         this.handleChangeStartDate = this.handleChangeStartDate.bind(this);
         this.handleChangeEndDate = this.handleChangeEndDate.bind(this);
         this.getDashboardAll(
-            moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss'),
-            moment(moment().startOf('week').isoWeekday(7).toDate()).format('YYYY-MM-DD HH:mm:ss'));
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
         this.getDashboardMasters(
-            moment(moment().startOf('week').isoWeekday(1).toDate()).format('YYYY-MM-DD HH:mm:ss'),
-            moment(moment().startOf('week').isoWeekday(7).toDate()).format('YYYY-MM-DD HH:mm:ss'));
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
     }
 
     getDashboardMasters(start, end) {
@@ -129,6 +130,11 @@ class Dashboard extends Component {
         });
     };
 
+    export = () => {
+        getMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+    };
+
     render() {
         return (
             <div className="main-div">
@@ -169,28 +175,38 @@ class Dashboard extends Component {
                     </div>
                 </div>
                 <hr/>
+                <div>
+                    <button onClick = { this.export } className="btn btn-primary">
+                        Выгрузить сводный отчет
+                    </button>
+                </div>
+                <hr/>
                 {this.state.masters ? <div>
                     <h2>Доходы и расходы мастеров</h2>
-                    <Bar
-                        data={this.state.masters}
-                        width={50}
-                        height={50}
-                        options={{
-                            maintainAspectRatio: false
-                        }}
-                    />
+                    <div className="dashboard">
+                        <Bar
+                            data={this.state.masters}
+                            width={50}
+                            height={50}
+                            options={{
+                                maintainAspectRatio: false
+                            }}
+                        />
+                    </div>
                     <hr/>
                 </div> : null}
                 {this.state.masterOrders ? <div>
                     <h2>Количество заказов</h2>
-                    <Bar
-                        data={this.state.masterOrders}
-                        width={50}
-                        height={50}
-                        options={{
-                            maintainAspectRatio: false
-                        }}
-                    />
+                    <div className="dashboard">
+                        <Bar
+                            data={this.state.masterOrders}
+                            width={50}
+                            height={50}
+                            options={{
+                                maintainAspectRatio: false
+                            }}
+                        />
+                    </div>
                     <hr/>
                 </div> : null}
                 {this.state.all ? <div>
