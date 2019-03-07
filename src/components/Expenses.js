@@ -12,6 +12,7 @@ import {getProducts} from "../service/productService";
 import moment from 'moment'
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
+import {getExpensesReport} from "../service/reportService";
 
 class Expenses extends Component {
 
@@ -39,6 +40,7 @@ class Expenses extends Component {
         this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
 
         this.accept = this.accept.bind(this);
+        this.export = this.export.bind(this);
 
         this.props.expenseActions(new PageParams(0, 10, "date", "asc"),
             moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
@@ -150,6 +152,17 @@ class Expenses extends Component {
         });
     };
 
+    export() {
+        getExpensesReport(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+    }
+
     render() {
         const colExpense = [
             {
@@ -239,6 +252,8 @@ class Expenses extends Component {
                                                    sizePerPage={this.props.expenses ? this.props.expenses.size : 0}
                                                    update={this.onOpenUpdateModal}
                                                    create={this.onOpenCreateModal}
+                                                   isExport={true}
+                                                   export={this.export}
                                                    totalSize={this.props.expenses ? this.props.expenses.totalElements : 0}
                                                    onTableChange={this.handleTableChange}/>
 

@@ -58,6 +58,9 @@ class TableRemote extends Component {
                     { this.state.select ? <button onClick = { this.updateEntity } className="btn btn-primary">
                         {this.props.buttonEditTitle}
                     </button>: null }
+                    { this.props.isExport ? <button onClick = { this.props.export } className="btn btn-primary">
+                        Выгрузить
+                    </button>: null }
                 </div>
                 <hr/>
                 <BootstrapTable
