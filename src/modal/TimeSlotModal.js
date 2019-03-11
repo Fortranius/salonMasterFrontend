@@ -21,6 +21,7 @@ import 'moment/locale/ru';
 import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
 import {getAllHairCategories, getAllHairs} from "../service/hairService";
+import HistoryChangeSlot from "../components/HistoryChangeSlot";
 
 const styles = theme => ({
     container: {
@@ -551,12 +552,36 @@ class TimeSlotModal extends Component {
     };
 
     handleChangeProcedures = (selectedProcedures) => {
+        let allSum = 0, masterWorkSum = 0;
         let procedures = selectedProcedures.map(option => {
             return option.procedure;
         });
+
+        let hairCountExtension = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.hairCountExtension : 0;
+        let hairCountRemoval = procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? this.state.hairCountRemoval : 0;
+        let hairWeight = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.hairWeight : 0;
+        let selectedHair = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.selectedHair : undefined;
+
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+            .forEach(hairCategory => {
+                if (selectedHair) allSum = allSum + hairCategory.price*hairCountExtension + selectedHair.hair.price*hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
+            });
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
+            });
+
         this.setState({
             selectedProcedures: selectedProcedures,
-            procedures: procedures
+            procedures: procedures,
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum,
+            selectedHair: selectedHair,
+            hairWeight: hairWeight,
+            hairCountExtension: hairCountExtension,
+            hairCountRemoval: hairCountRemoval
         });
     };
 
@@ -589,11 +614,16 @@ class TimeSlotModal extends Component {
                                     {this.state.selectClient ? <li>
                                         <a href="#" onClick={() => this.setMenu('HISTORY')}>История посещений</a>
                                     </li> : null}
-                                    <li>
+                                    {this.props.event.timeSlot ? <li>
                                         <a href="#" onClick={() => this.setMenu('HISTORY_CHANGE')}>История изменений</a>
-                                    </li>
+                                    </li> : null}
                                 </ul>
                             </div>
+                            {this.state.menu === 'HISTORY_CHANGE' ? <div className="col-sm">
+                                <div className="container selectDiv">
+                                    <HistoryChangeSlot changes={this.props.event.timeSlot.changes}/>
+                                </div>
+                            </div> : null}
                             {this.state.menu === 'HISTORY' ? <div className="col-sm">
                                 <div className="container selectDiv">
                                     <HistoryClients client={this.state.selectClient}/>
