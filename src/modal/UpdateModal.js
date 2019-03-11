@@ -11,6 +11,9 @@ import masterTypeOptions from "../data/masterTypeOptions";
 import Select from 'react-select';
 import {getProcedures} from "../service/procedureService";
 import typeFormatter from "../data/categoryMasterFormatter";
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
+import masterWork from "../data/masterWork";
 
 const styles = theme => ({
     container: {
@@ -79,7 +82,11 @@ class UpdateModal extends Component {
             submit: false,
             submitProcedure: false,
             selectedProcedures: [],
-            optionProcedures: []
+            optionProcedures: [],
+            startDateWork: new Date(),
+            workingDay: '',
+            selectWorkingDay: undefined
+
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -140,7 +147,10 @@ class UpdateModal extends Component {
             selectType: undefined,
             submit: false,
             submitProcedure: false,
-            selectedProcedures: []
+            selectedProcedures: [],
+            startDateWork: new Date(),
+            workingDay: '',
+            selectWorkingDay: undefined
         });
     }
 
@@ -205,6 +215,13 @@ class UpdateModal extends Component {
         });
     };
 
+    handleChangeWorkingDay = (newValue) => {
+        this.setState({
+            workingDay: newValue.value,
+            selectWorkingDay: newValue
+        });
+    };
+
     handleChangeProcedures = (selectedProcedures) => {
         let procedures = selectedProcedures.map(option => {
             return option.procedure;
@@ -212,6 +229,12 @@ class UpdateModal extends Component {
         this.setState({
             selectedProcedures: selectedProcedures,
             procedures: procedures
+        });
+    };
+
+    handleChangeDate = (newValue) => {
+        this.setState({
+            startDateWork: newValue
         });
     };
 
@@ -247,21 +270,61 @@ class UpdateModal extends Component {
                             { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl> : null}
                     </div>
-                    { this.props.entity === 'мастера' ? <FormControl className={classes.formControl} error={this.validateState('type')} aria-describedby="type-error-text">
-                        <InputLabel htmlFor="type">Категория</InputLabel>
-                        <Select
-                            value={this.state.selectType}
-                            options={masterTypeOptions}
-                            placeholder={'Выберите категорию'}
-                            onChange={this.handleChangeTypeMaster}
-                            className='selectMasterTypeStyle'
-                        />
-                        { this.validateState('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
-                    </FormControl> : null}
-                    <hr/>
-                    { this.props.entity === 'мастера' ? <div>
-                        <hr/>
-                        <FormControl className={classes.formControlServices} error={this.validateProcedures()} aria-describedby="procedures-error-text">
+                    { this.props.entity === 'мастера' ?  <hr/> : null}
+                    { this.props.entity === 'мастера' ? <div className="row">
+                        <div className="col-sm-2">
+                            Дата начала работы:
+                        </div>
+                        <div className="col-sm-4">
+                            <DayPickerInput
+                                placeholder={``}
+                                parseDate={parseDate}
+                                value={this.state.startDateWork}
+                                onDayChange={this.handleChangeDate}
+                                formatDate={formatDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils,
+                                }}/>
+                            <FormControl className={classes.formControl} error={this.validateState('startDateWork')} aria-describedby="startDateWork-error-text">
+                                { this.validateState('startDateWork') ? <FormHelperText id="startDateWork-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                        <div className="col-sm-2">
+                            График работы:
+                        </div>
+                        <div className="col-sm-4">
+                            <Select
+                                value={this.state.selectWorkingDay}
+                                options={masterWork}
+                                placeholder={'Выберите график'}
+                                onChange={this.handleChangeWorkingDay}
+                            />
+                            <FormControl className={classes.formControl} error={this.validateState('workingDay')} aria-describedby="workingDay-error-text">
+                                { this.validateState('workingDay') ? <FormHelperText id="workingDay-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                    </div> : null}
+
+                    { this.props.entity === 'мастера' ? <div className="row">
+                        <div className="col-sm-2">
+                            Категория мастера:
+                        </div>
+                        <div className="col-sm-4">
+                            <Select
+                                value={this.state.selectType}
+                                options={masterTypeOptions}
+                                placeholder={'Выберите категорию'}
+                                onChange={this.handleChangeTypeMaster}
+                            />
+                            <FormControl className={classes.formControl} error={this.validateState('type')} aria-describedby="type-error-text">
+                                { this.validateState('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                        <div className="col-sm-2">
+                            Услуги мастера:
+                        </div>
+                        <div className="col-sm-4">
                             <Select id="procedures"
                                     isMulti
                                     closeMenuOnSelect={false}
@@ -270,9 +333,11 @@ class UpdateModal extends Component {
                                     placeholder="Выберите услуги"
                                     options={this.state.optionProcedures}
                             />
-                            { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
-                        </FormControl>
-                    </div>: null }
+                            <FormControl className={classes.formControl} error={this.validateProcedures()} aria-describedby="procedures-error-text">
+                                { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                    </div> : null}
                     <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>

@@ -275,25 +275,25 @@ class ExpenseModal extends Component {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-sm-2">
-                                Дата:
-                            </div>
-                            <div className="col-sm-4">
-                                <DayPickerInput
-                                    placeholder={`Дата расхода`}
-                                    parseDate={parseDate}
-                                    value={this.state.date}
-                                    onDayChange={this.handleChangeDate}
-                                    formatDate={formatDate}
-                                    dayPickerProps={{
-                                        locale: 'ru',
-                                        localeUtils: MomentLocaleUtils,
-                                    }}/>
-                                <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
-                                    { this.validate('date') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                </FormControl>
-                            </div>
+                        <div className="col-sm-2">
+                            Дата:
                         </div>
+                        <div className="col-sm-4">
+                            <DayPickerInput
+                                placeholder={`Дата расхода`}
+                                parseDate={parseDate}
+                                value={this.state.date}
+                                onDayChange={this.handleChangeDate}
+                                formatDate={formatDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils,
+                                }}/>
+                            <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
+                                { this.validate('date') ? <FormHelperText id="date-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                    </div>
                     </div>
                     { this.state.error ? <div className="row error_label">
                         {this.state.error}

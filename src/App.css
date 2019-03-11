@@ -50,11 +50,6 @@
   width: 100px;
 }
 
-.selectMasterTypeStyle {
-  border: none;
-  width: 400px;
-}
-
 .quote {
   margin: 10px;
 }
@@ -381,4 +376,10 @@ h2 {
 
 .dashboard {
   height: 300px;
+}
+div[aria-describedby="startDateWork-error-text"] {
+  margin-top: 2px !important;
+}
+.UpdateModal-formControl-3 {
+  margin-top: 2px !important;
 }
