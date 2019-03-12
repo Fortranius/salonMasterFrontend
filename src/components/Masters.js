@@ -96,6 +96,8 @@ class Masters extends Component {
         master.person = entity.person;
         master.procedures = entity.procedures;
         master.type = entity.type;
+        master.workingDay = entity.workingDay;
+        master.startDateWork = entity.startDateWork;
         updateMaster(master).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({

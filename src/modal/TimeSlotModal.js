@@ -10,8 +10,6 @@ import PageParams from "../model/PageParams";
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from 'react-select';
-import hoursOptions from '../data/hoursOptions'
-import minutesOptions from '../data/minutesOptions'
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import NumberFormat from 'react-number-format';
 import TextField from '@material-ui/core/TextField';
@@ -22,6 +20,7 @@ import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
 import {getAllHairCategories, getAllHairs} from "../service/hairService";
 import HistoryChangeSlot from "../components/HistoryChangeSlot";
+import {hourOptions, minuteOptions} from "../data/selectOptions";
 
 const styles = theme => ({
     container: {
@@ -671,7 +670,7 @@ class TimeSlotModal extends Component {
                                             <div className="inlineDiv">
                                                 <Select
                                                     value={this.state.startHour}
-                                                    options={hoursOptions}
+                                                    options={hourOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeStartHour}
                                                     className='selectStyle'
@@ -679,7 +678,7 @@ class TimeSlotModal extends Component {
                                                 <div className="quote">:</div>
                                                 <Select
                                                     value={this.state.startMinutes}
-                                                    options={minutesOptions}
+                                                    options={minuteOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeStartMinutes}
                                                     className='selectStyle'
@@ -693,7 +692,7 @@ class TimeSlotModal extends Component {
                                             <div className="inlineDiv">
                                                 <Select
                                                     value={this.state.endHour}
-                                                    options={hoursOptions}
+                                                    options={hourOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeEndHour}
                                                     className='selectStyle'
@@ -701,7 +700,7 @@ class TimeSlotModal extends Component {
                                                 <div className="quote">:</div>
                                                 <Select
                                                     value={this.state.endMinutes}
-                                                    options={minutesOptions}
+                                                    options={minuteOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeEndMinutes}
                                                     className='selectStyle'

@@ -1,5 +1,4 @@
-import typeMasterFormatter from "./categoryMasterFormatter";
-import typeHairFormatter from "./typeHair";
+import {typeHairFormatter, typeMasterFormatter} from "../data/formatter";
 
 import React from "react";
 

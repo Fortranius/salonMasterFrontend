@@ -7,13 +7,13 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import masterTypeOptions from "../data/masterTypeOptions";
 import Select from 'react-select';
 import {getProcedures} from "../service/procedureService";
-import typeFormatter from "../data/categoryMasterFormatter";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
-import masterWork from "../data/masterWork";
+import {typeMasterFormatter, typeMAsterWorkingDayFormatter} from "../data/formatter";
+import moment from "moment/moment";
+import {masterTypeOptions, masterWorkOptions} from "../data/selectOptions";
 
 const styles = theme => ({
     container: {
@@ -110,12 +110,20 @@ class UpdateModal extends Component {
                 selectedProcedures = this.props.update.procedures.map(procedure => {
                     return { value: procedure.id, label: procedure.description, procedure: procedure };
                 });
-            let selectType = undefined;
-            if (this.props.update.type)
+            let selectType, selectWorkingDay = undefined;
+            if (this.props.update.type) {
                 selectType = {
                     value: this.props.update.type,
-                    label: typeFormatter(this.props.update.type)
+                    label: typeMasterFormatter(this.props.update.type)
                 };
+
+            }
+            if (this.props.update.workingDay) {
+                selectWorkingDay = {
+                    value: this.props.update.workingDay,
+                    label: typeMAsterWorkingDayFormatter(this.props.update.workingDay)
+                };
+            }
             this.setState({
                 person: {
                     phone: this.props.update.person.phone ? this.props.update.person.phone : '',
@@ -125,7 +133,10 @@ class UpdateModal extends Component {
                 type: this.props.update.type ? this.props.update.type : '',
                 selectType: selectType,
                 procedures: this.props.update.procedures,
-                selectedProcedures: selectedProcedures
+                selectedProcedures: selectedProcedures,
+                selectWorkingDay: selectWorkingDay,
+                workingDay: this.props.update.workingDay,
+                startDateWork: this.props.update.startDateWork ? moment.unix(this.props.update.startDateWork).toDate() : new Date(),
             });
         }
     }
@@ -296,7 +307,7 @@ class UpdateModal extends Component {
                         <div className="col-sm-4">
                             <Select
                                 value={this.state.selectWorkingDay}
-                                options={masterWork}
+                                options={masterWorkOptions()}
                                 placeholder={'Выберите график'}
                                 onChange={this.handleChangeWorkingDay}
                             />
@@ -313,7 +324,7 @@ class UpdateModal extends Component {
                         <div className="col-sm-4">
                             <Select
                                 value={this.state.selectType}
-                                options={masterTypeOptions}
+                                options={masterTypeOptions()}
                                 placeholder={'Выберите категорию'}
                                 onChange={this.handleChangeTypeMaster}
                             />

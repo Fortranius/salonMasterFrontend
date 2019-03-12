@@ -1,4 +1,4 @@
-export default function typeFormatter(cell) {
+export function typeMasterFormatter(cell) {
     switch (cell) {
         case 'TOP_LEADER':
             return "Руководитель Топ мастер";
@@ -23,3 +23,26 @@ export default function typeFormatter(cell) {
     }
 }
 
+export function typeHairFormatter(cell) {
+    switch (cell) {
+        case 'HAIR_EXTENSION':
+            return "Наращивание волос";
+        case 'HAIR_REMOVAL':
+            return "Снятие волос";
+        default:
+            return "";
+    }
+}
+
+export function typeMAsterWorkingDayFormatter(cell) {
+    switch (cell) {
+        case '$2X2':
+            return "2 на 2";
+        case '$5X2':
+            return "5 на 2";
+        case '$4X2':
+            return "4 на 2";
+        default:
+            return "";
+    }
+}
