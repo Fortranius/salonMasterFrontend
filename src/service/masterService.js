@@ -16,6 +16,24 @@ export function getAllMasters() {
         });
 }
 
+export function allMastersByWorkDay(date) {
+    return fetch("http://localhost:8080/api/allMastersByWorkDay?date=" + date)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
+export function allMastersByDayOff(date) {
+    return fetch("http://localhost:8080/api/allMastersByDayOff?date=" + date)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function getMastersByFiO(name) {
     return fetch("http://localhost:8080/api/masters/name/" + name)
         .then(handleErrors)

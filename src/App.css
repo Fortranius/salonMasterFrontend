@@ -279,6 +279,9 @@ li a:hover {
   width: 1000px;
 }
 
+.add_master_modal {
+  width: 600px;
+}
 .btn-primary {
   background-color: #9c9e9f;
   border: none;

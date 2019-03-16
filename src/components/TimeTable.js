@@ -8,7 +8,9 @@ import 'moment/locale/ru';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {getTimeSlotsByDateAction} from "../actions/timeSlotActions";
-import {getAllMasters} from "../service/masterService";
+import {allMastersByDayOff, allMastersByWorkDay} from "../service/masterService";
+import Modal from 'react-responsive-modal';
+import Select from 'react-select';
 
 class TimeTable extends Component {
 
@@ -25,7 +27,10 @@ class TimeTable extends Component {
             endWeek: end,
             selectMaster: undefined,
             timeSlots:undefined,
-            date: new Date()
+            date: new Date(),
+            openAddMaster: false,
+            addMasterSelect: undefined,
+            addMasterOptions: []
         };
         this.onOpenTimeSlotModal = this.onOpenTimeSlotModal.bind(this);
         this.onCloseTimeSlotModal = this.onCloseTimeSlotModal.bind(this);
@@ -33,6 +38,12 @@ class TimeTable extends Component {
         this.onNavigate = this.onNavigate.bind(this);
         this.onSelectEvent = this.onSelectEvent.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
+        this.openModalMasterToGraph = this.openModalMasterToGraph.bind(this);
+        this.closeModalMasterToGraph = this.closeModalMasterToGraph.bind(this);
+        this.addMasterToGraph = this.addMasterToGraph.bind(this);
+        this.handleChangeAddMaster = this.handleChangeAddMaster.bind(this);
+        this.setTimeSlots = this.setTimeSlots.bind(this);
+
         this.setTimeSlots(start, end, undefined);
     }
 
@@ -75,19 +86,25 @@ class TimeTable extends Component {
                 };
                 return event;
             });
-            getAllMasters().then(masters => {
-                let resources = masters.map(master => {
+            allMastersByWorkDay(start).then(mastersWorkDay => {
+                let resources = mastersWorkDay.map(master => {
                     return {
                         id: master.id,
                         title: master.person.name,
                         master: master
                     };
                 });
-                this.setState({
-                    timeSlots: {
-                        evants: evants,
-                        resources: resources
-                    }
+                allMastersByDayOff(start).then(mastersWorkOff => {
+                    let addMasterOptions = mastersWorkOff.map(master => {
+                        return { value: master.id, label: master.person.name, master: master };
+                    });
+                    this.setState({
+                        timeSlots: {
+                            evants: evants,
+                            resources: resources
+                        },
+                        addMasterOptions: addMasterOptions
+                    });
                 });
             });
         });
@@ -162,6 +179,50 @@ class TimeTable extends Component {
         });
     };
 
+    openModalMasterToGraph() {
+        this.setState({
+            openAddMaster: true
+        });
+    };
+
+    closeModalMasterToGraph() {
+        this.setState({
+            openAddMaster: false
+        });
+    };
+
+    handleChangeAddMaster = (newValue) => {
+        this.setState({
+            addMasterSelect: newValue
+        });
+    };
+
+    addMasterToGraph() {
+        let addMasterOptions = this.state.addMasterOptions.filter(
+            master => {
+                return master.id !== this.state.addMasterSelect.id
+            }
+        );
+        let resources = this.state.timeSlots.resources;
+        resources.push({
+            id: this.state.addMasterSelect.master.id,
+            title: this.state.addMasterSelect.master.person.name,
+            master: this.state.addMasterSelect.master
+        });
+
+        this.setState((state) => {
+            return {
+                timeSlots: {
+                    evants: state.timeSlots.evants,
+                    resources: resources,
+                },
+                addMasterOptions: addMasterOptions,
+                addMasterSelect: undefined,
+                openAddMaster: false
+            };
+        });
+    };
+
     render() {
         moment.locale("ru", {
             week: {
@@ -172,6 +233,12 @@ class TimeTable extends Component {
         const localizer = BigCalendar.momentLocalizer(moment);
         return (
             <div className="main-div">
+                <div className="button-group">
+                    <button onClick = { this.openModalMasterToGraph } className="btn btn-primary">
+                        Добавить мастера в расписание
+                    </button>
+                </div>
+                <hr/>
                 { this.state.timeSlots ? <BigCalendar
                     date={this.state.date}
                     localizer={localizer}
@@ -218,6 +285,33 @@ class TimeTable extends Component {
                     selectMaster={this.state.selectMaster}
                     open={this.state.open}
                     close={this.onCloseTimeSlotModal}/>: null}
+
+                <Modal open={this.state.openAddMaster}
+                       closeOnOverlayClick={true}
+                       showCloseIcon={false}
+                       onClose={this.closeModalMasterToGraph}
+                       closeOnEsc={false} center={false}>
+                    <div className="container add_master_modal">
+                        <div className='row'>
+                            <div className="col-sm">
+                                <Select closeMenuOnSelect={false}
+                                        value={this.state.addMasterSelect}
+                                        onChange={this.handleChangeAddMaster}
+                                        placeholder="Выберите мастера"
+                                        options={this.state.addMasterOptions}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="button-group">
+                        <button className="btn btn-primary" onClick={this.addMasterToGraph}>
+                            Сохранить
+                        </button>
+                        <button className="btn btn-primary" onClick={this.closeModalMasterToGraph}>
+                            Отмена
+                        </button>
+                    </div>
+                </Modal>
             </div>
         );
     }
