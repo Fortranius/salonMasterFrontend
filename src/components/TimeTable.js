@@ -50,31 +50,20 @@ class TimeTable extends Component {
     componentDidMount() {
         let date = this.props.location.search.substr(6);
         if (!date) return;
-        this.setDate(date);
+        this.setTimeSlots(date);
     }
 
     componentWillReceiveProps(newProps) {
-        let date = newProps.location.search.substr(6);;
-        this.setDate(date);
+        let date = newProps.location.search.substr(6);
+        this.setTimeSlots(date);
     }
 
-    setDate(date) {
+    setTimeSlots(date) {
         let start = moment(new Date(moment(date).startOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let end = moment(new Date(moment(date).endOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
-
-        this.setTimeSlots(start, end);
-
-        this.setState({
-            date: new Date(date),
-            startWeek: start,
-            endWeek: end
-        });
-    }
-
-    setTimeSlots(start, end) {
         getTimeSlotsByDate(start, end).then(timeSlots => {
             let evants = timeSlots.map(timeSlot => {
-                let event = {
+                return {
                     id: timeSlot.id,
                     resourceId: timeSlot.master.id,
                     title: "\nМастер: "+ timeSlot.master.person.name
@@ -84,7 +73,6 @@ class TimeTable extends Component {
                     start: moment.unix(timeSlot.startSlot).toDate(),
                     end: moment.unix(timeSlot.endSlot).toDate()
                 };
-                return event;
             });
             allMastersByWorkDay(start).then(mastersWorkDay => {
                 let resources = mastersWorkDay.map(master => {
@@ -103,7 +91,10 @@ class TimeTable extends Component {
                             evants: evants,
                             resources: resources
                         },
-                        addMasterOptions: addMasterOptions
+                        addMasterOptions: addMasterOptions,
+                        date: new Date(date),
+                        startWeek: start,
+                        endWeek: end
                     });
                 });
             });

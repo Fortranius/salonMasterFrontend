@@ -19,6 +19,7 @@ import logo from './logo_Lady_Land.png';
 import Procedures from "./components/Procedures";
 import Directory from "./components/Directory";
 import Sales from "./components/Sales";
+import moment from "moment/moment";
 
 class App extends Component {
 
@@ -47,7 +48,7 @@ class App extends Component {
                             }}>
                             <SideNav.Nav defaultSelected="">
                                 <Title><img src={logo} className='logo-image'/>Укротитель волос</Title>
-                                <Calendar onChange={date => history.push("/?date=" + date)}/>
+                                <Calendar onChange={date => history.push("/?date=" + moment(date).format('YYYY-MM-DD HH:mm:ss'))}/>
                                 <NavItem eventKey="">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-home" style={{fontSize: '1.75em'}}/>
