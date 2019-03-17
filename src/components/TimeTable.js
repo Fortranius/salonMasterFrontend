@@ -11,6 +11,7 @@ import {getTimeSlotsByDateAction} from "../actions/timeSlotActions";
 import {allMastersByDayOff, allMastersByWorkDay} from "../service/masterService";
 import Modal from 'react-responsive-modal';
 import Select from 'react-select';
+import {typeMasterFormatter} from "../data/formatter";
 
 class TimeTable extends Component {
 
@@ -81,7 +82,7 @@ class TimeTable extends Component {
                 let resources = mastersWorkDay.map(master => {
                     return {
                         id: master.id,
-                        title: master.person.name,
+                        title: master.person.name + " - " + typeMasterFormatter(master.type),
                         master: master
                     };
                 });
@@ -254,18 +255,18 @@ class TimeTable extends Component {
                     eventPropGetter={
                         (event, start, end, isSelected) => {
                             let newStyle = {
-                                backgroundColor: "lightgrey",
+                                backgroundColor: "rgb(104, 14, 14)",
                                 borderRadius: "0px",
                                 border: "none"
                             };
                             if (event.timeSlot.status === 'NEW'){
-                                newStyle.backgroundColor = "#df47fb"
+                                newStyle.backgroundColor = "gray"
                             }
                             if (event.timeSlot.status === 'CANCELED'){
                                 newStyle.backgroundColor = "#f30808"
                             }
                             if (event.timeSlot.status === 'DONE'){
-                                newStyle.backgroundColor = "#56CB51"
+                                newStyle.backgroundColor = "rgb(39, 38, 42)"
                             }
                             return {
                                 style: newStyle

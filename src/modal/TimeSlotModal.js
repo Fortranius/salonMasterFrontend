@@ -21,6 +21,7 @@ import HistoryClients from "../components/HistoryClients";
 import {getAllHairCategories, getAllHairs} from "../service/hairService";
 import HistoryChangeSlot from "../components/HistoryChangeSlot";
 import {hourOptions, minuteOptions} from "../data/selectOptions";
+import {typeMasterFormatter} from "../data/formatter";
 
 const styles = theme => ({
     container: {
@@ -46,11 +47,12 @@ const styles = theme => ({
 
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
+    console.log(search);
     if (!search) response = await getMasters(new PageParams(0, 100));
     else response = await getMastersByFiO(search);
     let cachedOptions = response.content.map((d) => ({
         value: d.id,
-        label: d.person.name,
+        label: d.person.name + " - " + typeMasterFormatter(d.type),
         master: d
     }));
     return {
@@ -178,7 +180,7 @@ class TimeSlotModal extends Component {
             procedures = this.props.event.timeSlot.procedures;
             selectMasterName = {
                 value: this.props.event.timeSlot.master.id,
-                label: this.props.event.timeSlot.master.person.name,
+                label: this.props.event.timeSlot.master.person.name + " - " + typeMasterFormatter(this.props.event.timeSlot.master.type),
                 master: this.props.event.timeSlot.master
             };
             if (this.props.event.timeSlot.hair)
@@ -201,7 +203,7 @@ class TimeSlotModal extends Component {
         } else if (this.props.selectMaster) {
             selectMasterName = {
                 value: this.props.selectMaster.master.id,
-                label: this.props.selectMaster.master.person.name,
+                label: this.props.selectMaster.master.person.name + " - " + typeMasterFormatter(this.props.selectMaster.master.type),
                 master: this.props.selectMaster.master
             };
             selectMaster = this.props.selectMaster.master;
@@ -347,7 +349,7 @@ class TimeSlotModal extends Component {
             selectMaster: newValue.master,
             selectMasterName: {
                 value: newValue.value,
-                label: newValue.master.person.name,
+                label: newValue.master.person.name + " - " + typeMasterFormatter(newValue.master.type),
                 master: newValue.master
             },
             allPrice: 0,

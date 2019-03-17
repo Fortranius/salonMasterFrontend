@@ -47,7 +47,7 @@ class App extends Component {
                                 }
                             }}>
                             <SideNav.Nav defaultSelected="">
-                                <Title><img src={logo} className='logo-image'/>Укротитель волос</Title>
+                                <Title><img src={logo} className='logo-image'/>Укротители волос</Title>
                                 <Calendar onChange={date => history.push("/?date=" + moment(date).format('YYYY-MM-DD HH:mm:ss'))}/>
                                 <NavItem eventKey="">
                                     <NavIcon>
