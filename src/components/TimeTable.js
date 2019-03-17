@@ -59,6 +59,9 @@ class TimeTable extends Component {
     }
 
     setTimeSlots(date) {
+        this.setState({
+            timeSlots: undefined
+        });
         let start = moment(new Date(moment(date).startOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let end = moment(new Date(moment(date).endOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
         getTimeSlotsByDate(start, end).then(timeSlots => {
@@ -191,7 +194,7 @@ class TimeTable extends Component {
     addMasterToGraph() {
         let addMasterOptions = this.state.addMasterOptions.filter(
             master => {
-                return master.id !== this.state.addMasterSelect.id
+                return master.value !== this.state.addMasterSelect.value
             }
         );
         let resources = this.state.timeSlots.resources;
