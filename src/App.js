@@ -21,6 +21,7 @@ import Directory from "./components/Directory";
 import Sales from "./components/Sales";
 import moment from "moment/moment";
 import Incoming from "./components/Incoming";
+import AdditionalIncome from "./components/AdditionalIncome";
 
 class App extends Component {
 
@@ -114,6 +115,14 @@ class App extends Component {
                                         Продажи
                                     </NavText>
                                 </NavItem>
+                                <NavItem eventKey="additionalIncomes">
+                                    <NavIcon>
+                                        <i className="fa fa-fw fa-user" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Доп. заработок
+                                    </NavText>
+                                </NavItem>
                                 <NavItem eventKey="procedures">
                                     <NavIcon>
                                         <i className="fa fa-fw fa-cut" style={{fontSize: '1.75em'}}/>
@@ -158,6 +167,7 @@ class App extends Component {
                             <PrivateRoute path="/expenses" component={Expenses}/>
                             <PrivateRoute path="/incoming" component={Incoming}/>
                             <PrivateRoute path="/sales" component={Sales}/>
+                            <PrivateRoute path="/additionalIncomes" component={AdditionalIncome}/>
                             <PrivateRoute path="/procedures" component={Procedures}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
                             <PrivateRoute path="/directory" component={Directory}/>

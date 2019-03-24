@@ -5,6 +5,7 @@ import timeSlotReducer from './timeSlotReducer';
 import expenseReducer from './expenseReducer';
 import saleReducer from './saleReducer';
 import incomingReducer from './incomingReducer';
+import additionalIncomeReducer from './additionalIncomeReducer';
 
 export default combineReducers({
     masterReducer,
@@ -12,5 +13,6 @@ export default combineReducers({
     timeSlotReducer,
     expenseReducer,
     saleReducer,
-    incomingReducer
+    incomingReducer,
+    additionalIncomeReducer
 });
