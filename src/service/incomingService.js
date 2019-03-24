@@ -1,3 +1,19 @@
+export function getIncomings(params, start, end) {
+    let sort = params.sortField ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
+    let filterProduct= params.filters && params.filters['product.description'] ? "&productId=" + params.filters['product.description'].filterVal : '';
+    return fetch("http://localhost:8080/api/incomings?page=" + params.page
+        + "&size=" + params.size + sort + filterProduct + "&start=" + start + "&end=" + end)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
+export function updateIncoming(entity) {
+    return sendRequest(entity, "PUT");
+}
+
 export function createIncoming(entity) {
     return sendRequest(entity, "POST");
 }
@@ -11,7 +27,6 @@ function sendRequest(entity, method) {
     };
 
     return fetch("http://localhost:8080/api/incoming", options)
-        .then(handleErrors)
         .then(function(res){ return res })
 }
 

@@ -7,10 +7,6 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import AsyncPaginate from 'react-select-async-paginate';
 import {getProducts, getProductsByDescription} from "../service/productService";
 import TextField from '@material-ui/core/TextField';
-import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
-import DayPickerInput from 'react-day-picker/DayPickerInput';
-import moment from "moment/moment";
-import {createIncoming, updateIncoming} from "../service/incomingService";
 
 const styles = theme => ({
     container: {
@@ -25,7 +21,7 @@ const styles = theme => ({
     }
 });
 
-async function getOptionIncomingByDescription(search, loadedOptions) {
+async function getOptionExpensesByDescription(search, loadedOptions) {
     let response;
     if (!search) response = await getProducts();
     else response = await getProductsByDescription(search);
@@ -40,42 +36,21 @@ async function getOptionIncomingByDescription(search, loadedOptions) {
     };
 }
 
-class IncomingModal extends Component {
+class BalanceModal extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             id: undefined,
-            date: new Date(),
             selectProduct: undefined,
             selectProductByDescription: undefined,
             countProduct: 1,
-            submit: false,
-            error: undefined
+            submit: false
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleInputProductChange = this.handleInputProductChange.bind(this);
-        this.handleChange = this.handleChange.bind(this);
         this.handleChangeCountProduct = this.handleChangeCountProduct.bind(this);
-        this.handleChangeDate = this.handleChangeDate.bind(this);
-    }
-
-    componentDidMount() {
-        if (this.props.update) {
-            this.setState({
-                id: this.props.update.id,
-                date: this.props.update.date ? moment.unix(this.props.update.date).toDate() : new Date(),
-                countProduct: this.props.update.countProduct,
-                selectProduct: this.props.update.product,
-                selectProductByDescription: {
-                    value: this.props.update.product.id,
-                    label: this.props.update.product.description,
-                    product: this.props.update.product
-                },
-                error: undefined
-            });
-        }
     }
 
     clear() {
@@ -85,8 +60,7 @@ class IncomingModal extends Component {
             selectProduct: undefined,
             selectProductByDescription: undefined,
             countProduct: 1,
-            submit: false,
-            error: undefined
+            submit: false
         });
     }
 
@@ -101,31 +75,15 @@ class IncomingModal extends Component {
             submit: true
         });
         if (this.state.selectProduct
-            && this.state.countProduct>0
-            && this.state.date) {
+            && this.state.countProduct>0) {
             let incoming = {
                 id: this.state.id,
-                date: this.state.date,
                 product: this.state.selectProduct,
                 countProduct: this.state.countProduct
             };
-            if (this.props.isCreate) this.createIncoming(incoming);
-            else this.updateIncoming(incoming);
+            this.props.accept(incoming);
+            this.clear();
         }
-    };
-
-    updateIncoming(entity) {
-        updateIncoming(entity).then(resp => {
-            this.props.accept();
-            this.clear();
-        });
-    };
-
-    createIncoming(entity) {
-        createIncoming(entity).then(resp => {
-            this.props.accept();
-            this.clear();
-        });
     };
 
     handleInputProductChange = (newValue) => {
@@ -135,30 +93,16 @@ class IncomingModal extends Component {
                 value: newValue.value,
                 label: newValue.product.description,
                 product: newValue.product
-            },
-            error: undefined
+            }
         });
     };
 
     handleChangeCountProduct = event => {
         if (event.target.value > 0) {
             this.setState({
-                countProduct: event.target.value,
-                error: undefined
+                countProduct: event.target.value
             });
         }
-    };
-
-    handleChange = name => event => {
-        this.setState({
-            [name]: event.target.value
-        });
-    };
-
-    handleChangeDate = (newValue) => {
-        this.setState({
-            date: newValue
-        });
     };
 
     validate(field) {
@@ -178,13 +122,13 @@ class IncomingModal extends Component {
                        closeOnEsc={false} center={false}>
                     <div className="container">
                         <div className="row">
-                            <div className="col-sm-2">
+                            <div className="col-sm-2 title-margin">
                                 Товар:
                             </div>
                             <div className="col-sm-4">
                                 <AsyncPaginate
                                     value={this.state.selectProductByDescription}
-                                    loadOptions={getOptionIncomingByDescription}
+                                    loadOptions={getOptionExpensesByDescription}
                                     onChange={this.handleInputProductChange}
                                     placeholder={'Выберите товар'}
                                 />
@@ -192,7 +136,7 @@ class IncomingModal extends Component {
                                     { this.validate('selectProduct') ? <FormHelperText id="selectProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
                             </div>
-                            <div className="col-sm-2">
+                            <div className="col-sm-2 title-margin">
                                 Количество:
                             </div>
                             <div className="col-sm-4">
@@ -204,30 +148,7 @@ class IncomingModal extends Component {
                                 </FormControl>
                             </div>
                         </div>
-                        <div className="row">
-                        <div className="col-sm-2">
-                            Дата:
-                        </div>
-                        <div className="col-sm-4">
-                            <DayPickerInput
-                                placeholder={`Дата прихода`}
-                                parseDate={parseDate}
-                                value={this.state.date}
-                                onDayChange={this.handleChangeDate}
-                                formatDate={formatDate}
-                                dayPickerProps={{
-                                    locale: 'ru',
-                                    localeUtils: MomentLocaleUtils,
-                                }}/>
-                            <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
-                                { this.validate('date') ? <FormHelperText id="date-error-text">Поле не может быть пустым</FormHelperText>: null }
-                            </FormControl>
-                        </div>
                     </div>
-                    </div>
-                    { this.state.error ? <div className="row error_label">
-                        {this.state.error}
-                    </div> : null}
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
                             Сохранить
@@ -242,4 +163,4 @@ class IncomingModal extends Component {
     }
 }
 
-export default withStyles(styles)(IncomingModal);
+export default withStyles(styles)(BalanceModal);

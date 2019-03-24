@@ -6,7 +6,7 @@ import Masters from './components/Masters';
 import Timetable from "./components/TimeTable";
 import Products from "./components/Products";
 import Expenses from "./components/Expenses";
-import Incoming from "./components/Incoming";
+import Balance from "./components/Balance";
 import Dashboard from "./components/Dashboard";
 import LoginPage from "./components/LoginPage";
 import {PrivateRoute} from './route/PrivateRoute';
@@ -20,6 +20,7 @@ import Procedures from "./components/Procedures";
 import Directory from "./components/Directory";
 import Sales from "./components/Sales";
 import moment from "moment/moment";
+import Incoming from "./components/Incoming";
 
 class App extends Component {
 
@@ -79,6 +80,14 @@ class App extends Component {
                                     </NavIcon>
                                     <NavText>
                                         Аксессуары
+                                    </NavText>
+                                </NavItem>
+                                <NavItem eventKey="balance">
+                                    <NavIcon>
+                                        <i className="fa fa-fw fa-balance-scale" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Остатки
                                     </NavText>
                                 </NavItem>
                                 <NavItem eventKey="incoming">
@@ -145,8 +154,9 @@ class App extends Component {
                             <PrivateRoute path="/masters" component={Masters}/>
                             <PrivateRoute path="/clients" component={Clients}/>
                             <PrivateRoute path="/products" component={Products}/>
-                            <PrivateRoute path="/incoming" component={Incoming}/>
+                            <PrivateRoute path="/balance" component={Balance}/>
                             <PrivateRoute path="/expenses" component={Expenses}/>
+                            <PrivateRoute path="/incoming" component={Incoming}/>
                             <PrivateRoute path="/sales" component={Sales}/>
                             <PrivateRoute path="/procedures" component={Procedures}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
