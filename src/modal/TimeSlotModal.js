@@ -10,8 +10,6 @@ import PageParams from "../model/PageParams";
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from 'react-select';
-import hoursOptions from '../data/hoursOptions'
-import minutesOptions from '../data/minutesOptions'
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import NumberFormat from 'react-number-format';
 import TextField from '@material-ui/core/TextField';
@@ -20,8 +18,10 @@ import MomentLocaleUtils, {parseDate} from 'react-day-picker/moment';
 import 'moment/locale/ru';
 import Autosuggest from 'react-autosuggest';
 import HistoryClients from "../components/HistoryClients";
-import {getProducts, getProductsByDescription} from "../service/productService";
-import ExpenseList from "./components/ExpenseItem";
+import {getAllHairCategories, getAllHairs} from "../service/hairService";
+import HistoryChangeSlot from "../components/HistoryChangeSlot";
+import {hourOptions, minuteOptions} from "../data/selectOptions";
+import {typeMasterFormatter} from "../data/formatter";
 
 const styles = theme => ({
     container: {
@@ -37,15 +37,22 @@ const styles = theme => ({
     formControl: {
         display: 'flex'
     },
+    formControlHairs: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        marginTop:16,
+        width: 250
+    }
 });
 
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
+    console.log(search);
     if (!search) response = await getMasters(new PageParams(0, 100));
     else response = await getMastersByFiO(search);
     let cachedOptions = response.content.map((d) => ({
         value: d.id,
-        label: d.person.name,
+        label: d.person.name + " - " + typeMasterFormatter(d.type),
         master: d
     }));
     return {
@@ -74,17 +81,10 @@ function NumberFormatCustom(props) {
 
 const getClientName = client => client.person.name;
 const getClientPhone = client => client.person.phone;
-const getServiceDescription = service => service.description;
 
 const renderClient = client => {
     return (
         <span>{client.person.name}</span>
-    );
-};
-
-const renderService = service => {
-    return (
-        <span>{service.description}</span>
     );
 };
 
@@ -98,56 +98,40 @@ const getSectionClients = section => {
     return section.clients;
 };
 
-const getSectionServices = section => {
-    return section.services;
-};
-
-async function getOptionExpensesByDescription(search, loadedOptions) {
-    let response;
-    if (!search) response = await getProducts();
-    else response = await getProductsByDescription(search);
-    let cachedOptions = response.map((d) => ({
-        value: d.id,
-        label: d.description,
-        product: d
-    }));
-    return {
-        options: cachedOptions,
-        hasMore: true
-    };
-}
-
 class TimeSlotModal extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selectService: undefined,
-            selectServiceByDescription: '',
             selectMaster: undefined,
             selectMasterName: undefined,
             selectClient: undefined,
             selectClientName: '',
             selectClientPhone: '',
+            clientDescription: '',
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
             id: undefined,
-            price: 0,
+            allPrice: 0,
+            masterWorkPrice: 0,
             status: 'NEW',
             value: '',
-            services:[],
             clients: [],
             menu:'MAIN',
-            expense: {
-                product: undefined,
-                countProduct: 1
-            },
             selectProductByDescription: undefined,
-            submitExpense: false,
-            expenses: []
+            optionHairs: [],
+            selectedHair: undefined,
+            hairWeight: 0,
+            hairCountExtension: 0,
+            hairCountRemoval: 0,
+            hairsCategory: [],
+            procedures: [],
+            submitProcedure: false,
+            selectedProcedures: [],
+            optionProcedures: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -158,8 +142,24 @@ class TimeSlotModal extends Component {
         this.handleChangeEndMinutes = this.handleChangeEndMinutes.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleChangeExpense = this.handleChangeExpense.bind(this);
+        this.handleChangeHair = this.handleChangeHair.bind(this);
         this.setStatus = this.setStatus.bind(this);
+        this.handleChangeProcedures = this.handleChangeProcedures.bind(this);
+
+        getAllHairs().then(data => {
+            let hairs = data.map(hair => {
+                return { value: hair.id, label: "Волосы " + hair.minLength + " - " + (hair.maxLength !== 0 ? hair.maxLength : "более"), hair: hair };
+            });
+            this.setState({
+                optionHairs: hairs
+            });
+        });
+
+        getAllHairCategories().then(data => {
+            this.setState({
+                hairsCategory: data
+            })
+        });
     }
 
     componentDidMount() {
@@ -168,55 +168,54 @@ class TimeSlotModal extends Component {
             selectClient,
             selectClientName = '',
             selectClientPhone = '',
-            services,
-            selectService,
-            selectServiceByDescription = '',
-            status;
+            clientDescription = '',
+            status,
+            selectedHair,
+            procedures = [],
+            selectedProcedures = [];
         if (this.props.event.timeSlot) {
+            selectedProcedures = this.props.event.timeSlot.procedures.map(procedure => {
+                return { value: procedure.id, label: procedure.description, procedure: procedure };
+            });
+            procedures = this.props.event.timeSlot.procedures;
             selectMasterName = {
                 value: this.props.event.timeSlot.master.id,
-                label: this.props.event.timeSlot.master.person.name,
+                label: this.props.event.timeSlot.master.person.name + " - " + typeMasterFormatter(this.props.event.timeSlot.master.type),
                 master: this.props.event.timeSlot.master
             };
+            if (this.props.event.timeSlot.hair)
+                selectedHair = {
+                    value: this.props.event.timeSlot.hair.id,
+                    label: "Волосы " + this.props.event.timeSlot.hair.minLength + " - " +
+                        (this.props.event.timeSlot.hair.maxLength !== 0 ? this.props.event.timeSlot.hair.maxLength : "более"),
+                    hair: this.props.event.timeSlot.hair
+                };
             selectMaster = this.props.event.timeSlot.master ? this.props.event.timeSlot.master : undefined;
             status = this.props.event.timeSlot.status ? this.props.event.timeSlot.status : 'NEW';
             selectClient = this.props.event.timeSlot.client;
             selectClientName = this.props.event.timeSlot.client.person.name;
+            clientDescription = this.props.event.timeSlot.client.description ? this.props.event.timeSlot.client.description : '';
 
             selectClientPhone = '+7 (' + this.props.event.timeSlot.client.person.phone.substring(0,3) + ') '
                 + this.props.event.timeSlot.client.person.phone.substring(3, 6) + ' '
                 + this.props.event.timeSlot.client.person.phone.substring(6, 8) + ' '
                 + this.props.event.timeSlot.client.person.phone.substring(8, 10);
-            selectService = this.props.event.timeSlot.service;
-            selectServiceByDescription = this.props.event.timeSlot.service.description;
-            services = this.props.event.timeSlot.master.services.map(service => {
-                return {
-                    title: service.description,
-                    services: [
-                        service
-                    ]
-                }
-            });
         } else if (this.props.selectMaster) {
-            services = this.props.selectMaster.master.services.map(service => {
-                return {
-                    title: service.description,
-                    services: [
-                        service
-                    ]
-                }
-            });
             selectMasterName = {
                 value: this.props.selectMaster.master.id,
-                label: this.props.selectMaster.master.person.name,
+                label: this.props.selectMaster.master.person.name + " - " + typeMasterFormatter(this.props.selectMaster.master.type),
                 master: this.props.selectMaster.master
             };
             selectMaster = this.props.selectMaster.master;
         }
+        let optionProcedures = selectMaster.procedures.map(procedure => {
+            return { value: procedure.id, label: procedure.description, procedure: procedure };
+        });
         this.setState({
             date: this.props.event.start,
             id: this.props.event.id,
-            price: this.props.event.timeSlot ? this.props.event.timeSlot.price : 0,
+            allPrice: this.props.event.timeSlot ? this.props.event.timeSlot.allPrice : 0,
+            masterWorkPrice: this.props.event.timeSlot ? this.props.event.timeSlot.masterWorkPrice : 0,
             startHour: {
                 value: this.props.event.start.getHours(),
                 label: this.props.event.start.getHours()
@@ -238,15 +237,18 @@ class TimeSlotModal extends Component {
             selectMasterName: selectMasterName,
             selectMaster: selectMaster,
             status: status ? status : 'NEW',
-
+            clientDescription: clientDescription,
             selectClient: selectClient,
             selectClientName: selectClientName,
             selectClientPhone: selectClientPhone,
-            services: services,
-            selectService: selectService,
-            selectServiceByDescription: selectServiceByDescription,
             menu:'MAIN',
-            expenses: this.props.event.timeSlot ? this.props.event.timeSlot.expenses : []
+            hairWeight: this.props.event.timeSlot ? this.props.event.timeSlot.hairWeight : 0,
+            hairCountExtension: this.props.event.timeSlot ? this.props.event.timeSlot.hairCountExtension : 0,
+            hairCountRemoval: this.props.event.timeSlot ? this.props.event.timeSlot.hairCountRemoval : 0,
+            selectedHair: selectedHair,
+            selectedProcedures: selectedProcedures,
+            optionProcedures: optionProcedures,
+            procedures: procedures
         });
     }
 
@@ -268,13 +270,18 @@ class TimeSlotModal extends Component {
                 client = {
                     person: {
                         name: this.state.selectClientName,
-                        phone: this.state.selectClientPhone
+                        phone: this.state.selectClientPhone.substring(2).replace(/[.*+ ?^${}()|[\]\\]/g, ""),
                     }
                 }
         }
 
-        if (!client || !this.state.selectMaster || !this.state.date || !this.state.selectService)
+        if (!client || !this.state.selectMaster || !this.state.date || !this.state.procedures || this.state.procedures.length === 0)
             return false;
+
+        if (this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') && !this.state.selectedHair)
+            return false;
+
+        client.description = this.state.clientDescription;
 
         let startDate = new Date(this.state.date);
         startDate.setHours(this.state.startHour.value);
@@ -283,26 +290,20 @@ class TimeSlotModal extends Component {
         endDate.setHours(this.state.endHour.value);
         endDate.setMinutes(this.state.endMinutes.value);
 
-        let expenses = this.state.expenses.map(expense => {
-            return {
-                id: expense.id,
-                product: expense.product,
-                countProduct: expense.countProduct,
-                master: this.state.selectMaster,
-                date: new Date()
-            }
-        });
-
         let timeSlot = {
             id: this.state.id,
             client: client,
             master: this.state.selectMaster,
             startSlot: startDate,
             endSlot: endDate,
-            price: this.state.price,
-            service: this.state.selectService,
+            allPrice: this.state.allPrice,
+            masterWorkPrice: this.state.masterWorkPrice,
             status: this.state.status,
-            expenses: expenses
+            hairWeight: this.state.hairWeight,
+            hairCountExtension: this.state.hairCountExtension,
+            hairCountRemoval: this.state.hairCountRemoval,
+            procedures: this.state.procedures,
+            hair: this.state.selectedHair ? this.state.selectedHair.hair : undefined
         };
         this.props.accept(timeSlot);
         this.clear();
@@ -310,54 +311,56 @@ class TimeSlotModal extends Component {
 
     clear() {
         this.setState({
-            selectService: undefined,
-            selectServiceByDescription: '',
             selectClient: undefined,
             selectMaster: undefined,
             selectMasterName: undefined,
             selectClientName: '',
             selectClientPhone: '',
+            clientDescription: '',
             submit: false,
             startHour: { value: 10, label: '10' },
             startMinutes: { value: 0, label: '00' },
             endHour: { value: 10, label: '10' },
             endMinutes: { value: 0, label: '00' },
             date: new Date(),
-            price: 0,
+            allPrice: 0,
+            masterWorkPrice: 0,
             status: 'NEW',
-            services:[],
             clients:[],
             menu:'MAIN',
-            expense: {
-                product: undefined,
-                countProduct: 1
-            },
             selectProductByDescription: undefined,
-            submitExpense: false,
-            expenses: []
+            optionHairs: [],
+            selectedHair: undefined,
+            hairWeight: 0,
+            hairCountExtension: 0,
+            hairCountRemoval: 0,
+            procedures: [],
+            submitProcedure: false,
+            selectedProcedures: [],
+            optionProcedures: []
         });
     }
 
     handleInputMasterChange = (newValue) => {
-        let options = newValue.master.services.map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
-            return {
-                title: service.minPrice + ' руб.' + maxPrice,
-                services: [
-                    service
-                ]
-            }
+        let procedures = newValue.master.procedures.map(procedure => {
+            return { value: procedure.id, label: procedure.description, procedure: procedure };
         });
         this.setState({
             selectMaster: newValue.master,
-            services: options,
-            selectService: undefined,
-            selectServiceByDescription: '',
             selectMasterName: {
                 value: newValue.value,
-                label: newValue.master.person.name,
+                label: newValue.master.person.name + " - " + typeMasterFormatter(newValue.master.type),
                 master: newValue.master
-            }
+            },
+            allPrice: 0,
+            masterWorkPrice: 0,
+            selectedProcedures: [],
+            procedures: [],
+            selectedHair: undefined,
+            hairWeight: 0,
+            hairCountExtension: 0,
+            hairCountRemoval: 0,
+            optionProcedures: procedures
         });
     };
 
@@ -394,12 +397,30 @@ class TimeSlotModal extends Component {
         });
     };
 
-    handleChangeExpense = name => event => {
+    handleChangeAndRecountSum = name => event => {
+        let allSum = 0, masterWorkSum = 0;
+        let hairCountExtension = this.state.hairCountExtension;
+        let hairCountRemoval = this.state.hairCountRemoval;
+        let hairWeight = this.state.hairWeight;
+
+        if (name==='hairCountExtension') hairCountExtension=event.target.value;
+        if (name==='hairWeight') hairWeight=event.target.value;
+        if (name==='hairCountRemoval') hairCountRemoval=event.target.value;
+
+        if (this.state.selectedHair) this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*hairCountExtension + this.state.selectedHair.hair.price*hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
+            });
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
+            });
         this.setState({
-            expense: {
-                ...this.state.expense,
-                [name]: event.target.value
-            }
+            [name]: event.target.value,
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum
         });
     };
 
@@ -419,6 +440,12 @@ class TimeSlotModal extends Component {
         if (!this.state.submit)
             return false;
         return (!this.state || !this.state[field]);
+    }
+
+    validateProcedures() {
+        if (!this.state.submit)
+            return false;
+        return (!this.state || !this.state.procedures || this.state.procedures.length === 0);
     }
 
     onClientsFetchRequestedByName = ({ value }) => {
@@ -464,50 +491,17 @@ class TimeSlotModal extends Component {
         });
     };
 
-    onServicesByDescription = ({ value }) => {
-        const inputValue = value.trim().toLowerCase();
-        const inputLength = inputValue.length;
-        let options = this.state.selectMaster.services.filter(service =>
-            service.description.toLowerCase().slice(0, inputLength) === inputValue
-        ).map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
-            return {
-                title: service.minPrice + ' руб.' + maxPrice,
-                services: [
-                    service
-                ]
-            }
-        });
-        this.setState({
-            services: options
-        });
-    };
-
     onClientsClearRequested = () => {
         this.setState({
             clients: []
         });
     };
 
-    onServicesClearRequested = () => {
-        let options = this.state.selectMaster.services.map(service => {
-            let maxPrice = service.maxPrice ? ' - ' + service.maxPrice + ' руб.': '';
-            return {
-                title: service.minPrice + ' руб.' + maxPrice,
-                services: [
-                    service
-                ]
-            }
-        });
-        this.setState({
-            services: options
-        });
-    };
-
     onChangeClientName = (event, { newValue }) => {
         this.setState({
             selectClientName: newValue,
-            selectClient: undefined
+            selectClient: undefined,
+            clientDescription: ''
         });
     };
 
@@ -521,14 +515,8 @@ class TimeSlotModal extends Component {
         else phone = newValue;
         this.setState({
             selectClientPhone: phone,
-            selectClient: undefined
-        });
-    };
-
-    onChangeServiceDescription = (event, { newValue }) => {
-        this.setState({
-            selectService: undefined,
-            selectServiceByDescription: newValue
+            selectClient: undefined,
+            clientDescription: ''
         });
     };
 
@@ -536,6 +524,7 @@ class TimeSlotModal extends Component {
         this.setState({
             selectClient: suggestion,
             selectClientName: suggestion.person.name,
+            clientDescription: suggestion.description ? suggestion.description : "",
             selectClientPhone: '+7 (' + suggestion.person.phone.substring(0,3) + ') '
                 + suggestion.person.phone.substring(3, 6) + ' '
                 + suggestion.person.phone.substring(6, 8) + ' '
@@ -543,62 +532,58 @@ class TimeSlotModal extends Component {
         });
     };
 
-    onServiceSelected = (event, { suggestion })  => {
-        this.setState({
-            selectService: suggestion,
-            price: suggestion.minPrice,
-            selectServiceByDescription: suggestion.description
-        });
-    };
-
-    shouldRenderSuggestions = (value) => {
-        return value.trim().length > -1;
-    };
-
-    handleInputProductChange = (newValue) => {
-        this.setState({
-            expense: {
-                ...this.state.expense,
-                product: newValue.product
-            },
-            selectProductByDescription: {
-                value: newValue.value,
-                label: newValue.product.description,
-                product: newValue.product
-            }
-        });
-    };
-
-    addExpense = ()  => {
-        this.setState({
-            submitExpense: true
-        });
-        if (this.state.expense.product
-            && this.state.expense.countProduct) {
-            let expenses = this.state.expenses;
-            expenses.push(this.state.expense);
-            this.setState({
-                selectProductByDescription: undefined,
-                expenses: expenses,
-                expense: {
-                    product: undefined,
-                    countProduct: 1
-                },
-                submitExpense:false
+    handleChangeHair = (newValue) => {
+        let allSum = 0, masterWorkSum = 0;
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*this.state.hairCountExtension + newValue.hair.price*this.state.hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountExtension;
             });
-        }
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*this.state.hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountRemoval;
+            });
+
+        this.setState({
+            selectedHair: newValue,
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum
+        });
     };
 
-    validateExpense(field) {
-        if (!this.state.submitExpense)
-            return false;
-        return (!this.state.expense || !this.state.expense[field]);
-    };
+    handleChangeProcedures = (selectedProcedures) => {
+        let allSum = 0, masterWorkSum = 0;
+        let procedures = selectedProcedures.map(option => {
+            return option.procedure;
+        });
 
-    removeExpense = (serviceIndex)  => {
-        let array = [...this.state.expenses];
-        array.splice(serviceIndex, 1);
-        this.setState({expenses: array});
+        let hairCountExtension = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.hairCountExtension : 0;
+        let hairCountRemoval = procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? this.state.hairCountRemoval : 0;
+        let hairWeight = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.hairWeight : 0;
+        let selectedHair = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.selectedHair : undefined;
+
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+            .forEach(hairCategory => {
+                if (selectedHair) allSum = allSum + hairCategory.price*hairCountExtension + selectedHair.hair.price*hairWeight;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
+            });
+        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+            .forEach(hairCategory => {
+                allSum = allSum + hairCategory.price*hairCountRemoval;
+                masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
+            });
+
+        this.setState({
+            selectedProcedures: selectedProcedures,
+            procedures: procedures,
+            allPrice: allSum,
+            masterWorkPrice: masterWorkSum,
+            selectedHair: selectedHair,
+            hairWeight: hairWeight,
+            hairCountExtension: hairCountExtension,
+            hairCountRemoval: hairCountRemoval
+        });
     };
 
     render() {
@@ -612,12 +597,6 @@ class TimeSlotModal extends Component {
             placeholder: 'Введите телефон клиента',
             value: this.state.selectClientPhone,
             onChange: this.onChangeClientPhone
-        };
-
-        const inputServiceProps = {
-            placeholder: '',
-            value: this.state.selectServiceByDescription,
-            onChange: this.onChangeServiceDescription
         };
         return (
             <div>
@@ -633,57 +612,22 @@ class TimeSlotModal extends Component {
                                     <li>
                                         <a href="#" onClick={() => this.setMenu('MAIN')}>Детали заказа</a>
                                     </li>
-                                    <li>
-                                        <a href="#" onClick={() => this.setMenu('EXPENSE')}>Расходы</a>
-                                    </li>
                                     {this.state.selectClient ? <li>
                                         <a href="#" onClick={() => this.setMenu('HISTORY')}>История посещений</a>
                                     </li> : null}
+                                    {this.props.event.timeSlot ? <li>
+                                        <a href="#" onClick={() => this.setMenu('HISTORY_CHANGE')}>История изменений</a>
+                                    </li> : null}
                                 </ul>
                             </div>
+                            {this.state.menu === 'HISTORY_CHANGE' ? <div className="col-sm">
+                                <div className="container selectDiv">
+                                    <HistoryChangeSlot changes={this.props.event.timeSlot.changes}/>
+                                </div>
+                            </div> : null}
                             {this.state.menu === 'HISTORY' ? <div className="col-sm">
                                 <div className="container selectDiv">
                                     <HistoryClients client={this.state.selectClient}/>
-                                </div>
-                            </div> : null}
-                            {this.state.menu === 'EXPENSE' ? <div className="col-sm">
-                                <div className="container selectDiv">
-                                    <div className="row">
-                                        <ExpenseList expenses={this.state.expenses} removeExpense={this.removeExpense}/>
-                                    </div>
-                                    <div className="row">
-                                        <hr/>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-sm-1 title-margin-date">
-                                            Товар:
-                                        </div>
-                                        <div className="col-sm-4">
-                                            <AsyncPaginate
-                                                value={this.state.selectProductByDescription}
-                                                loadOptions={getOptionExpensesByDescription}
-                                                onChange={this.handleInputProductChange}
-                                                placeholder={'Выберите товар'}
-                                            />
-                                            <FormControl className={classes.formControl} error={this.validateExpense('product')} aria-describedby="product-error-text">
-                                                { this.validateExpense('product') ? <FormHelperText id="product-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                            </FormControl>
-                                        </div>
-                                        <div className="col-sm-2 title-margin-date">
-                                            Количество:
-                                        </div>
-                                        <div className="col-sm-4">
-                                            <TextField InputLabelProps={{ shrink: true }} value={this.state.expense.countProduct}
-                                                       onChange={this.handleChangeExpense('countProduct')} type="number"/>
-
-                                            <FormControl className={classes.formControl} error={this.validateExpense('countProduct')} aria-describedby="countProduct-error-text">
-                                                { this.validateExpense('countProduct') ? <FormHelperText id="countProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                            </FormControl>
-                                        </div>
-                                        <div className="col-sm-1">
-                                            <button className="btn btn-default add-expense-button" onClick={this.addExpense}>+</button>
-                                        </div>
-                                    </div>
                                 </div>
                             </div> : null}
                             {this.state.menu === 'MAIN' ? <div className="col-sm">
@@ -728,7 +672,7 @@ class TimeSlotModal extends Component {
                                             <div className="inlineDiv">
                                                 <Select
                                                     value={this.state.startHour}
-                                                    options={hoursOptions}
+                                                    options={hourOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeStartHour}
                                                     className='selectStyle'
@@ -736,7 +680,7 @@ class TimeSlotModal extends Component {
                                                 <div className="quote">:</div>
                                                 <Select
                                                     value={this.state.startMinutes}
-                                                    options={minutesOptions}
+                                                    options={minuteOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeStartMinutes}
                                                     className='selectStyle'
@@ -750,7 +694,7 @@ class TimeSlotModal extends Component {
                                             <div className="inlineDiv">
                                                 <Select
                                                     value={this.state.endHour}
-                                                    options={hoursOptions}
+                                                    options={hourOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeEndHour}
                                                     className='selectStyle'
@@ -758,7 +702,7 @@ class TimeSlotModal extends Component {
                                                 <div className="quote">:</div>
                                                 <Select
                                                     value={this.state.endMinutes}
-                                                    options={minutesOptions}
+                                                    options={minuteOptions()}
                                                     placeholder={''}
                                                     onChange={this.handleChangeEndMinutes}
                                                     className='selectStyle'
@@ -817,6 +761,16 @@ class TimeSlotModal extends Component {
                                 <hr/>
                                 <div className="row">
                                     <div className="col-sm">
+                                        Комментарии к клиенту:
+                                    </div>
+                                </div>
+                                <div>
+                                    <TextField InputLabelProps={{ shrink: true }} value={this.state.clientDescription}
+                                               onChange={this.handleChange('clientDescription')} fullWidth/>
+                                </div>
+                                <hr/>
+                                <div className="row">
+                                    <div className="col-sm">
                                         Мастер:
                                     </div>
                                 </div>
@@ -836,32 +790,108 @@ class TimeSlotModal extends Component {
                                             Услуга:
                                         </div>
                                         <div className="col-sm">
-                                            {this.state.selectMaster ? <Autosuggest
-                                                suggestions={this.state.services}
-                                                multiSection={true}
-                                                onSuggestionsFetchRequested={this.onServicesByDescription}
-                                                onSuggestionsClearRequested={this.onServicesClearRequested}
-                                                getSuggestionValue={getServiceDescription}
-                                                renderSuggestion={renderService}
-                                                renderSectionTitle={renderSectionTitle}
-                                                getSectionSuggestions={getSectionServices}
-                                                inputProps={inputServiceProps}
-                                                onSuggestionSelected={this.onServiceSelected}
-                                                focusInputOnSuggestionClick={true}
-                                                shouldRenderSuggestions={this.shouldRenderSuggestions}
-                                            />: null }
-                                            <FormControl className={classes.formControl} error={this.validate('selectService')} aria-describedby="selectService-error-text">
-                                                { this.validate('selectService') ? <FormHelperText id="selectService-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            <FormControl className={classes.formControl} error={this.validateProcedures()} aria-describedby="procedures-error-text">
+                                                <Select id="procedures"
+                                                        isMulti
+                                                        closeMenuOnSelect={false}
+                                                        value={this.state.selectedProcedures}
+                                                        onChange={this.handleChangeProcedures}
+                                                        placeholder="Выберите услуги"
+                                                        options={this.state.optionProcedures}
+                                                />
+                                                { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Необходимо выбрать хотя бы один вариант</FormHelperText>: null }
                                             </FormControl>
                                         </div>
-                                        <div className="col-sm-2 title-margin-date">
-                                            Цена (руб.):
+                                    </div>
+                                </div>
+                                <hr/>
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-2 title-margin">
+                                            Расход волос:
+                                        </div>
+                                        <div className="col-sm">
+                                            <Select value={this.state.selectedHair}
+                                                    onChange={this.handleChangeHair}
+                                                    placeholder="Выберите категорию волос"
+                                                    options={this.state.optionHairs}
+                                            />
+                                            <FormControl className={classes.formControlHairs} error={this.validate('selectedHair')} aria-describedby="selectedHair-error-text">
+                                                { this.validate('selectedHair') ? <FormHelperText id="selectedHair-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                            </FormControl>
+                                        </div>
+                                    </div>
+                                    {this.state.selectedHair ? <div className="row">
+                                        <div className="col-sm-3 title-margin-date">
+                                            Количество (шт.):
                                         </div>
                                         <div className="col-sm">
                                             <TextField
                                                 className={classes.formControl}
-                                                value={this.state.price}
-                                                onChange={this.handleChange('price')}
+                                                value={this.state.hairCountExtension}
+                                                onChange={this.handleChangeAndRecountSum('hairCountExtension')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-sm-3 title-margin-date">
+                                            Вес (гр.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.hairWeight}
+                                                onChange={this.handleChangeAndRecountSum('hairWeight')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                    </div> : null}
+                                    <hr/>
+                                </div> : null}
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-4 title-margin-date">
+                                            Снятие волос (количество прядей):
+                                        </div>
+                                        <div className="col-sm-3">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.hairCountRemoval}
+                                                onChange={this.handleChangeAndRecountSum('hairCountRemoval')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                </div> : null}
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-3 title-margin-date">
+                                            Услуги мастера (руб.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.masterWorkPrice}
+                                                onChange={this.handleChange('masterWorkPrice')}
+                                                InputProps={{
+                                                    inputComponent: NumberFormatCustom,
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-sm-3 title-margin-date">
+                                            Общая стоимость (руб.):
+                                        </div>
+                                        <div className="col-sm">
+                                            <TextField
+                                                className={classes.formControl}
+                                                value={this.state.allPrice}
+                                                onChange={this.handleChange('allPrice')}
                                                 InputProps={{
                                                     inputComponent: NumberFormatCustom,
                                                 }}

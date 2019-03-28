@@ -22,7 +22,10 @@ class LoginPage extends React.Component {
 
     handleChange(e) {
         const { name, value } = e.target;
-        this.setState({ [name]: value });
+        this.setState({
+            [name]: value,
+            error: ''
+        });
     }
 
     handleSubmit(e) {
@@ -40,7 +43,10 @@ class LoginPage extends React.Component {
                     const { from } = this.props.location.state || { from: { pathname: "/" } };
                     this.props.history.push(from);
                 },
-                error => this.setState({ error, loading: false })
+                error => {
+                    console.log(error);
+                    this.setState({ error: 'Логин или пароль введены неверно', loading: false });
+                }
             );
     }
 

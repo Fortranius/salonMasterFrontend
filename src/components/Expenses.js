@@ -1,13 +1,18 @@
 import React, {Component} from 'react';
 import '../App.css';
 import TableRemote from "./remote/TableRemote";
-import colExpense from "../data/colExpense";
 import {connect} from 'react-redux';
 import {getExpensesAction} from "../actions/expenseActions"
 import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
-import {createExpense, updateExpense} from "../service/expenseService";
 import ExpenseModal from "../modal/ExpenseModal";
+import {getAllMasters} from "../service/masterService";
+import {selectFilter} from "react-bootstrap-table2-filter";
+import {getProducts} from "../service/productService";
+import moment from 'moment'
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
+import {getExpensesReport} from "../service/reportService";
 
 class Expenses extends Component {
 
@@ -16,92 +21,250 @@ class Expenses extends Component {
         this.state = {
             openUpdate: false,
             openCreate: false,
-            row: undefined
+            sortField: '',
+            sortOrder: '',
+            masterOptions: {},
+            productOptions: {},
+            filters: {},
+            row: undefined,
+            error: undefined,
+            start: moment().startOf('month').toDate(),
+            end: moment().endOf('month').toDate()
         };
         this.handleTableChange = this.handleTableChange.bind(this);
 
-        this.updateExpense = this.updateExpense.bind(this);
         this.onOpenUpdateModal = this.onOpenUpdateModal.bind(this);
         this.onCloseUpdateModal = this.onCloseUpdateModal.bind(this);
 
-        this.createExpense = this.createExpense.bind(this);
         this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
         this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
 
-        this.props.expenseActions(new PageParams(0, 10));
+        this.accept = this.accept.bind(this);
+        this.export = this.export.bind(this);
+
+        this.props.expenseActions(new PageParams(0, 10, "date", "asc"),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+
+        getAllMasters().then(masters => {
+            let masterOptions = {};
+            masters.forEach(master => {
+                masterOptions[master.id] = master.person.name;
+            });
+            this.setState({
+                masterOptions: masterOptions
+            })
+        });
+        getProducts().then(products => {
+            let productOptions = {};
+            products.forEach(product => {
+                productOptions[product.id] = product.description;
+            });
+            this.setState({
+                productOptions: productOptions
+            })
+        });
     }
 
     onOpenUpdateModal (row) {
         this.setState({
             openUpdate: true,
-            row: row
+            row: row,
+            error: undefined
         });
     };
 
     onOpenCreateModal () {
         this.setState({
             openCreate: true,
+            error: undefined
         });
     };
 
     onCloseUpdateModal = () => {
         this.setState({
             openUpdate: false,
-            row: undefined
+            row: undefined,
+            error: undefined
         });
     };
 
     onCloseCreateModal = () => {
         this.setState({
-            openCreate: false
+            openCreate: false,
+            error: undefined
         });
     };
 
-    handleTableChange = (type, {page, sizePerPage}) => {
-        this.props.expenseActions(new PageParams(page - 1, sizePerPage));
+    handleTableChange = (type, {sortField, sortOrder, filters, page, sizePerPage}) => {
+        this.setState({
+            sortField: sortField,
+            sortOrder: sortOrder,
+            filters: filters
+        });
+        this.props.expenseActions(new PageParams(page - 1, sizePerPage, sortField, sortOrder, filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
     };
 
-    updateExpense(entity) {
-        updateExpense(entity).then(() => {
-            this.props.expenseActions(new PageParams(this.props.expenses.number, this.props.expenses.size));
-            this.setState({
-                openUpdate: false,
-                row: undefined
-            });
+    accept() {
+        this.props.expenseActions(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+        this.setState({
+            openUpdate: false,
+            openCreate: false,
+            row: undefined,
+            error: undefined
         });
     };
 
-    createExpense(entity) {
-        createExpense(entity).then(() => {
-            this.props.expenseActions(new PageParams(this.props.expenses.number, this.props.expenses.size));
-            this.setState({
-                openCreate: false
-            });
+    handleChangeStartDate = (newValue) => {
+        this.props.expenseActions(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+        this.setState({
+            start: newValue
         });
     };
+
+    handleChangeEndDate = (newValue) => {
+        this.props.expenseActions(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'));
+        this.setState({
+            end: newValue
+        });
+    };
+
+    export() {
+        getExpensesReport(new PageParams(
+            this.props.expenses.number,
+            this.props.expenses.size,
+            this.state.sortField,
+            this.state.sortOrder,
+            this.state.filters),
+            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'));
+    }
 
     render() {
+        const colExpense = [
+            {
+                dataField: 'date',
+                text: 'Дата расхода',
+                sort: true,
+                formatter: (cellContent) => {
+                    return (
+                        <div>
+                            {moment.unix(cellContent).format("DD.MM.YYYY")}
+                        </div>
+                    )
+                }
+            },{
+                dataField: 'master.person.name',
+                text: '',
+                sort: true,
+                filter: selectFilter({
+                    placeholder: 'Мастер',
+                    style: {
+                        backgroundColor: '#e4e4e1'
+                    },
+                    options: this.state.masterOptions
+                })
+            },
+            {
+                dataField: 'product.description',
+                text: '',
+                sort: true,
+                filter: selectFilter({
+                    placeholder: 'Товар',
+                    style: {
+                        backgroundColor: '#e4e4e1'
+                    },
+                    options: this.state.productOptions
+                })
+            },
+            {
+                dataField: 'countProduct',
+                text: 'Количество товара'
+            }
+        ];
         return (
             <div className="main-div">
-                {this.props.expenses ? <TableRemote data={this.props.expenses.content}
-                                                   page={this.props.expenses.number + 1}
+                <div className="container" >
+                    <div className="row">
+                        <div className="col-sm-2 title-margin-date">
+                            c
+                        </div>
+                        <div className="col-sm">
+                            <DayPickerInput
+                                placeholder={``}
+                                parseDate={parseDate}
+                                formatDate={formatDate}
+                                value={this.state.start}
+                                onDayChange={this.handleChangeStartDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils
+                                }}
+                            />
+                        </div>
+                        <div className="col-sm-2 title-margin-date">
+                            по
+                        </div>
+                        <div className="col-sm">
+                            <DayPickerInput
+                                placeholder={``}
+                                parseDate={parseDate}
+                                formatDate={formatDate}
+                                value={this.state.end}
+                                onDayChange={this.handleChangeEndDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <TableRemote data={this.props.expenses ? this.props.expenses.content : []}
+                                                   page={this.props.expenses ? this.props.expenses.number + 1 : 1}
                                                    columns={colExpense}
                                                    entity="расход"
-                                                   sizePerPage={this.props.expenses.size}
-                                                   remove={this.onOpenDeleteModal}
+                                                   buttonCreateTitle='Создание нового расхода'
+                                                   buttonEditTitle='Изменение расхода'
+                                                   sizePerPage={this.props.expenses ? this.props.expenses.size : 0}
                                                    update={this.onOpenUpdateModal}
                                                    create={this.onOpenCreateModal}
-                                                   totalSize={this.props.expenses.totalElements}
+                                                   isExport={true}
+                                                   export={this.export}
+                                                   totalSize={this.props.expenses ? this.props.expenses.totalElements : 0}
                                                    onTableChange={this.handleTableChange}/>
-                    : null}
 
-                {this.state.row ? <ExpenseModal accept={this.updateExpense}
+                {this.state.row ? <ExpenseModal accept={this.accept}
                              open={this.state.openUpdate}
+                             isCreate={false}
                              update={this.state.row}
                              close={this.onCloseUpdateModal} />: null}
 
-                <ExpenseModal accept={this.createExpense}
-                             open={this.state.openCreate}
+                <ExpenseModal accept={this.accept}
+                             open={this.state.openCreate} isCreate={true}
                              close={this.onCloseCreateModal} />
             </div>
         );

@@ -6,8 +6,8 @@ import filterFactory from 'react-bootstrap-table2-filter';
 
 class TableRemote extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             select: undefined
         };
@@ -25,10 +25,16 @@ class TableRemote extends Component {
 
     removeEntity() {
         this.props.remove(this.state.select.id);
+        this.setState({
+            select: undefined
+        })
     };
 
     updateEntity() {
         this.props.update(this.state.select);
+        this.setState({
+            select: undefined
+        })
     };
 
     createEntity() {
@@ -47,14 +53,17 @@ class TableRemote extends Component {
             <div>
                 <div className="button-group">
                     <button onClick = { this.createEntity } className="btn btn-primary">
-                        Добавить нового {this.props.entity}
+                        {this.props.buttonCreateTitle}
                     </button>
                     { this.state.select ? <button onClick = { this.updateEntity } className="btn btn-primary">
-                        Редактировать {this.props.entity}
+                        {this.props.buttonEditTitle}
+                    </button>: null }
+                    { this.props.isExport ? <button onClick = { this.props.export } className="btn btn-primary">
+                        Выгрузить
                     </button>: null }
                 </div>
                 <hr/>
-                { this.props.data.length > 0 ? <BootstrapTable
+                <BootstrapTable
                     remote
                     keyField="id"
                     data={this.props.data}
@@ -67,7 +76,7 @@ class TableRemote extends Component {
                         totalSize: this.props.totalSize
                     })}
                     onTableChange={this.props.onTableChange}
-                /> : null }
+                />
             </div>
         );
     }

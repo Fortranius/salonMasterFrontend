@@ -94,8 +94,10 @@ class Masters extends Component {
     updateMaster(entity) {
         let master = this.state.row;
         master.person = entity.person;
-        master.services = entity.services;
+        master.procedures = entity.procedures;
         master.type = entity.type;
+        master.workingDay = entity.workingDay;
+        master.startDateWork = entity.startDateWork;
         updateMaster(master).then(() => {
             this.props.masterActions(new PageParams(this.props.masters.number, this.props.masters.size));
             this.setState({
@@ -121,6 +123,8 @@ class Masters extends Component {
                                                    page={this.props.masters.number + 1}
                                                    columns={colMaster}
                                                    entity="мастера"
+                                                   buttonCreateTitle='Создание нового мастера'
+                                                   buttonEditTitle='Изменение мастера'
                                                    sizePerPage={this.props.masters.size}
                                                    remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}

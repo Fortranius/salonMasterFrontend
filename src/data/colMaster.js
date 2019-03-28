@@ -1,4 +1,6 @@
 import React from 'react';
+import {typeMasterFormatter, typeMAsterWorkingDayFormatter} from "../data/formatter";
+import moment from 'moment'
 
 function phoneFormatter(cell, row) {
     if (row.person.phone) {
@@ -18,11 +20,25 @@ function phoneFormatter(cell, row) {
     );
 }
 
+function type(cell) {
+    return (
+        <span>{typeMasterFormatter(cell)}</span>
+    );
+}
+
+function workingDay(cell) {
+    return (
+        <span>{typeMAsterWorkingDayFormatter(cell)}</span>
+    );
+}
+
+function dateFormatter(cell) {
+    return (
+        <span>{moment.unix(cell).toDate().toLocaleDateString()}</span>
+    );
+}
+
 export default [
-    {
-        dataField: 'id',
-        text: 'ID'
-    },
     {
         dataField: 'person.name',
         text: 'Имя'
@@ -38,6 +54,17 @@ export default [
     },
     {
         dataField: 'type',
-        text: 'Категория'
+        text: 'Категория',
+        formatter: type
+    },
+    {
+        dataField: 'startDateWork',
+        text: 'Дата начала работы',
+        formatter: dateFormatter
+    },
+    {
+        dataField: 'workingDay',
+        text: 'График',
+        formatter: workingDay
     }
 ]

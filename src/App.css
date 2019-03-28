@@ -50,11 +50,6 @@
   width: 100px;
 }
 
-.selectMasterTypeStyle {
-  border: none;
-  width: 400px;
-}
-
 .quote {
   margin: 10px;
 }
@@ -94,11 +89,13 @@
 }
 
 .login-form {
-  margin-left: 40%;
-  margin-right: 40%;
+  margin-left: 35%;
+  margin-right: 35%;
 }
 .login-div {
   width: 100%;
+  padding-top: 40px;
+  padding-right: 190px;
 }
 
 .react-calendar__navigation button {
@@ -244,7 +241,7 @@ nav {
 }
 
 .sidenav---sidenav---_2tBP {
-  background: #2b4f3e !important;
+  background: #383e3b !important
 }
 
 .modal-div {
@@ -282,6 +279,9 @@ li a:hover {
   width: 1000px;
 }
 
+.add_master_modal {
+  width: 600px;
+}
 .btn-primary {
   background-color: #9c9e9f;
   border: none;
@@ -361,10 +361,33 @@ h2 {
 }
 
 .logo-image {
-  height: 50px;
   width: 50px;
+}
+
+.logo-span {
+  margin: 10px;
+  text-align: center;
+  font-style: italic;
 }
 
 .react-autosuggest__suggestions-list {
   width: 100%;
+}
+
+.error_label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+  font-size: 22px;
+}
+
+.dashboard {
+  height: 300px;
+}
+div[aria-describedby="startDateWork-error-text"] {
+  margin-top: 2px !important;
+}
+.UpdateModal-formControl-3 {
+  margin-top: 2px !important;
 }

@@ -7,9 +7,13 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import ServiceList from './components/ServiceItem';
-import masterTypeOptions from "../data/masterTypeOptions";
 import Select from 'react-select';
+import {getProcedures} from "../service/procedureService";
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
+import {typeMasterFormatter, typeMAsterWorkingDayFormatter} from "../data/formatter";
+import moment from "moment/moment";
+import {masterTypeOptions, masterWorkOptions} from "../data/selectOptions";
 
 const styles = theme => ({
     container: {
@@ -57,60 +61,69 @@ function NumberFormatCustomPhone(props) {
     );
 }
 
-function NumberFormatCustomSum(props) {
-    const { inputRef, onChange, ...other } = props;
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={inputRef}
-            onValueChange={values => {
-                onChange({
-                    target: {
-                        value: values.value,
-                    },
-                });
-            }}
-            thousandSeparator={' '}
-        />
-    );
-}
-
 class UpdateModal extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             person: {
                 phone: '',
                 name:'',
                 mail:''
             },
-            service: {
+            procedure: {
                 description: '',
                 minPrice: 0,
                 maxPrice: 0
             },
             type: '',
             selectType: undefined,
-            services: [],
+            procedures: [],
             submit: false,
-            submitService: false
+            submitProcedure: false,
+            selectedProcedures: [],
+            optionProcedures: [],
+            startDateWork: new Date(),
+            workingDay: '',
+            selectWorkingDay: undefined
+
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangePerson = this.handleChangePerson.bind(this);
-        this.handleChangeService = this.handleChangeService.bind(this);
+
+        getProcedures().then(data => {
+            let procedures = data.map(procedure => {
+                return { value: procedure.id, label: procedure.description, procedure: procedure };
+            });
+            this.setState({
+                optionProcedures: procedures
+            });
+        });
     }
 
     componentDidMount() {
         if (this.props.update) {
-            let selectType = undefined;
-            if (this.props.update.type)
+            let selectedProcedures = [];
+            if (this.props.update.procedures)
+                selectedProcedures = this.props.update.procedures.map(procedure => {
+                    return { value: procedure.id, label: procedure.description, procedure: procedure };
+                });
+            let selectType, selectWorkingDay = undefined;
+            if (this.props.update.type) {
                 selectType = {
                     value: this.props.update.type,
-                    label: this.props.update.type
+                    label: typeMasterFormatter(this.props.update.type)
                 };
+
+            }
+            if (this.props.update.workingDay) {
+                selectWorkingDay = {
+                    value: this.props.update.workingDay,
+                    label: typeMAsterWorkingDayFormatter(this.props.update.workingDay)
+                };
+            }
             this.setState({
                 person: {
                     phone: this.props.update.person.phone ? this.props.update.person.phone : '',
@@ -119,7 +132,11 @@ class UpdateModal extends Component {
                 },
                 type: this.props.update.type ? this.props.update.type : '',
                 selectType: selectType,
-                services: this.props.update.services
+                procedures: this.props.update.procedures,
+                selectedProcedures: selectedProcedures,
+                selectWorkingDay: selectWorkingDay,
+                workingDay: this.props.update.workingDay,
+                startDateWork: this.props.update.startDateWork ? moment.unix(this.props.update.startDateWork).toDate() : new Date(),
             });
         }
     }
@@ -132,15 +149,19 @@ class UpdateModal extends Component {
                 mail:''
             },
             type: '',
-            services:[],
-            service: {
+            procedures:[],
+            procedure: {
                 description: '',
                 minPrice: 0,
                 maxPrice: 0
             },
             selectType: undefined,
             submit: false,
-            submitService: false
+            submitProcedure: false,
+            selectedProcedures: [],
+            startDateWork: new Date(),
+            workingDay: '',
+            selectWorkingDay: undefined
         });
     }
 
@@ -156,7 +177,7 @@ class UpdateModal extends Component {
         });
         if (this.state.person.name
             && this.state.person.phone.length === 10
-            && ((this.state.services && this.state.services.length>0)
+            && ((this.state.procedures && this.state.procedures.length>0)
                 || this.props.entity !== 'мастера')) {
             this.props.accept(this.state);
             this.clear();
@@ -178,15 +199,6 @@ class UpdateModal extends Component {
         });
     };
 
-    handleChangeService = name => event => {
-        this.setState({
-            service: {
-                ...this.state.service,
-                [name]: event.target.value
-            }
-        });
-    };
-
     validate(field) {
         if (!this.state.submit)
             return false;
@@ -195,48 +207,45 @@ class UpdateModal extends Component {
         return (!this.state.person || !this.state.person[field]);
     };
 
+    validateProcedures() {
+        if (!this.state.submit)
+            return false;
+        return (!this.state || !this.state.procedures || this.state.procedures.length === 0);
+    }
+
     validateState(field) {
         if (!this.state.submit)
             return false;
         return (!this.state || !this.state[field]);
     };
 
-    validateService(field) {
-        if (!this.state.submitService)
-            return false;
-        return (!this.state.service || !this.state.service[field]);
-    };
-
-    removeService = (serviceIndex)  => {
-        let array = [...this.state.services];
-        array.splice(serviceIndex, 1);
-        this.setState({services: array});
-    };
-
-    addService = ()  => {
-        this.setState({
-            submitService: true
-        });
-        if (this.state.service.description
-            && this.state.service.minPrice) {
-            let services = this.state.services;
-            services.push(this.state.service);
-            this.setState({
-                services: services,
-                service: {
-                    description: '',
-                    minPrice: 0,
-                    maxPrice: 0
-                },
-                submitService:false
-            });
-        }
-    };
-
     handleChangeTypeMaster = (newValue) => {
         this.setState({
             type: newValue.value,
             selectType: newValue
+        });
+    };
+
+    handleChangeWorkingDay = (newValue) => {
+        this.setState({
+            workingDay: newValue.value,
+            selectWorkingDay: newValue
+        });
+    };
+
+    handleChangeProcedures = (selectedProcedures) => {
+        let procedures = selectedProcedures.map(option => {
+            return option.procedure;
+        });
+        this.setState({
+            selectedProcedures: selectedProcedures,
+            procedures: procedures
+        });
+    };
+
+    handleChangeDate = (newValue) => {
+        this.setState({
+            startDateWork: newValue
         });
     };
 
@@ -272,43 +281,74 @@ class UpdateModal extends Component {
                             { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
                         </FormControl> : null}
                     </div>
-                    { this.props.entity === 'мастера' ? <FormControl className={classes.formControl} error={this.validateState('type')} aria-describedby="type-error-text">
-                        <InputLabel htmlFor="type">Категория</InputLabel>
-                        <Select
-                            value={this.state.selectType}
-                            options={masterTypeOptions}
-                            placeholder={'Выберите категорию'}
-                            onChange={this.handleChangeTypeMaster}
-                            className='selectMasterTypeStyle'
-                        />
-                        { this.validateState('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
-                    </FormControl> : null}
-                    <hr/>
-                    { this.props.entity === 'мастера' ? <div>
-                        <div className="row">
-                            <div className="col-sm">
-                                Услуги мастера:
-                            </div>
+                    { this.props.entity === 'мастера' ?  <hr/> : null}
+                    { this.props.entity === 'мастера' ? <div className="row">
+                        <div className="col-sm-2">
+                            Дата начала работы:
                         </div>
-                        <ServiceList services={this.state.services} isRemove={!this.props.update} removeService={this.removeService}/>
-                        <div className={classes.container}>
-                            <FormControl className={classes.formControl} error={this.validateService('description')} aria-describedby="description-error-text">
-                                <InputLabel htmlFor="description">Описание</InputLabel>
-                                <Input id="description" value={this.state.service.description} onChange={this.handleChangeService('description')} />
-                                { this.validateService('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
+                        <div className="col-sm-4">
+                            <DayPickerInput
+                                placeholder={``}
+                                parseDate={parseDate}
+                                value={this.state.startDateWork}
+                                onDayChange={this.handleChangeDate}
+                                formatDate={formatDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils,
+                                }}/>
+                            <FormControl className={classes.formControl} error={this.validateState('startDateWork')} aria-describedby="startDateWork-error-text">
+                                { this.validateState('startDateWork') ? <FormHelperText id="startDateWork-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
-                            <FormControl className={classes.formControl} error={this.validateService('minPrice')} aria-describedby="minPrice-error-text">
-                                <InputLabel htmlFor="minPrice">Минимальная цена (руб.)</InputLabel>
-                                <Input id="minPrice" value={this.state.service.minPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('minPrice')} />
-                                { this.validateService('minPrice') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
-                            </FormControl>
-                            <FormControl className={classes.formControl} aria-describedby="maxPrice-error-text">
-                                <InputLabel htmlFor="maxPrice">Максимальная цена (руб.)</InputLabel>
-                                <Input id="maxPrice" value={this.state.service.maxPrice} inputComponent={NumberFormatCustomSum} onChange={this.handleChangeService('maxPrice')} />
-                            </FormControl>
-                            <button className="btn btn-default add-service-button" onClick={this.addService}>+</button>
                         </div>
-                    </div>: null}
+                        <div className="col-sm-2">
+                            График работы:
+                        </div>
+                        <div className="col-sm-4">
+                            <Select
+                                value={this.state.selectWorkingDay}
+                                options={masterWorkOptions()}
+                                placeholder={'Выберите график'}
+                                onChange={this.handleChangeWorkingDay}
+                            />
+                            <FormControl className={classes.formControl} error={this.validateState('workingDay')} aria-describedby="workingDay-error-text">
+                                { this.validateState('workingDay') ? <FormHelperText id="workingDay-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                    </div> : null}
+
+                    { this.props.entity === 'мастера' ? <div className="row">
+                        <div className="col-sm-2">
+                            Категория мастера:
+                        </div>
+                        <div className="col-sm-4">
+                            <Select
+                                value={this.state.selectType}
+                                options={masterTypeOptions()}
+                                placeholder={'Выберите категорию'}
+                                onChange={this.handleChangeTypeMaster}
+                            />
+                            <FormControl className={classes.formControl} error={this.validateState('type')} aria-describedby="type-error-text">
+                                { this.validateState('type') ? <FormHelperText id="type-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                        <div className="col-sm-2">
+                            Услуги мастера:
+                        </div>
+                        <div className="col-sm-4">
+                            <Select id="procedures"
+                                    isMulti
+                                    closeMenuOnSelect={false}
+                                    value={this.state.selectedProcedures}
+                                    onChange={this.handleChangeProcedures}
+                                    placeholder="Выберите услуги"
+                                    options={this.state.optionProcedures}
+                            />
+                            <FormControl className={classes.formControl} error={this.validateProcedures()} aria-describedby="procedures-error-text">
+                                { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
+                        </div>
+                    </div> : null}
                     <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>

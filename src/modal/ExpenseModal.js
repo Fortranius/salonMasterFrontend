@@ -12,6 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import moment from "moment/moment";
+import {createExpense, updateExpense} from "../service/expenseService";
 
 const styles = theme => ({
     container: {
@@ -59,8 +60,8 @@ async function getOptionExpensesByDescription(search, loadedOptions) {
 
 class ExpenseModal extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             id: undefined,
             date: new Date(),
@@ -69,13 +70,15 @@ class ExpenseModal extends Component {
             selectProductByDescription: undefined,
             selectMasterFio: undefined,
             countProduct: 1,
-            submit: false
+            submit: false,
+            error: undefined
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleInputProductChange = this.handleInputProductChange.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeCountProduct = this.handleChangeCountProduct.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
     }
 
@@ -96,7 +99,8 @@ class ExpenseModal extends Component {
                     value: this.props.update.product.id,
                     label: this.props.update.product.description,
                     product: this.props.update.product
-                }
+                },
+                error: undefined
             });
         }
     }
@@ -110,7 +114,8 @@ class ExpenseModal extends Component {
             selectProductByDescription: undefined,
             selectMasterFio: undefined,
             countProduct: 1,
-            submit: false
+            submit: false,
+            error: undefined
         });
     }
 
@@ -125,6 +130,7 @@ class ExpenseModal extends Component {
             submit: true
         });
         if (this.state.selectProduct
+            && this.state.countProduct>0
             && this.state.selectMaster
             && this.state.date) {
             let expense = {
@@ -134,9 +140,35 @@ class ExpenseModal extends Component {
                 master: this.state.selectMaster,
                 countProduct: this.state.countProduct
             };
-            this.props.accept(expense);
-            this.clear();
+            if (this.props.isCreate) this.createExpense(expense);
+            else this.updateExpense(expense);
         }
+    };
+
+    updateExpense(entity) {
+        updateExpense(entity).then(resp => {
+            if (resp.status === 400) {
+                this.setState({
+                    error: 'На складе отсутсвует введенное количество товара'
+                });
+                return false;
+            }
+            this.props.accept();
+            this.clear();
+        });
+    };
+
+    createExpense(entity) {
+        createExpense(entity).then(resp => {
+            if (resp.status === 400) {
+                this.setState({
+                    error: 'На складе отсутсвует введенное количество товара'
+                });
+                return false;
+            }
+            this.props.accept();
+            this.clear();
+        });
     };
 
     handleInputProductChange = (newValue) => {
@@ -146,7 +178,8 @@ class ExpenseModal extends Component {
                 value: newValue.value,
                 label: newValue.product.description,
                 product: newValue.product
-            }
+            },
+            error: undefined
         });
     };
 
@@ -161,12 +194,19 @@ class ExpenseModal extends Component {
         });
     };
 
-    handleChange = event => {
+    handleChangeCountProduct = event => {
         if (event.target.value > 0) {
             this.setState({
-                countProduct: event.target.value
+                countProduct: event.target.value,
+                error: undefined
             });
         }
+    };
+
+    handleChange = name => event => {
+        this.setState({
+            [name]: event.target.value
+        });
     };
 
     handleChangeDate = (newValue) => {
@@ -211,10 +251,10 @@ class ExpenseModal extends Component {
                             </div>
                             <div className="col-sm-4">
                                 <TextField InputLabelProps={{ shrink: true }} value={this.state.countProduct}
-                                           onChange={this.handleChange} type="number"/>
+                                           onChange={this.handleChangeCountProduct} type="number"/>
 
-                                <FormControl className={classes.formControl} error={this.validate('selectProduct')} aria-describedby="selectProduct-error-text">
-                                    { this.validate('selectProduct') ? <FormHelperText id="selectProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
+                                <FormControl className={classes.formControl} error={this.validate('countProduct')} aria-describedby="countProduct-error-text">
+                                    { this.validate('countProduct') ? <FormHelperText id="countProduct-error-text">Поле не может быть пустым</FormHelperText>: null }
                                 </FormControl>
                             </div>
                         </div>
@@ -235,26 +275,29 @@ class ExpenseModal extends Component {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-sm-2">
-                                Дата:
-                            </div>
-                            <div className="col-sm">
-                                <DayPickerInput
-                                    placeholder={`Дата расхода`}
-                                    parseDate={parseDate}
-                                    value={this.state.date}
-                                    onDayChange={this.handleChangeDate}
-                                    formatDate={formatDate}
-                                    dayPickerProps={{
-                                        locale: 'ru',
-                                        localeUtils: MomentLocaleUtils,
-                                    }}/>
-                                <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
-                                    { this.validate('date') ? <FormHelperText id="selectMaster-error-text">Поле не может быть пустым</FormHelperText>: null }
-                                </FormControl>
-                            </div>
+                        <div className="col-sm-2">
+                            Дата:
+                        </div>
+                        <div className="col-sm-4">
+                            <DayPickerInput
+                                placeholder={`Дата расхода`}
+                                parseDate={parseDate}
+                                value={this.state.date}
+                                onDayChange={this.handleChangeDate}
+                                formatDate={formatDate}
+                                dayPickerProps={{
+                                    locale: 'ru',
+                                    localeUtils: MomentLocaleUtils,
+                                }}/>
+                            <FormControl className={classes.formControl} error={this.validate('date')} aria-describedby="date-error-text">
+                                { this.validate('date') ? <FormHelperText id="date-error-text">Поле не может быть пустым</FormHelperText>: null }
+                            </FormControl>
                         </div>
                     </div>
+                    </div>
+                    { this.state.error ? <div className="row error_label">
+                        {this.state.error}
+                    </div> : null}
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
                             Сохранить

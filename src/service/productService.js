@@ -16,20 +16,20 @@ export function getProductsByDescription(description) {
         });
 }
 
-export function createProduct(product) {
-    return sendRequest(product, "POST");
+export function createProduct(entity) {
+    return sendRequest(entity, "POST");
 }
 
-export function updateProduct(product) {
-    return sendRequest(product, "PUT");
+export function updateProduct(entity) {
+    return sendRequest(entity, "PUT");
 }
 
-function sendRequest(product, method) {
+function sendRequest(entity, method) {
 
     const options = {
         method: method,
         headers: new Headers({'content-type': 'application/json'}),
-        body: JSON.stringify(product)
+        body: JSON.stringify(entity)
     };
 
     return fetch("http://localhost:8080/api/product", options)

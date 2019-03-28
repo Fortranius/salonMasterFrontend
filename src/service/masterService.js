@@ -16,6 +16,24 @@ export function getAllMasters() {
         });
 }
 
+export function allMastersByWorkDay(date) {
+    return fetch("http://localhost:8080/api/allMastersByWorkDay?date=" + date)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
+export function allMastersByDayOff(date) {
+    return fetch("http://localhost:8080/api/allMastersByDayOff?date=" + date)
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(val => {
+            return val;
+        });
+}
+
 export function getMastersByFiO(name) {
     return fetch("http://localhost:8080/api/masters/name/" + name)
         .then(handleErrors)
@@ -31,20 +49,20 @@ export function removeMaster(master) {
         .then(function(res){ return res })
 }
 
-export function updateMaster(master) {
-    return sendRequest(master, "PUT");
+export function updateMaster(entity) {
+    return sendRequest(entity, "PUT");
 }
 
-export function createMaster(master) {
-    return sendRequest(master, "POST");
+export function createMaster(entity) {
+    return sendRequest(entity, "POST");
 }
 
-function sendRequest(master, method) {
+function sendRequest(entity, method) {
 
     const options = {
         method: method,
         headers: new Headers({'content-type': 'application/json'}),
-        body: JSON.stringify(master)
+        body: JSON.stringify(entity)
     };
 
     return fetch("http://localhost:8080/api/master", options)

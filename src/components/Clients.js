@@ -120,6 +120,8 @@ class Clients extends Component {
                                                    page={this.props.clients.number + 1}
                                                    columns={colClient}
                                                    entity="клиента"
+                                                   buttonCreateTitle='Создание нового клиента'
+                                                   buttonEditTitle='Изменение клиента'
                                                    remove={this.onOpenDeleteModal}
                                                    update={this.onOpenUpdateModal}
                                                    create={this.onOpenCreateModal}
