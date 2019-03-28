@@ -15,7 +15,7 @@ import SideNav, {NavIcon, NavItem, NavText} from '@trendmicro/react-sidenav';
 import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import {Title} from "./model/containers";
 import 'font-awesome/css/font-awesome.min.css';
-import logo from './logo_Lady_Land.png';
+import logo from './logo.jpg';
 import Procedures from "./components/Procedures";
 import Directory from "./components/Directory";
 import Sales from "./components/Sales";
@@ -49,7 +49,7 @@ class App extends Component {
                                 }
                             }}>
                             <SideNav.Nav defaultSelected="">
-                                <Title><img src={logo} className='logo-image'/>Укротители волос</Title>
+                                <Title><img src={logo} className='logo-image'/><span className='logo-span'>Укротители волос</span></Title>
                                 <Calendar onChange={date => history.push("/?date=" + moment(date).format('YYYY-MM-DD HH:mm:ss'))}/>
                                 <NavItem eventKey="">
                                     <NavIcon>

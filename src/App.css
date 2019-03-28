@@ -361,8 +361,13 @@ h2 {
 }
 
 .logo-image {
-  height: 50px;
   width: 50px;
+}
+
+.logo-span {
+  margin: 10px;
+  text-align: center;
+  font-style: italic;
 }
 
 .react-autosuggest__suggestions-list {
