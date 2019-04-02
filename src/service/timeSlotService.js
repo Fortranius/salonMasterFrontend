@@ -21,6 +21,12 @@ export function createTimeSlot(entity) {
     return sendRequest(entity, "POST");
 }
 
+export function deleteTimeSlot(id) {
+    return fetch("http://localhost:8080/api/timeSlot/" + id, {
+        method: 'delete'
+    }).then(res => res);
+}
+
 function sendRequest(entity, method) {
 
     const options = {
@@ -30,7 +36,6 @@ function sendRequest(entity, method) {
     };
 
     return fetch("http://localhost:8080/api/timeSlot", options)
-        .then(handleErrors)
         .then(function(res){ return res })
 }
 
