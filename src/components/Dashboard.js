@@ -9,6 +9,7 @@ import {getMasters, getMastersByFiO} from "../service/masterService";
 import AsyncPaginate from 'react-select-async-paginate';
 import PageParams from "../model/PageParams";
 import {getStatisticMastersReport} from "../service/dashboardService";
+import BootstrapTable from 'react-bootstrap-table-next';
 
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
@@ -34,14 +35,34 @@ class Dashboard extends Component {
             all: undefined,
             start: moment().startOf('month').toDate(),
             end: moment().endOf('month').toDate(),
-            selectMasterFio: undefined
+            selectMasterFio: undefined,
+            data: [],
+            columns: [{
+                dataField: 'day',
+                text: 'Дата'
+            }]
         };
         this.handleChangeStartDate = this.handleChangeStartDate.bind(this);
         this.handleChangeEndDate = this.handleChangeEndDate.bind(this);
 
         getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
-            moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            console.log(data);
 
+            let columns = [
+                    {
+                        dataField: 'day',
+                        text: 'Дата'
+                    },{
+                        dataField: 'master1000.product10001000',
+                        text: 'Дата'
+                    }
+                ];
+
+            this.setState({
+                columns: columns,
+                data: data
+            });
         });
     }
 
@@ -132,7 +153,11 @@ class Dashboard extends Component {
                 </div>
                 <hr/>
                 <div>
-                    <table></table>
+                    <BootstrapTable
+                        keyField="day"
+                        data={this.state.data}
+                        columns={this.state.columns}
+                    />
                 </div>
             </div>
         );
