@@ -60,8 +60,8 @@ class Dashboard extends Component {
                 ];
 
             this.setState({
-                columns: columns,
-                data: data
+                columns: data.columns,
+                data: data.data
             });
         });
     }
