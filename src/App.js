@@ -131,20 +131,20 @@ class App extends Component {
                                         Услуги
                                     </NavText>
                                 </NavItem>
-                                <NavItem eventKey="dashboard">
-                                    <NavIcon>
-                                        <i className="fa fa-bar-chart-o fa-fw" style={{fontSize: '1.75em'}}/>
-                                    </NavIcon>
-                                    <NavText>
-                                        Статистика
-                                    </NavText>
-                                </NavItem>
                                 <NavItem eventKey="directory">
                                     <NavIcon>
                                         <i className="fa fa-book fa-fw" style={{fontSize: '1.75em'}}/>
                                     </NavIcon>
                                     <NavText>
                                         Справочники
+                                    </NavText>
+                                </NavItem>
+                                <NavItem eventKey="dashboard">
+                                    <NavIcon>
+                                        <i className="fa fa-bar-chart-o fa-fw" style={{fontSize: '1.75em'}}/>
+                                    </NavIcon>
+                                    <NavText>
+                                        Статистика
                                     </NavText>
                                 </NavItem>
                                 <NavItem eventKey="logout">

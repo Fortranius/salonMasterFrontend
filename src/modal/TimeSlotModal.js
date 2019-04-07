@@ -22,6 +22,7 @@ import {getAllHairCategories, getAllHairs} from "../service/hairService";
 import HistoryChangeSlot from "../components/HistoryChangeSlot";
 import {hourOptions, minuteOptions} from "../data/selectOptions";
 import {typeMasterFormatter} from "../data/formatter";
+import {createTimeSlot, deleteTimeSlot} from "../service/timeSlotService";
 
 const styles = theme => ({
     container: {
@@ -47,7 +48,6 @@ const styles = theme => ({
 
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
-    console.log(search);
     if (!search) response = await getMasters(new PageParams(0, 100));
     else response = await getMastersByFiO(search);
     let cachedOptions = response.content.map((d) => ({
@@ -135,6 +135,7 @@ class TimeSlotModal extends Component {
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
+        this.delete = this.delete.bind(this);
         this.handleInputMasterChange = this.handleInputMasterChange.bind(this);
         this.handleChangeStartHour = this.handleChangeStartHour.bind(this);
         this.handleChangeStartMinutes = this.handleChangeStartMinutes.bind(this);
@@ -257,6 +258,13 @@ class TimeSlotModal extends Component {
         this.clear();
     };
 
+    delete = () => {
+        deleteTimeSlot(this.state.id).then(() => {
+            this.props.accept();
+            this.clear();
+        });
+    };
+
     accept = () => {
         this.setState({
             submit: true,
@@ -305,8 +313,16 @@ class TimeSlotModal extends Component {
             procedures: this.state.procedures,
             hair: this.state.selectedHair ? this.state.selectedHair.hair : undefined
         };
-        this.props.accept(timeSlot);
-        this.clear();
+        createTimeSlot(timeSlot).then(resp => {
+            if (resp.status === 400) {
+                this.setState({
+                    error: 'На складе отсутсвует введенное количество товара'
+                });
+                return false;
+            }
+            this.props.accept();
+            this.clear();
+        });
     };
 
     clear() {
@@ -407,11 +423,13 @@ class TimeSlotModal extends Component {
         if (name==='hairWeight') hairWeight=event.target.value;
         if (name==='hairCountRemoval') hairCountRemoval=event.target.value;
 
-        if (this.state.selectedHair) this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
-            .forEach(hairCategory => {
-                allSum = allSum + hairCategory.price*hairCountExtension + this.state.selectedHair.hair.price*hairWeight;
-                masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
-            });
+        if (this.state.selectedHair) {
+            this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+                .forEach(hairCategory => {
+                    allSum = allSum + hairCategory.price * hairCountExtension + this.state.selectedHair.hair.price * hairWeight;
+                    masterWorkSum = masterWorkSum + hairCategory.price * hairCountExtension;
+                });
+        }
         this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*hairCountRemoval;
@@ -449,7 +467,7 @@ class TimeSlotModal extends Component {
     }
 
     onClientsFetchRequestedByName = ({ value }) => {
-        getClientsByFiO(value).then(clients => {
+        if (value && value.length>3) getClientsByFiO(value).then(clients => {
             let options = clients.map(client => {
                 return {
                     title: '+7 (' + client.person.phone.substring(0,3) + ') '
@@ -473,7 +491,7 @@ class TimeSlotModal extends Component {
         else phone = value.substring(4);
         phone = phone.replace(/[.*-+?^${}()|[\]\\\s]/g, '');
         phone = phone.substring(0, 10);
-        if (phone) getClientsByPhone(phone).then(clients => {
+        if (phone && phone.length>3) getClientsByPhone(phone).then(clients => {
             let options = clients.map(client => {
                 return {
                     title: '+7 (' + client.person.phone.substring(0,3) + ') '
@@ -506,7 +524,7 @@ class TimeSlotModal extends Component {
     };
 
     onChangeClientPhone = (event, { newValue }) => {
-        let phone = '';
+        let phone = newValue;
         if (newValue.length === 1) phone = '+7 (' + newValue;
         else if (newValue.length === 7) phone = newValue + ") ";
         else if (newValue.length === 12) phone = newValue + " ";
@@ -816,6 +834,9 @@ class TimeSlotModal extends Component {
                                                     placeholder="Выберите категорию волос"
                                                     options={this.state.optionHairs}
                                             />
+                                            { this.state.error ? <div className="row error_label error_label_slot">
+                                                {this.state.error}
+                                            </div> : null}
                                             <FormControl className={classes.formControlHairs} error={this.validate('selectedHair')} aria-describedby="selectedHair-error-text">
                                                 { this.validate('selectedHair') ? <FormHelperText id="selectedHair-error-text">Поле не может быть пустым</FormHelperText>: null }
                                             </FormControl>
@@ -910,6 +931,9 @@ class TimeSlotModal extends Component {
                         <button className="btn btn-primary" onClick={this.refused}>
                             Отмена
                         </button>
+                        {this.state.id ? <button className="btn btn-primary" onClick={this.delete}>
+                            Удалить
+                        </button> : null}
                     </div>
                 </Modal>
             </div>

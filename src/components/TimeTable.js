@@ -3,7 +3,7 @@ import '../App.css';
 import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
 import TimeSlotModal from "../modal/TimeSlotModal";
-import {createTimeSlot, getTimeSlotsByDate} from "../service/timeSlotService";
+import {getTimeSlotsByDate} from "../service/timeSlotService";
 import 'moment/locale/ru';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -136,13 +136,11 @@ class TimeTable extends Component {
         });
     };
 
-    saveTimeSlot(timeSlot) {
-        createTimeSlot(timeSlot).then(() => {
-            this.setTimeSlots(this.state.startWeek, this.state.endWeek);
-            this.setState({
-                open: false,
-                event: {}
-            });
+    saveTimeSlot() {
+        this.setTimeSlots(this.state.startWeek, this.state.endWeek);
+        this.setState({
+            open: false,
+            event: {}
         });
     };
 

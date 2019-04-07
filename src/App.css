@@ -382,6 +382,10 @@ h2 {
   font-size: 22px;
 }
 
+.error_label_slot {
+  margin-top: 5px;
+}
+
 .dashboard {
   height: 300px;
 }
