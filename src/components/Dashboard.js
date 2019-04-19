@@ -9,7 +9,7 @@ import {getMasters, getMastersByFiO} from "../service/masterService";
 import AsyncPaginate from 'react-select-async-paginate';
 import PageParams from "../model/PageParams";
 import {getStatisticMastersReport} from "../service/dashboardService";
-import BootstrapTable from 'react-bootstrap-table-next';
+import ReactTable from 'react-table'
 
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
@@ -47,18 +47,6 @@ class Dashboard extends Component {
 
         getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
             moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss')).then(data => {
-            console.log(data);
-
-            let columns = [
-                    {
-                        dataField: 'day',
-                        text: 'Дата'
-                    },{
-                        dataField: 'master1000.product10001000',
-                        text: 'Дата'
-                    }
-                ];
-
             this.setState({
                 columns: data.columns,
                 data: data.data
@@ -67,14 +55,24 @@ class Dashboard extends Component {
     }
 
     handleChangeStartDate = (newValue) => {
-        this.setState({
-            start: newValue
+        getStatisticMastersReport(moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            this.setState({
+                columns: data.columns,
+                data: data.data,
+                start: newValue
+            });
         });
     };
 
     handleChangeEndDate = (newValue) => {
-        this.setState({
-            end: newValue
+        getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(newValue)).set({hour:23,minute:59,second:59,millisecond:0}).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            this.setState({
+                columns: data.columns,
+                data: data.data,
+                end: newValue
+            });
         });
     };
 
@@ -84,13 +82,18 @@ class Dashboard extends Component {
     };
 
     handleInputMasterChange = (newValue) => {
-        this.setState({
-            selectMaster: newValue.master,
-            selectMasterFio: {
-                value: newValue.value,
-                label: newValue.master.person.name,
-                master: newValue.master
-            }
+        getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'), newValue.master).then(data => {
+            this.setState({
+                columns: data.columns,
+                data: data.data,
+                selectMaster: newValue.master,
+                selectMasterFio: {
+                    value: newValue.value,
+                    label: newValue.master.person.name,
+                    master: newValue.master
+                }
+            });
         });
     };
 
@@ -153,8 +156,7 @@ class Dashboard extends Component {
                 </div>
                 <hr/>
                 <div>
-                    <BootstrapTable
-                        keyField="day"
+                    <ReactTable
                         data={this.state.data}
                         columns={this.state.columns}
                     />
