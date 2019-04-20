@@ -8,8 +8,10 @@ import {getMastersReport} from "../service/reportService";
 import {getMasters, getMastersByFiO} from "../service/masterService";
 import AsyncPaginate from 'react-select-async-paginate';
 import PageParams from "../model/PageParams";
-import {getStatisticMastersReport} from "../service/dashboardService";
+import {getIncomesBetweenDate, getStatisticMastersReport} from "../service/dashboardService";
 import ReactTable from 'react-table'
+import {reportOptions} from "../data/selectOptions";
+import Select from 'react-select';
 
 async function getOptionMastersByFIO(search, loadedOptions) {
     let response;
@@ -40,38 +42,45 @@ class Dashboard extends Component {
             columns: [{
                 dataField: 'day',
                 text: 'Дата'
-            }]
+            }],
+            pageSize: 30,
+            reportType: undefined,
+            report: 0
         };
         this.handleChangeStartDate = this.handleChangeStartDate.bind(this);
         this.handleChangeEndDate = this.handleChangeEndDate.bind(this);
 
         getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
-            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'), this.state.report).then(data => {
             this.setState({
                 columns: data.columns,
-                data: data.data
+                data: data.data,
+                pageSize: data.data.length + 1
             });
         });
     }
 
     handleChangeStartDate = (newValue) => {
         getStatisticMastersReport(moment(new Date(newValue)).format('YYYY-MM-DD HH:mm:ss'),
-            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'), this.state.report).then(data => {
             this.setState({
                 columns: data.columns,
                 data: data.data,
-                start: newValue
+                start: newValue,
+                pageSize: data.data.length + 1
             });
         });
     };
 
     handleChangeEndDate = (newValue) => {
         getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
-            moment(new Date(newValue)).set({hour:23,minute:59,second:59,millisecond:0}).format('YYYY-MM-DD HH:mm:ss')).then(data => {
+            moment(new Date(newValue)).set({hour:23,minute:59,second:59,millisecond:0}).format('YYYY-MM-DD HH:mm:ss'),
+            this.state.report).then(data => {
             this.setState({
                 columns: data.columns,
                 data: data.data,
-                end: newValue
+                end: newValue,
+                pageSize: data.data.length + 1
             });
         });
     };
@@ -83,16 +92,30 @@ class Dashboard extends Component {
 
     handleInputMasterChange = (newValue) => {
         getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
-            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'), newValue.master).then(data => {
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'), this.state.report, newValue.master).then(data => {
             this.setState({
                 columns: data.columns,
                 data: data.data,
+                pageSize: data.data.length + 1,
                 selectMaster: newValue.master,
                 selectMasterFio: {
                     value: newValue.value,
                     label: newValue.master.person.name,
                     master: newValue.master
                 }
+            });
+        });
+    };
+
+    handleChangeReport = (newValue) => {
+        getStatisticMastersReport(moment(new Date(this.state.start)).format('YYYY-MM-DD HH:mm:ss'),
+            moment(new Date(this.state.end)).format('YYYY-MM-DD HH:mm:ss'), newValue.value, this.state.selectMaster).then(data => {
+            this.setState({
+                columns: data.columns,
+                data: data.data,
+                pageSize: data.data.length + 1,
+                reportType: newValue,
+                report: newValue.value
             });
         });
     };
@@ -150,15 +173,34 @@ class Dashboard extends Component {
                 </div>
                 <hr/>
                 <div>
-                    <button onClick = { this.export } className="btn btn-primary">
-                        Выгрузить сводный отчет
-                    </button>
+                    <div className="container" >
+                        <div className="row">
+                            <div className="col-sm-3 title-margin-date">
+                                <button onClick = { this.export } className="btn btn-primary">
+                                    Выгрузить сводный отчет
+                                </button>
+                            </div>
+                            <div className="col-sm-1  title-margin-date">
+                                Отчет:
+                            </div>
+                            <div className="col-sm-4">
+                                <Select
+                                    value={this.state.reportType}
+                                    options={reportOptions()}
+                                    placeholder={''}
+                                    onChange={this.handleChangeReport}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <hr/>
                 <div>
                     <ReactTable
                         data={this.state.data}
                         columns={this.state.columns}
+                        showPagination={false}
+                        pageSize={this.state.pageSize}
                     />
                 </div>
             </div>

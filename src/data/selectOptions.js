@@ -1,3 +1,10 @@
+export function reportOptions() {
+    return [
+        { value: 0, label: 'Отчет по мастерам' },
+        { value: 1, label: 'Отчет по прибыли' }
+    ];
+}
+
 export function hourOptions() {
     return [
         { value: 10, label: '10' },
