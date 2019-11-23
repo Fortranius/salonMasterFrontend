@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getTimeSlotsByDate(start, end) {
-    return fetch("http://localhost:8080/api/timeSlotsByDate?start=" + start +
+    return fetch("getUrl() + /api/timeSlotsByDate?start=" + start +
         "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
@@ -9,7 +11,7 @@ export function getTimeSlotsByDate(start, end) {
 }
 
 export function getTimeSlotsByClientId(clientId) {
-    return fetch("http://localhost:8080/api/timeSlotsByClientId?clientId=" + clientId)
+    return fetch(getUrl() + "/api/timeSlotsByClientId?clientId=" + clientId)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -22,7 +24,7 @@ export function createTimeSlot(entity) {
 }
 
 export function deleteTimeSlot(id) {
-    return fetch("http://localhost:8080/api/timeSlot/" + id, {
+    return fetch(getUrl() + "/api/timeSlot/" + id, {
         method: 'delete'
     }).then(res => res);
 }
@@ -35,7 +37,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/timeSlot", options)
+    return fetch(getUrl() + "/api/timeSlot", options)
         .then(function(res){ return res })
 }
 

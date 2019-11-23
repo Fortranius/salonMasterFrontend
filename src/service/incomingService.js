@@ -1,7 +1,9 @@
+import {getUrl} from "./mainUrl";
+
 export function getIncomings(params, start, end) {
     let sort = params.sortField ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
     let filterProduct= params.filters && params.filters['product.description'] ? "&productId=" + params.filters['product.description'].filterVal : '';
-    return fetch("http://localhost:8080/api/incomings?page=" + params.page
+    return fetch(getUrl() + "/api/incomings?page=" + params.page
         + "&size=" + params.size + sort + filterProduct + "&start=" + start + "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
@@ -26,7 +28,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/incoming", options)
+    return fetch(getUrl() + "/api/incoming", options)
         .then(function(res){ return res })
 }
 

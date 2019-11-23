@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getProducts() {
-    return fetch("http://localhost:8080/api/products")
+    return fetch(getUrl() + "/api/products")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -8,7 +10,7 @@ export function getProducts() {
 }
 
 export function getProductsByDescription(description) {
-    return fetch("http://localhost:8080/api/products/description/" + description)
+    return fetch(getUrl() + "/api/products/description/" + description)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -32,7 +34,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/product", options)
+    return fetch(getUrl() + "/api/product", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }

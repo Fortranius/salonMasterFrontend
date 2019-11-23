@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getMasters(params) {
-    return fetch("http://localhost:8080/api/masters?page=" + params.page + "&size=" + params.size)
+    return fetch(getUrl() + "/api/masters?page=" + params.page + "&size=" + params.size)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -8,7 +10,7 @@ export function getMasters(params) {
 }
 
 export function getAllMasters() {
-    return fetch("http://localhost:8080/api/allMasters")
+    return fetch(getUrl() + "/api/allMasters")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -17,7 +19,7 @@ export function getAllMasters() {
 }
 
 export function allMastersByWorkDay(date) {
-    return fetch("http://localhost:8080/api/allMastersByWorkDay?date=" + date)
+    return fetch(getUrl() + "/api/allMastersByWorkDay?date=" + date)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -26,7 +28,7 @@ export function allMastersByWorkDay(date) {
 }
 
 export function allMastersByDayOff(date) {
-    return fetch("http://localhost:8080/api/allMastersByDayOff?date=" + date)
+    return fetch(getUrl() + "/api/allMastersByDayOff?date=" + date)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -35,7 +37,7 @@ export function allMastersByDayOff(date) {
 }
 
 export function getMastersByFiO(name) {
-    return fetch("http://localhost:8080/api/masters/name/" + name)
+    return fetch(getUrl() + "/api/masters/name/" + name)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -44,7 +46,7 @@ export function getMastersByFiO(name) {
 }
 
 export function removeMaster(master) {
-    return fetch("http://localhost:8080/api/master/" + master, {method: "DELETE"})
+    return fetch(getUrl() + "/api/master/" + master, {method: "DELETE"})
         .then(handleErrors)
         .then(function(res){ return res })
 }
@@ -65,7 +67,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/master", options)
+    return fetch(getUrl() + "/api/master", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }

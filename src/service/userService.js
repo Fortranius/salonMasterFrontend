@@ -1,3 +1,5 @@
+import {getUrl} from "./mainUrl";
+
 export const userService = {
     login,
     logout
@@ -10,7 +12,7 @@ function login(login, password) {
         body: JSON.stringify({ login, password })
     };
 
-    return fetch(`http://localhost:8080/api/login`, requestOptions)
+    return fetch(getUrl() + `api/login`, requestOptions)
         .then(handleResponse)
         .then(user => {
             if (user) {

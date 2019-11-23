@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getProcedures() {
-    return fetch("http://localhost:8080/api/procedures")
+    return fetch(getUrl() + "/api/procedures")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -23,7 +25,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/procedure", options)
+    return fetch(getUrl() + "/api/procedure", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }

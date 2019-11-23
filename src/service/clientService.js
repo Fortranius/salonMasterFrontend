@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getClients(params) {
-    return fetch("http://localhost:8080/api/clients?page=" + params.page + "&size=" + params.size)
+    return fetch(getUrl() + "/api/clients?page=" + params.page + "&size=" + params.size)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -8,7 +10,7 @@ export function getClients(params) {
 }
 
 export function getClientsByFiO(name) {
-    return fetch("http://localhost:8080/api/clients/name/" + name)
+    return fetch(getUrl() + "/api/clients/name/" + name)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -17,7 +19,7 @@ export function getClientsByFiO(name) {
 }
 
 export function getClientsByPhone(filter) {
-    return fetch("http://localhost:8080/api/clients/phone/" + filter)
+    return fetch(getUrl() + "/api/clients/phone/" + filter)
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -26,7 +28,7 @@ export function getClientsByPhone(filter) {
 }
 
 export function removeClient(clientId) {
-    return fetch("http://localhost:8080/api/client/" + clientId, {method: "DELETE"})
+    return fetch(getUrl() + "/api/client/" + clientId, {method: "DELETE"})
         .then(handleErrors)
         .then(function(res){ return res })
 }
@@ -47,7 +49,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/client", options)
+    return fetch(getUrl() + "/api/client", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }

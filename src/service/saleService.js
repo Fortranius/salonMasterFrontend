@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getSales(params) {
-    return fetch("http://localhost:8080/api/sales?page=" + params.page
+    return fetch(getUrl() + "/api/sales?page=" + params.page
         + "&size=" + params.size)
         .then(handleErrors)
         .then(res => res.json())
@@ -24,7 +26,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/sale", options)
+    return fetch(getUrl() + "/api/sale", options)
         .then(function(res){ return res })
 }
 

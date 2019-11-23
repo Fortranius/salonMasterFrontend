@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getMastersReport(start, end) {
-    return fetch("http://localhost:8080/report/getMastersReport?start=" + start + "&end=" + end)
+    return fetch(getUrl() + "/report/getMastersReport?start=" + start + "&end=" + end)
         .then(handleErrors)
         .then(res => {
             return res.blob();
@@ -16,7 +18,7 @@ export function getExpensesReport(params, start, end) {
     let sort = params.sortOrder ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
     let filterMaster= params.filters && params.filters['master.person.name'] ? "&masterId=" + params.filters['master.person.name'].filterVal : '';
     let filterProduct= params.filters && params.filters['product.description'] ? "&productId=" + params.filters['product.description'].filterVal : '';
-    return fetch("http://localhost:8080/report/getExpensesReport?start=" + start + "&end=" + end + sort + filterMaster + filterProduct)
+    return fetch(getUrl() + "/report/getExpensesReport?start=" + start + "&end=" + end + sort + filterMaster + filterProduct)
         .then(handleErrors)
         .then(res => {
             return res.blob();
@@ -32,7 +34,7 @@ export function getExpensesReport(params, start, end) {
 export function getIncomingReport(params, start, end) {
     let sort = params.sortOrder ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
     let filterProduct= params.filters && params.filters['product.description'] ? "&productId=" + params.filters['product.description'].filterVal : '';
-    return fetch("http://localhost:8080/report/getIncomingReport?start=" + start + "&end=" + end + sort + filterProduct)
+    return fetch(getUrl() + "/report/getIncomingReport?start=" + start + "&end=" + end + sort + filterProduct)
         .then(handleErrors)
         .then(res => {
             return res.blob();
@@ -48,7 +50,7 @@ export function getIncomingReport(params, start, end) {
 export function getAdditionalIncomingReport(params, start, end) {
     let sort = params.sortOrder ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
     let filterMaster= params.filters && params.filters['master.person.name'] ? "&masterId=" + params.filters['master.person.name'].filterVal : '';
-    return fetch("http://localhost:8080/report/getAdditionalIncomingReport?start=" + start + "&end=" + end + sort + filterMaster)
+    return fetch(getUrl() + "/report/getAdditionalIncomingReport?start=" + start + "&end=" + end + sort + filterMaster)
         .then(handleErrors)
         .then(res => {
             return res.blob();

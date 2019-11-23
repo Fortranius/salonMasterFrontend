@@ -1,7 +1,9 @@
+import {getUrl} from "./mainUrl";
+
 export function getAdditionalIncomes(params, start, end) {
     let sort = params.sortField ? "&sort=" + params.sortField +  ',' + params.sortOrder : '';
     let filterMaster= params.filters && params.filters['master.person.name'] ? "&masterId=" + params.filters['master.person.name'].filterVal : '';
-    return fetch("http://localhost:8080/api/additionalIncomes?page=" + params.page
+    return fetch(getUrl() + "/api/additionalIncomes?page=" + params.page
         + "&size=" + params.size + sort + filterMaster + "&start=" + start + "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
@@ -26,7 +28,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/additionalIncome", options)
+    return fetch(getUrl() + "/api/additionalIncome", options)
         .then(function(res){ return res })
 }
 

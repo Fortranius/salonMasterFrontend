@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getAllHairCategories() {
-    return fetch("http://localhost:8080/api/getAllHairCategories")
+    return fetch(getUrl() + "/api/getAllHairCategories")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
@@ -8,7 +10,7 @@ export function getAllHairCategories() {
 }
 
 export function getAllHairs() {
-    return fetch("http://localhost:8080/api/getAllHairs")
+    return fetch(getUrl() + "/api/getAllHairs")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {

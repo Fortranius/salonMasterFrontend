@@ -1,5 +1,7 @@
+import {getUrl} from "./mainUrl";
+
 export function getAllProductsBalance() {
-    return fetch("http://localhost:8080/api/getAllProductsBalance")
+    return fetch(getUrl() + "/api/getAllProductsBalance")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {

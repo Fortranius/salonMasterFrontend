@@ -1,3 +1,5 @@
+import {getUrl} from "./mainUrl";
+
 export function createIncoming(entity) {
     return sendRequest(entity, "POST");
 }
@@ -10,7 +12,7 @@ function sendRequest(entity, method) {
         body: JSON.stringify(entity)
     };
 
-    return fetch("http://localhost:8080/api/incoming", options)
+    return fetch(getUrl() + "/api/incoming", options)
         .then(handleErrors)
         .then(function(res){ return res })
 }
