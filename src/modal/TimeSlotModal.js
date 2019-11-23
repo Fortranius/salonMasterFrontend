@@ -21,7 +21,7 @@ import HistoryClients from "../components/HistoryClients";
 import {getAllHairCategories, getAllHairs} from "../service/hairService";
 import HistoryChangeSlot from "../components/HistoryChangeSlot";
 import {hourOptions, minuteOptions} from "../data/selectOptions";
-import {typeMasterFormatter} from "../data/formatter";
+import {phoneFormatterToString, typeMasterFormatter} from "../data/formatter";
 import {createTimeSlot, deleteTimeSlot} from "../service/timeSlotService";
 
 const styles = theme => ({
@@ -197,10 +197,7 @@ class TimeSlotModal extends Component {
             selectClientName = this.props.event.timeSlot.client.person.name;
             clientDescription = this.props.event.timeSlot.client.description ? this.props.event.timeSlot.client.description : '';
 
-            selectClientPhone = '+7 (' + this.props.event.timeSlot.client.person.phone.substring(0,3) + ') '
-                + this.props.event.timeSlot.client.person.phone.substring(3, 6) + ' '
-                + this.props.event.timeSlot.client.person.phone.substring(6, 8) + ' '
-                + this.props.event.timeSlot.client.person.phone.substring(8, 10);
+            selectClientPhone = phoneFormatterToString(this.props.event.timeSlot.client.person.phone);
         } else if (this.props.selectMaster) {
             selectMasterName = {
                 value: this.props.selectMaster.master.id,
@@ -278,7 +275,7 @@ class TimeSlotModal extends Component {
                 client = {
                     person: {
                         name: this.state.selectClientName,
-                        phone: this.state.selectClientPhone.substring(2).replace(/[.*+ ?^${}()|[\]\\]/g, ""),
+                        phone: this.state.selectClientPhone.replace(/[.*+ ?^${}()|[\]\\]/g, ""),
                     }
                 }
         }
@@ -467,22 +464,9 @@ class TimeSlotModal extends Component {
     }
 
     onClientsFetchRequestedByName = ({ value }) => {
-        if (value && value.length>3) getClientsByFiO(value).then(clients => {
-            let options = clients.map(client => {
-                return {
-                    title: '+7 (' + client.person.phone.substring(0,3) + ') '
-                        + client.person.phone.substring(3, 6) + ' '
-                        + client.person.phone.substring(6, 8) + ' '
-                        + client.person.phone.substring(8, 10),
-                    clients: [
-                        client
-                    ]
-                }
-            });
-            this.setState({
-                clients: options
-            });
-        });
+        if (value && value.length>3) getClientsByFiO(value).then(
+            clients => this.changeClients(clients)
+        );
     };
 
     onClientsFetchRequestedByPhone = ({ value }) => {
@@ -491,23 +475,24 @@ class TimeSlotModal extends Component {
         else phone = value.substring(4);
         phone = phone.replace(/[.*-+?^${}()|[\]\\\s]/g, '');
         phone = phone.substring(0, 10);
-        if (phone && phone.length>3) getClientsByPhone(phone).then(clients => {
-            let options = clients.map(client => {
-                return {
-                    title: '+7 (' + client.person.phone.substring(0,3) + ') '
-                        + client.person.phone.substring(3, 6) + ' '
-                        + client.person.phone.substring(6, 8) + ' '
-                        + client.person.phone.substring(8, 10),
-                    clients: [
-                        client
-                    ]
-                }
-            });
-            this.setState({
-                clients: options
-            });
-        });
+        if (phone && phone.length>3) getClientsByPhone(phone).then(
+            clients => this.changeClients(clients)
+        );
     };
+
+    changeClients(clients) {
+        let options = clients.map(client => {
+            return {
+                title: phoneFormatterToString(client.person.phone),
+                clients: [
+                    client
+                ]
+            }
+        });
+        this.setState({
+            clients: options
+        });
+    }
 
     onClientsClearRequested = () => {
         this.setState({
@@ -543,10 +528,7 @@ class TimeSlotModal extends Component {
             selectClient: suggestion,
             selectClientName: suggestion.person.name,
             clientDescription: suggestion.description ? suggestion.description : "",
-            selectClientPhone: '+7 (' + suggestion.person.phone.substring(0,3) + ') '
-                + suggestion.person.phone.substring(3, 6) + ' '
-                + suggestion.person.phone.substring(6, 8) + ' '
-                + suggestion.person.phone.substring(8, 10)
+            selectClientPhone: phoneFormatterToString(suggestion.person.phone)
         });
     };
 

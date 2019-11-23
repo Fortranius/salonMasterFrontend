@@ -11,7 +11,7 @@ import Select from 'react-select';
 import {getProcedures} from "../service/procedureService";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
-import {typeMasterFormatter, typeMAsterWorkingDayFormatter} from "../data/formatter";
+import {typeMasterFormatter, typeMasterWorkingDayFormatter} from "../data/formatter";
 import moment from "moment/moment";
 import {masterTypeOptions, masterWorkOptions} from "../data/selectOptions";
 
@@ -47,7 +47,7 @@ function NumberFormatCustomPhone(props) {
         <NumberFormat
             {...other}
             getInputRef={inputRef}
-            format="+7 (###) ###-####" mask="_"
+            format="+# (###) ###-####" mask="_"
             onValueChange={values => {
                 onChange({
                     target: {
@@ -121,7 +121,7 @@ class UpdateModal extends Component {
             if (this.props.update.workingDay) {
                 selectWorkingDay = {
                     value: this.props.update.workingDay,
-                    label: typeMAsterWorkingDayFormatter(this.props.update.workingDay)
+                    label: typeMasterWorkingDayFormatter(this.props.update.workingDay)
                 };
             }
             this.setState({
@@ -176,7 +176,7 @@ class UpdateModal extends Component {
             submit: true
         });
         if (this.state.person.name
-            && this.state.person.phone.length === 10
+            && this.state.person.phone.length === 11
             && ((this.state.procedures && this.state.procedures.length>0)
                 || this.props.entity !== 'мастера')) {
             this.props.accept(this.state);

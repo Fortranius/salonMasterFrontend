@@ -1,22 +1,4 @@
-import React from 'react';
-
-function phoneFormatter(cell, row) {
-    if (row.person.phone) {
-        let phone = '+7 (' + row.person.phone.substring(0,3) + ') '
-            + row.person.phone.substring(3, 6) + '-'
-            + row.person.phone.substring(6, 8) + '-'
-            + row.person.phone.substring(8, 10);
-        return (
-            <span>
-                {phone}
-            </span>
-        );
-    }
-
-    return (
-        <span>$ { cell } NTD</span>
-    );
-}
+import {phoneFormatter} from "../data/formatter";
 
 export default [
     {

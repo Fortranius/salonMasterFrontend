@@ -1,3 +1,6 @@
+import moment from 'moment'
+import React from 'react';
+
 export function typeMasterFormatter(cell) {
     switch (cell) {
         case 'TOP_LEADER':
@@ -34,7 +37,7 @@ export function typeHairFormatter(cell) {
     }
 }
 
-export function typeMAsterWorkingDayFormatter(cell) {
+export function typeMasterWorkingDayFormatter(cell) {
     switch (cell) {
         case '$2X2':
             return "2 на 2";
@@ -45,4 +48,32 @@ export function typeMAsterWorkingDayFormatter(cell) {
         default:
             return "";
     }
+}
+
+export function phoneFormatter(cell, row) {
+    if (row.person.phone) {
+        return (
+            <span>
+                {phoneFormatterToString(row.person.phone)}
+            </span>
+        );
+    }
+
+    return (
+        <span>$ { cell } NTD</span>
+    );
+}
+
+export function phoneFormatterToString(phone) {
+    return '+' + phone.substring(0,1)+' ('
+        + phone.substring(1,4) + ') '
+        + phone.substring(4, 7) + '-'
+        + phone.substring(7, 9) + '-'
+        + phone.substring(9, 11);
+}
+
+export function dateFormatter(cell) {
+    return (
+        <span>{moment.unix(cell).toDate().toLocaleDateString()}</span>
+    );
 }

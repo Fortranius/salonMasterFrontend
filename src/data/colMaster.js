@@ -1,24 +1,5 @@
 import React from 'react';
-import {typeMasterFormatter, typeMAsterWorkingDayFormatter} from "../data/formatter";
-import moment from 'moment'
-
-function phoneFormatter(cell, row) {
-    if (row.person.phone) {
-        let phone = '+7 (' + row.person.phone.substring(0,3) + ') '
-            + row.person.phone.substring(3, 6) + '-'
-            + row.person.phone.substring(6, 8) + '-'
-            + row.person.phone.substring(8, 10);
-        return (
-            <span>
-                {phone}
-            </span>
-        );
-    }
-
-    return (
-        <span>$ { cell } NTD</span>
-    );
-}
+import {dateFormatter, phoneFormatter, typeMasterFormatter, typeMasterWorkingDayFormatter} from "../data/formatter";
 
 function type(cell) {
     return (
@@ -28,13 +9,7 @@ function type(cell) {
 
 function workingDay(cell) {
     return (
-        <span>{typeMAsterWorkingDayFormatter(cell)}</span>
-    );
-}
-
-function dateFormatter(cell) {
-    return (
-        <span>{moment.unix(cell).toDate().toLocaleDateString()}</span>
+        <span>{typeMasterWorkingDayFormatter(cell)}</span>
     );
 }
 
