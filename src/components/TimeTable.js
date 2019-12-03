@@ -66,7 +66,7 @@ class TimeTable extends Component {
         let start = moment(new Date(moment(date).startOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
         let end = moment(new Date(moment(date).endOf('day').toDate())).format('YYYY-MM-DD HH:mm:ss');
         getTimeSlotsByDate(start, end).then(timeSlots => {
-            let evants = timeSlots.map(timeSlot => {
+            let events = timeSlots.map(timeSlot => {
                 return {
                     id: timeSlot.id,
                     resourceId: timeSlot.master.id,
@@ -92,7 +92,7 @@ class TimeTable extends Component {
                     });
                     this.setState({
                         timeSlots: {
-                            evants: evants,
+                            events: events,
                             resources: resources
                         },
                         addMasterOptions: addMasterOptions,
@@ -206,7 +206,7 @@ class TimeTable extends Component {
         this.setState((state) => {
             return {
                 timeSlots: {
-                    evants: state.timeSlots.evants,
+                    events: state.timeSlots.events,
                     resources: resources,
                 },
                 addMasterOptions: addMasterOptions,
@@ -235,7 +235,7 @@ class TimeTable extends Component {
                 { this.state.timeSlots ? <BigCalendar
                     date={this.state.date}
                     localizer={localizer}
-                    events={this.state.timeSlots.evants}
+                    events={this.state.timeSlots.events}
                     resources={this.state.timeSlots.resources}
                     startAccessor="start"
                     endAccessor="end"

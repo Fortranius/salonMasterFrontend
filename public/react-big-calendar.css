@@ -67,12 +67,12 @@ button.rbc-input::-moz-focus-inner {
       -ms-flex: 1 0 0%;
           flex: 1 0 0%;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
   padding: 0 3px;
   text-align: center;
   vertical-align: middle;
   font-weight: bold;
-  font-size: 90%;
+  font-size: 12pt;
   min-height: 0;
   border-bottom: 1px solid #DDD;
 }
@@ -528,7 +528,6 @@ button.rbc-input::-moz-focus-inner {
   overflow: hidden;
 }
 .rbc-time-view-resources .rbc-time-header-content {
-  min-width: auto;
   -webkit-flex: 1 0 0;
       -ms-flex: 1 0 0px;
           flex: 1 0 0;
@@ -610,7 +609,6 @@ button.rbc-input::-moz-focus-inner {
 }
 .rbc-time-view .rbc-row {
   box-sizing: border-box;
-  min-height: 20px;
 }
 .rbc-time-header {
   display: -webkit-flex;
@@ -698,4 +696,12 @@ button.rbc-input::-moz-focus-inner {
   height: 1px;
   background-color: #74ad31;
   pointer-events: none;
+}
+
+.react-calendar button {
+  font-size: 11pt;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  font-size: 8pt;
 }
