@@ -805,7 +805,7 @@ class TimeSlotModal extends Component {
                                     </div>
                                 </div>
                                 <hr/>
-                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? <div className="container">
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') ? <div className="container">
                                     <div className="row">
                                         <div className="col-sm-2 title-margin">
                                             Расход волос:
@@ -854,7 +854,7 @@ class TimeSlotModal extends Component {
                                     </div> : null}
                                     <hr/>
                                 </div> : null}
-                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? <div className="container">
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL' || procedure.hairType === 'HAIR_CORRECTION') ? <div className="container">
                                     <div className="row">
                                         <div className="col-sm-4 title-margin-date">
                                             Снятие волос (количество прядей):

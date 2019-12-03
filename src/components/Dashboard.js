@@ -8,7 +8,7 @@ import {getMastersReport} from "../service/reportService";
 import {getMasters, getMastersByFiO} from "../service/masterService";
 import AsyncPaginate from 'react-select-async-paginate';
 import PageParams from "../model/PageParams";
-import {getIncomesBetweenDate, getStatisticMastersReport} from "../service/dashboardService";
+import {getStatisticMastersReport} from "../service/dashboardService";
 import ReactTable from 'react-table'
 import {reportOptions} from "../data/selectOptions";
 import Select from 'react-select';

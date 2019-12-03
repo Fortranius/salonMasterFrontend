@@ -12,7 +12,7 @@ function login(login, password) {
         body: JSON.stringify({ login, password })
     };
 
-    return fetch(getUrl() + `api/login`, requestOptions)
+    return fetch(getUrl() + `/api/login`, requestOptions)
         .then(handleResponse)
         .then(user => {
             if (user) {

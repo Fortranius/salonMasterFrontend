@@ -223,7 +223,7 @@ class TimeTable extends Component {
             }
         });
 
-        const localizer = BigCalendar.momentLocalizer(moment);
+        const localize = BigCalendar.momentLocalizer(moment);
         return (
             <div className="main-div">
                 <div className="button-group">
@@ -234,7 +234,7 @@ class TimeTable extends Component {
                 <hr/>
                 { this.state.timeSlots ? <BigCalendar
                     date={this.state.date}
-                    localizer={localizer}
+                    localizer={localize}
                     events={this.state.timeSlots.events}
                     resources={this.state.timeSlots.resources}
                     startAccessor="start"

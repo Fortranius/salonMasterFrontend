@@ -1,7 +1,7 @@
 import {getUrl} from "./mainUrl";
 
 export function getTimeSlotsByDate(start, end) {
-    return fetch("getUrl() + /api/timeSlotsByDate?start=" + start +
+    return fetch(getUrl() + "/api/timeSlotsByDate?start=" + start +
         "&end=" + end)
         .then(handleErrors)
         .then(res => res.json())
