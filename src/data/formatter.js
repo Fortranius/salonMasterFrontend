@@ -1,5 +1,6 @@
 import moment from 'moment'
 import React from 'react';
+import NumberFormat from "react-number-format";
 
 export function typeMasterFormatter(cell) {
     switch (cell) {
@@ -77,3 +78,25 @@ export function dateFormatter(cell) {
         <span>{moment.unix(cell).toDate().toLocaleDateString()}</span>
     );
 }
+
+export function NumberFormatCustomPhone(props) {
+    const { inputRef, onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={inputRef}
+            format="+# (###) ###-####" mask="_"
+            onValueChange={values => {
+                onChange({
+                    target: {
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator
+            prefix="$"
+        />
+    );
+}
+

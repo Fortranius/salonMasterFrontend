@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import '../App.css';
 import Modal from 'react-responsive-modal';
 import {withStyles} from '@material-ui/core/styles';
-import NumberFormat from 'react-number-format';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
@@ -10,8 +9,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from 'react-select';
 import {getProcedures} from "../service/procedureService";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import MomentLocaleUtils, {formatDate, parseDate,} from 'react-day-picker/moment';
-import {typeMasterFormatter, typeMasterWorkingDayFormatter} from "../data/formatter";
+import MomentLocaleUtils, {formatDate, parseDate} from 'react-day-picker/moment';
+import {NumberFormatCustomPhone, typeMasterFormatter, typeMasterWorkingDayFormatter} from "../data/formatter";
 import moment from "moment/moment";
 import {masterTypeOptions, masterWorkOptions} from "../data/selectOptions";
 
@@ -40,28 +39,7 @@ const styles = theme => ({
     },
 });
 
-function NumberFormatCustomPhone(props) {
-    const { inputRef, onChange, ...other } = props;
-
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={inputRef}
-            format="+# (###) ###-####" mask="_"
-            onValueChange={values => {
-                onChange({
-                    target: {
-                        value: values.value,
-                    },
-                });
-            }}
-            thousandSeparator
-            prefix="$"
-        />
-    );
-}
-
-class UpdateModal extends Component {
+class MasterModal extends Component {
 
     constructor(props) {
         super(props);
@@ -149,7 +127,7 @@ class UpdateModal extends Component {
                 mail:''
             },
             type: '',
-            procedures:[],
+            procedures: [],
             procedure: {
                 description: '',
                 minPrice: 0,
@@ -177,8 +155,8 @@ class UpdateModal extends Component {
         });
         if (this.state.person.name
             && this.state.person.phone.length === 11
-            && ((this.state.procedures && this.state.procedures.length>0)
-                || this.props.entity !== 'мастера')) {
+            && this.state.procedures
+            && this.state.procedures.length>0) {
             this.props.accept(this.state);
             this.clear();
         }
@@ -203,7 +181,7 @@ class UpdateModal extends Component {
         if (!this.state.submit)
             return false;
         if (field === 'phone')
-            return this.state.person.phone.length !== 10;
+            return this.state.person.phone.length !== 11;
         return (!this.state.person || !this.state.person[field]);
     };
 
@@ -258,8 +236,8 @@ class UpdateModal extends Component {
                        showCloseIcon={false}
                        onClose={this.refused}
                        closeOnEsc={false} center={false}>
-                    { this.props.update ? <h2>Редактирование {this.props.entity}</h2>: null }
-                    { !this.props.update ? <h2>Создание {this.props.entity}</h2>: null }
+                    { this.props.update ? <h2>Редактирование мастера</h2>: null }
+                    { !this.props.update ? <h2>Создание мастера</h2>: null }
                     <div className={classes.container}>
                         <FormControl className={classes.formControl} error={this.validate('name')} aria-describedby="name-error-text">
                             <InputLabel htmlFor="name">Имя</InputLabel>
@@ -275,14 +253,9 @@ class UpdateModal extends Component {
                             <InputLabel htmlFor="mail">Почта</InputLabel>
                             <Input id="mail" value={this.state.person.mail} onChange={this.handleChangePerson('mail')} />
                         </FormControl>
-                        { this.props.entity === 'клиента' ? <FormControl className={classes.formControl} error={this.validate('description')} aria-describedby="description-error-text">
-                            <InputLabel htmlFor="type">Описание</InputLabel>
-                            <Input id="description" value={this.state.description} onChange={this.handleChange('description')} />
-                            { this.validate('description') ? <FormHelperText id="description-error-text">Поле не может быть пустым</FormHelperText>: null }
-                        </FormControl> : null}
                     </div>
-                    { this.props.entity === 'мастера' ?  <hr/> : null}
-                    { this.props.entity === 'мастера' ? <div className="row">
+                    <hr/>
+                    <div className="row">
                         <div className="col-sm-2">
                             Дата начала работы:
                         </div>
@@ -315,9 +288,9 @@ class UpdateModal extends Component {
                                 { this.validateState('workingDay') ? <FormHelperText id="workingDay-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                         </div>
-                    </div> : null}
+                    </div>
 
-                    { this.props.entity === 'мастера' ? <div className="row">
+                    <div className="row">
                         <div className="col-sm-2">
                             Категория мастера:
                         </div>
@@ -348,7 +321,7 @@ class UpdateModal extends Component {
                                 { this.validateProcedures() ? <FormHelperText id="procedures-error-text">Поле не может быть пустым</FormHelperText>: null }
                             </FormControl>
                         </div>
-                    </div> : null}
+                    </div>
                     <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
@@ -364,4 +337,4 @@ class UpdateModal extends Component {
     }
 }
 
-export default withStyles(styles)(UpdateModal);
+export default withStyles(styles)(MasterModal);

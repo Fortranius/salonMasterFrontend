@@ -283,7 +283,7 @@ class TimeSlotModal extends Component {
         if (!client || !this.state.selectMaster || !this.state.date || !this.state.procedures || this.state.procedures.length === 0)
             return false;
 
-        if (this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') && !this.state.selectedHair)
+        if (this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') && !this.state.selectedHair)
             return false;
 
         client.description = this.state.clientDescription;
@@ -421,13 +421,14 @@ class TimeSlotModal extends Component {
         if (name==='hairCountRemoval') hairCountRemoval=event.target.value;
 
         if (this.state.selectedHair) {
-            this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+            this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type
+                && (hairCategory.hairType === 'HAIR_EXTENSION' || hairCategory.hairType === 'HAIR_CORRECTION')))
                 .forEach(hairCategory => {
                     allSum = allSum + hairCategory.price * hairCountExtension + this.state.selectedHair.hair.price * hairWeight;
                     masterWorkSum = masterWorkSum + hairCategory.price * hairCountExtension;
                 });
         }
-        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL' || hairCategory.hairType === 'HAIR_CORRECTION'))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*hairCountRemoval;
                 masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
@@ -470,12 +471,7 @@ class TimeSlotModal extends Component {
     };
 
     onClientsFetchRequestedByPhone = ({ value }) => {
-        let phone = '';
-        if (value.length<2) phone = value;
-        else phone = value.substring(4);
-        phone = phone.replace(/[.*-+?^${}()|[\]\\\s]/g, '');
-        phone = phone.substring(0, 10);
-        if (phone && phone.length>3) getClientsByPhone(phone).then(
+        if (value && value.length>3) getClientsByPhone(value).then(
             clients => this.changeClients(clients)
         );
     };
@@ -509,15 +505,9 @@ class TimeSlotModal extends Component {
     };
 
     onChangeClientPhone = (event, { newValue }) => {
-        let phone = newValue;
-        if (newValue.length === 1) phone = '+7 (' + newValue;
-        else if (newValue.length === 7) phone = newValue + ") ";
-        else if (newValue.length === 12) phone = newValue + " ";
-        else if (newValue.length === 15) phone = newValue + " ";
-        else if (newValue.length > 18) return false;
-        else phone = newValue;
+        if (newValue.length > 11) return false;
         this.setState({
-            selectClientPhone: phone,
+            selectClientPhone: newValue,
             selectClient: undefined,
             clientDescription: ''
         });
@@ -534,12 +524,13 @@ class TimeSlotModal extends Component {
 
     handleChangeHair = (newValue) => {
         let allSum = 0, masterWorkSum = 0;
-        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type
+            && (hairCategory.hairType === 'HAIR_EXTENSION' || hairCategory.hairType === 'HAIR_CORRECTION')))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*this.state.hairCountExtension + newValue.hair.price*this.state.hairWeight;
                 masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountExtension;
             });
-        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL' || hairCategory.hairType === 'HAIR_CORRECTION'))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*this.state.hairCountRemoval;
                 masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountRemoval;
@@ -558,17 +549,18 @@ class TimeSlotModal extends Component {
             return option.procedure;
         });
 
-        let hairCountExtension = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.hairCountExtension : 0;
-        let hairCountRemoval = procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? this.state.hairCountRemoval : 0;
-        let hairWeight = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.hairWeight : 0;
-        let selectedHair = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? this.state.selectedHair : undefined;
+        let hairCountExtension = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') ? this.state.hairCountExtension : 0;
+        let hairCountRemoval = procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL' || procedure.hairType === 'HAIR_CORRECTION') ? this.state.hairCountRemoval : 0;
+        let hairWeight = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') ? this.state.hairWeight : 0;
+        let selectedHair = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') ? this.state.selectedHair : undefined;
 
-        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type && hairCategory.hairType === 'HAIR_EXTENSION'))
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type
+            && (hairCategory.hairType === 'HAIR_EXTENSION' || hairCategory.hairType === 'HAIR_CORRECTION')))
             .forEach(hairCategory => {
                 if (selectedHair) allSum = allSum + hairCategory.price*hairCountExtension + selectedHair.hair.price*hairWeight;
                 masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
             });
-        this.state.hairsCategory.filter(hairCategory => hairCategory.hairType === 'HAIR_REMOVAL')
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL' || hairCategory.hairType === 'HAIR_CORRECTION'))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*hairCountRemoval;
                 masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
@@ -805,7 +797,7 @@ class TimeSlotModal extends Component {
                                     </div>
                                 </div>
                                 <hr/>
-                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION') ? <div className="container">
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') ? <div className="container">
                                     <div className="row">
                                         <div className="col-sm-2 title-margin">
                                             Расход волос:
@@ -854,7 +846,7 @@ class TimeSlotModal extends Component {
                                     </div> : null}
                                     <hr/>
                                 </div> : null}
-                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL') ? <div className="container">
+                                {this.state.procedures.some(procedure => procedure.hairType === 'HAIR_REMOVAL' || procedure.hairType === 'HAIR_CORRECTION') ? <div className="container">
                                     <div className="row">
                                         <div className="col-sm-4 title-margin-date">
                                             Снятие волос (количество прядей):

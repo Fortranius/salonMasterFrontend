@@ -8,7 +8,7 @@ import {bindActionCreators} from "redux";
 import {getClientsAction} from "../actions/clientActions";
 import {createClient, removeClient, updateClient} from "../service/clientService";
 import DeleteModal from "../modal/DeleteModal";
-import UpdateModal from "../modal/UpdateModal";
+import ClientModal from "../modal/ClientModal";
 
 class Clients extends Component {
 
@@ -134,16 +134,14 @@ class Clients extends Component {
                              close={this.onCloseDeleteModal}
                              entity="клиента" />
 
-                {this.state.row ? <UpdateModal accept={this.updateClient}
+                {this.state.row ? <ClientModal accept={this.updateClient}
                                                open={this.state.openUpdate}
                                                update={this.state.row}
-                                               close={this.onCloseUpdateModal}
-                                               entity="клиента" />: null}
+                                               close={this.onCloseUpdateModal} />: null}
 
-                <UpdateModal accept={this.createClient}
+                <ClientModal accept={this.createClient}
                              open={this.state.openCreate}
-                             close={this.onCloseCreateModal}
-                             entity="клиента" />
+                             close={this.onCloseCreateModal} />
             </div>
         );
     }

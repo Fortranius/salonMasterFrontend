@@ -8,7 +8,7 @@ import {bindActionCreators} from 'redux'
 import PageParams from '../model/PageParams'
 import {createMaster, removeMaster, updateMaster} from "../service/masterService";
 import DeleteModal from "../modal/DeleteModal";
-import UpdateModal from "../modal/UpdateModal";
+import MasterModal from "../modal/MasterModal";
 
 class Masters extends Component {
 
@@ -137,16 +137,14 @@ class Masters extends Component {
                              close={this.onCloseDeleteModal}
                              entity="мастера" />
 
-                {this.state.row ? <UpdateModal accept={this.updateMaster}
+                {this.state.row ? <MasterModal accept={this.updateMaster}
                              open={this.state.openUpdate}
                              update={this.state.row}
-                             close={this.onCloseUpdateModal}
-                             entity="мастера" />: null}
+                             close={this.onCloseUpdateModal} />: null}
 
-                <UpdateModal accept={this.createMaster}
+                <MasterModal accept={this.createMaster}
                              open={this.state.openCreate}
-                             close={this.onCloseCreateModal}
-                             entity="мастера" />
+                             close={this.onCloseCreateModal} />
             </div>
         );
     }
