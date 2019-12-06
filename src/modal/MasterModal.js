@@ -13,7 +13,7 @@ import MomentLocaleUtils, {formatDate, parseDate} from 'react-day-picker/moment'
 import {NumberFormatCustomPhone, typeMasterFormatter, typeMasterWorkingDayFormatter} from "../data/formatter";
 import moment from "moment/moment";
 import {masterTypeOptions, masterWorkOptions} from "../data/selectOptions";
-import DayPicker from "react-day-picker";
+import DayPicker, {DateUtils} from 'react-day-picker';
 import 'moment/locale/ru';
 
 const styles = theme => ({
@@ -65,13 +65,14 @@ class MasterModal extends Component {
             optionProcedures: [],
             startDateWork: new Date(),
             workingDay: '',
-            selectWorkingDay: undefined
-
+            selectWorkingDay: undefined,
+            selectedDays: []
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangePerson = this.handleChangePerson.bind(this);
+        this.handleDayClick = this.handleDayClick.bind(this);
 
         getProcedures().then(data => {
             let procedures = data.map(procedure => {
@@ -141,7 +142,8 @@ class MasterModal extends Component {
             selectedProcedures: [],
             startDateWork: new Date(),
             workingDay: '',
-            selectWorkingDay: undefined
+            selectWorkingDay: undefined,
+            selectedDays: []
         });
     }
 
@@ -228,6 +230,19 @@ class MasterModal extends Component {
             startDateWork: newValue
         });
     };
+
+    handleDayClick(day, { selected }) {
+        const { selectedDays } = this.state;
+        if (selected) {
+            const selectedIndex = selectedDays.findIndex(selectedDay =>
+                DateUtils.isSameDay(selectedDay, day)
+            );
+            selectedDays.splice(selectedIndex, 1);
+        } else {
+            selectedDays.push(day);
+        }
+        this.setState({ selectedDays });
+    }
 
     render() {
         const { classes } = this.props;
@@ -325,10 +340,11 @@ class MasterModal extends Component {
                         </div>
                     </div>
                     <hr/>
-                    <h1>
+                    <h3>
                         Рабочие и выходные дни
-                    </h1>
-                    <DayPicker localeUtils={MomentLocaleUtils} locale='ru'/>
+                    </h3>
+                    <DayPicker selectedDays={this.state.selectedDays} numberOfMonths={3} localeUtils={MomentLocaleUtils} locale='ru'
+                               onDayClick={this.handleDayClick}/>
                     <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
