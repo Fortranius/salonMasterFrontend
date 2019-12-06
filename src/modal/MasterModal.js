@@ -13,6 +13,8 @@ import MomentLocaleUtils, {formatDate, parseDate} from 'react-day-picker/moment'
 import {NumberFormatCustomPhone, typeMasterFormatter, typeMasterWorkingDayFormatter} from "../data/formatter";
 import moment from "moment/moment";
 import {masterTypeOptions, masterWorkOptions} from "../data/selectOptions";
+import DayPicker from "react-day-picker";
+import 'moment/locale/ru';
 
 const styles = theme => ({
     container: {
@@ -322,6 +324,11 @@ class MasterModal extends Component {
                             </FormControl>
                         </div>
                     </div>
+                    <hr/>
+                    <h1>
+                        Рабочие и выходные дни
+                    </h1>
+                    <DayPicker localeUtils={MomentLocaleUtils} locale='ru'/>
                     <hr/>
                     <div className="button-group">
                         <button className="btn btn-primary" onClick={this.accept}>
