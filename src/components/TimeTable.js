@@ -199,7 +199,8 @@ class TimeTable extends Component {
         let resources = this.state.timeSlots.resources;
         resources.push({
             id: this.state.addMasterSelect.master.id,
-            title: this.state.addMasterSelect.master.person.name,
+            title: this.state.addMasterSelect.master.person.name + " - "
+                + typeMasterFormatter(this.state.addMasterSelect.master.type),
             master: this.state.addMasterSelect.master
         });
 
