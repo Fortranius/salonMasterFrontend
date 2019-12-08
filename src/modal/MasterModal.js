@@ -56,6 +56,7 @@ class MasterModal extends Component {
                 minPrice: 0,
                 maxPrice: 0
             },
+            workDays: [],
             type: '',
             selectType: undefined,
             procedures: [],
@@ -66,7 +67,9 @@ class MasterModal extends Component {
             startDateWork: new Date(),
             workingDay: '',
             selectWorkingDay: undefined,
-            selectedDays: []
+            startDate: moment().subtract(6, 'months').toDate(),
+            endDate: moment().add(6, 'months').toDate(),
+            currentDate: moment().subtract(1, 'months').toDate()
         };
         this.refused = this.refused.bind(this);
         this.accept = this.accept.bind(this);
@@ -111,6 +114,8 @@ class MasterModal extends Component {
                     name: this.props.update.person.name ? this.props.update.person.name : '',
                     mail: this.props.update.person.mail ? this.props.update.person.mail : '',
                 },
+                workDays: this.props.update.workDays ? this.props.update.workDays
+                    .map(value => moment.unix(value).toDate()) : [],
                 type: this.props.update.type ? this.props.update.type : '',
                 selectType: selectType,
                 procedures: this.props.update.procedures,
@@ -136,14 +141,14 @@ class MasterModal extends Component {
                 minPrice: 0,
                 maxPrice: 0
             },
+            workDays: [],
             selectType: undefined,
             submit: false,
             submitProcedure: false,
             selectedProcedures: [],
             startDateWork: new Date(),
             workingDay: '',
-            selectWorkingDay: undefined,
-            selectedDays: []
+            selectWorkingDay: undefined
         });
     }
 
@@ -232,16 +237,16 @@ class MasterModal extends Component {
     };
 
     handleDayClick(day, { selected }) {
-        const { selectedDays } = this.state;
+        const { workDays } = this.state;
         if (selected) {
-            const selectedIndex = selectedDays.findIndex(selectedDay =>
+            const selectedIndex = workDays.findIndex(selectedDay =>
                 DateUtils.isSameDay(selectedDay, day)
             );
-            selectedDays.splice(selectedIndex, 1);
+            workDays.splice(selectedIndex, 1);
         } else {
-            selectedDays.push(day);
+            workDays.push(day);
         }
-        this.setState({ selectedDays });
+        this.setState({ workDays });
     }
 
     render() {
@@ -343,7 +348,12 @@ class MasterModal extends Component {
                     <h3>
                         Рабочие и выходные дни
                     </h3>
-                    <DayPicker selectedDays={this.state.selectedDays} numberOfMonths={3} localeUtils={MomentLocaleUtils} locale='ru'
+                    <DayPicker selectedDays={this.state.workDays}
+                               numberOfMonths={8}
+                               month={this.state.currentDate}
+                               fromMonth={this.state.startDate}
+                               toMonth={this.state.endDate}
+                               localeUtils={MomentLocaleUtils} locale='ru'
                                onDayClick={this.handleDayClick}/>
                     <hr/>
                     <div className="button-group">

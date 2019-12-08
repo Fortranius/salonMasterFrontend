@@ -72,7 +72,7 @@ button.rbc-input::-moz-focus-inner {
   text-align: center;
   vertical-align: middle;
   font-weight: bold;
-  font-size: 12pt;
+  font-size: 14pt;
   min-height: 0;
   border-bottom: 1px solid #DDD;
 }
@@ -712,4 +712,8 @@ button.rbc-input::-moz-focus-inner {
 
 .rbc-day-bg {
   background-color: #cecec8 !important;
+}
+
+.rbc-header p {
+  font-size: 9pt;
 }

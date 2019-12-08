@@ -82,7 +82,7 @@ class TimeTable extends Component {
                 let resources = mastersWorkDay.map(master => {
                     return {
                         id: master.id,
-                        title: master.person.name + " - " + typeMasterFormatter(master.type),
+                        title: this.breakLine(master.person.name + "<p/>" + typeMasterFormatter(master.type)),
                         master: master
                     };
                 });
@@ -102,6 +102,13 @@ class TimeTable extends Component {
                     });
                 });
             });
+        });
+    }
+
+    breakLine(text) {
+        let regex = /(<p\/>)/g;
+        return text.substring(0, text.indexOf("<p/>") + 4).split(regex).map(function(line, index) {
+            return line.match(regex) ? <p key={"key_" + index}>{text.substring(text.indexOf("<p/>") + 4)}</p> : line;
         });
     }
 

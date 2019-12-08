@@ -1,7 +1,7 @@
 import {getUrl} from "./mainUrl";
 
 export function getMasters(params) {
-    return fetch(getUrl() + "/api/masters?page=" + params.page + "&size=" + params.size)
+    return fetch(getUrl() + "/api/masters?page=" + params.page + "&size=" + params.size + "&sort=id&id.dir=desc")
         .then(handleErrors)
         .then(res => res.json())
         .then(val => {
