@@ -4,6 +4,8 @@ import NumberFormat from "react-number-format";
 
 export function typeMasterFormatter(cell) {
     switch (cell) {
+        case 'GRAND_MASTER':
+            return "Гранд мастер";
         case 'TOP_LEADER':
             return "Руководитель Топ мастер";
         case 'TOP':

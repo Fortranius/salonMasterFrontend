@@ -163,7 +163,6 @@ class MasterModal extends Component {
             submit: true
         });
         if (this.state.person.name
-            && this.state.person.phone.length === 11
             && this.state.procedures
             && this.state.procedures.length>0) {
             this.props.accept(this.state);
@@ -189,8 +188,6 @@ class MasterModal extends Component {
     validate(field) {
         if (!this.state.submit)
             return false;
-        if (field === 'phone')
-            return this.state.person.phone.length !== 11;
         return (!this.state.person || !this.state.person[field]);
     };
 

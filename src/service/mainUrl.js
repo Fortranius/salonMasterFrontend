@@ -1,3 +1,3 @@
 export function getUrl() {
-    return 'http://localhost:8080';
+    return 'http://192.16.1.87:8080';
 }

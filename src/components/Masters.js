@@ -34,7 +34,7 @@ class Masters extends Component {
         this.onOpenCreateModal = this.onOpenCreateModal.bind(this);
         this.onCloseCreateModal = this.onCloseCreateModal.bind(this);
 
-        this.props.masterActions(new PageParams(0, 10));
+        this.props.masterActions(new PageParams(0, 50));
     }
 
     onOpenDeleteModal (row) {

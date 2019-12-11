@@ -422,13 +422,13 @@ class TimeSlotModal extends Component {
 
         if (this.state.selectedHair) {
             this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type
-                && (hairCategory.hairType === 'HAIR_EXTENSION' || hairCategory.hairType === 'HAIR_CORRECTION')))
+                && (hairCategory.hairType === 'HAIR_EXTENSION')))
                 .forEach(hairCategory => {
                     allSum = allSum + hairCategory.price * hairCountExtension + this.state.selectedHair.hair.price * hairWeight;
                     masterWorkSum = masterWorkSum + hairCategory.price * hairCountExtension;
                 });
         }
-        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL' || hairCategory.hairType === 'HAIR_CORRECTION'))
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL'))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*hairCountRemoval;
                 masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;
@@ -525,12 +525,12 @@ class TimeSlotModal extends Component {
     handleChangeHair = (newValue) => {
         let allSum = 0, masterWorkSum = 0;
         this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type
-            && (hairCategory.hairType === 'HAIR_EXTENSION' || hairCategory.hairType === 'HAIR_CORRECTION')))
+            && (hairCategory.hairType === 'HAIR_EXTENSION')))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*this.state.hairCountExtension + newValue.hair.price*this.state.hairWeight;
                 masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountExtension;
             });
-        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL' || hairCategory.hairType === 'HAIR_CORRECTION'))
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL'))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*this.state.hairCountRemoval;
                 masterWorkSum = masterWorkSum + hairCategory.price*this.state.hairCountRemoval;
@@ -555,12 +555,12 @@ class TimeSlotModal extends Component {
         let selectedHair = procedures.some(procedure => procedure.hairType === 'HAIR_EXTENSION' || procedure.hairType === 'HAIR_CORRECTION') ? this.state.selectedHair : undefined;
 
         this.state.hairsCategory.filter(hairCategory => (hairCategory.masterType === this.state.selectMaster.type
-            && (hairCategory.hairType === 'HAIR_EXTENSION' || hairCategory.hairType === 'HAIR_CORRECTION')))
+            && (hairCategory.hairType === 'HAIR_EXTENSION')))
             .forEach(hairCategory => {
                 if (selectedHair) allSum = allSum + hairCategory.price*hairCountExtension + selectedHair.hair.price*hairWeight;
                 masterWorkSum = masterWorkSum + hairCategory.price*hairCountExtension;
             });
-        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL' || hairCategory.hairType === 'HAIR_CORRECTION'))
+        this.state.hairsCategory.filter(hairCategory => (hairCategory.hairType === 'HAIR_REMOVAL'))
             .forEach(hairCategory => {
                 allSum = allSum + hairCategory.price*hairCountRemoval;
                 masterWorkSum = masterWorkSum + hairCategory.price*hairCountRemoval;

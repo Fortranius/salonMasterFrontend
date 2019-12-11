@@ -42,6 +42,7 @@ export function minuteOptions() {
 
 export function masterTypeOptions() {
     return [
+        { value: 'GRAND_MASTER', label: 'Гранд мастер' },
         { value: 'TOP_LEADER', label: 'Руководитель Топ мастер' },
         { value: 'TOP', label: 'Топ мастер' },
         { value: 'MIDDLE_PLUS', label: 'Стандарт плюс мастер' },
